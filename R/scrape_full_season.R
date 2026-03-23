@@ -104,8 +104,8 @@ pbp_lite <- pbp_updated |>
 # Save in all 4 formats
 pbp_updated |> saveRDS(glue("nhl/pbp/full/rds/{filename}.rds"), compress = "xz")
 pbp_lite |> saveRDS(glue("nhl/pbp/lite/rds/{filename}_lite.rds"), compress = "xz")
-pbp_updated |> arrow::write_parquet(glue("nhl/pbp/full/parquet/{filename}.parquet"))
-pbp_lite |> arrow::write_parquet(glue("nhl/pbp/lite/parquet/{filename}_lite.parquet"))
+pbp_updated |> arrow::write_parquet(glue("nhl/pbp/full/parquet/{filename}.parquet"), compression = "gzip")
+pbp_lite |> arrow::write_parquet(glue("nhl/pbp/lite/parquet/{filename}_lite.parquet"), compression = "gzip")
 
 
 cat("=== Done! ===\n")
