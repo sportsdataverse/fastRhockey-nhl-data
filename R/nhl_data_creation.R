@@ -362,6 +362,8 @@ all_games <- purrr::map(years_vec, function(season_year) {
     .save_dataset(season_rosters_unique, "nhl/rosters", "rosters", season_year)
     logging(glue("{nrow(season_rosters_unique)} unique roster entries"))
     cli::cli_alert_info("{nrow(season_rosters_unique)} unique roster entries")
+    .upload_to_release(season_rosters_unique, glue("rosters_{season_year}"),
+                       "nhl_rosters", "NHL rosters")
   }
 
 
