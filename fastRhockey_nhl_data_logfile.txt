@@ -17,3 +17,10 @@
 [2026-04-07 16:44:10] ERROR: Could not fetch schedule for 2021-22 
 [2026-04-07 16:44:12] INFO: Master: 1416 schedule rows, 1232 with PBP 
 [2026-04-07 16:44:12] INFO: === NHL Data Creation complete === 
+[2026-04-07 16:48:56] INFO: === NHL Data Creation started === 
+[2026-04-07 16:48:56] INFO: Processing seasons: 2020 
+[2026-04-07 16:48:56] INFO: === 2020-21 season === 
+[2026-04-07 16:48:56] ERROR: Failed to read RDS from https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_2020.rds: cannot open the connection to 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_2020.rds' 
+[2026-04-07 16:48:56] ERROR: Could not fetch schedule for 2020-21 
+[2026-04-07 16:49:00] INFO: Master: 1416 schedule rows, 1232 with PBP 
+[2026-04-07 16:49:00] INFO: === NHL Data Creation complete === 
