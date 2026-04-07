@@ -48,3 +48,15 @@
 [2026-04-07 20:13:14] INFO: Completed 2021-22: 975777 PBP, 2802 team_box, 56020 player_box 
 [2026-04-07 20:13:16] INFO: Master: 3872 schedule rows, 3585 with PBP 
 [2026-04-07 20:13:16] INFO: === NHL Data Creation complete === 
+[2026-04-07 20:59:41] INFO: === NHL Data Creation started === 
+[2026-04-07 20:59:41] INFO: Processing seasons: 2022 
+[2026-04-07 20:59:41] INFO: === 2022-23 season === 
+[2026-04-07 20:59:42] INFO: 1400 games with final JSON in raw repo 
+[2026-04-07 21:01:45] INFO: 1103989 PBP events compiled 
+[2026-04-07 21:05:52] INFO: Uploading play_by_play_2022_23 to sportsdataverse-data releases 
+[2026-04-07 21:13:40] INFO: 2800 team_box rows 
+[2026-04-07 21:13:44] INFO: 50381 skater + 5599 goalie rows 
+[2026-04-07 21:15:59] INFO: 1192 unique roster entries 
+[2026-04-07 21:16:01] INFO: Completed 2022-23: 1103989 PBP, 2800 team_box, 55980 player_box 
+[2026-04-07 21:16:03] INFO: Master: 5380 schedule rows, 4985 with PBP 
+[2026-04-07 21:16:03] INFO: === NHL Data Creation complete === 
