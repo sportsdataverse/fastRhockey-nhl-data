@@ -24,3 +24,15 @@
 [2026-04-07 16:48:56] ERROR: Could not fetch schedule for 2020-21 
 [2026-04-07 16:49:00] INFO: Master: 1416 schedule rows, 1232 with PBP 
 [2026-04-07 16:49:00] INFO: === NHL Data Creation complete === 
+[2026-04-07 18:58:45] INFO: === NHL Data Creation started === 
+[2026-04-07 18:58:45] INFO: Processing seasons: 2020 
+[2026-04-07 18:58:45] INFO: === 2020-21 season === 
+[2026-04-07 18:58:45] INFO: 952 games with final JSON in raw repo 
+[2026-04-07 19:00:00] INFO: 596372 PBP events compiled 
+[2026-04-07 19:02:26] INFO: Uploading play_by_play_2020_21 to sportsdataverse-data releases 
+[2026-04-07 19:06:50] INFO: 1904 team_box rows 
+[2026-04-07 19:06:54] INFO: 34252 skater + 3808 goalie rows 
+[2026-04-07 19:08:08] INFO: 1107 unique roster entries 
+[2026-04-07 19:08:10] INFO: Completed 2020-21: 596372 PBP, 1904 team_box, 38060 player_box 
+[2026-04-07 19:08:12] INFO: Master: 2368 schedule rows, 2184 with PBP 
+[2026-04-07 19:08:12] INFO: === NHL Data Creation complete === 
