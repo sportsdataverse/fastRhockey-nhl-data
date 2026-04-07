@@ -10,3 +10,10 @@
 [2026-04-07 14:16:13] INFO: Completed 2025-26: 736733 PBP, 2464 team_box, 49279 player_box 
 [2026-04-07 14:16:16] INFO: Master: 1416 schedule rows, 1232 with PBP 
 [2026-04-07 14:16:16] INFO: === NHL Data Creation complete === 
+[2026-04-07 16:44:09] INFO: === NHL Data Creation started === 
+[2026-04-07 16:44:09] INFO: Processing seasons: 2021 
+[2026-04-07 16:44:10] INFO: === 2021-22 season === 
+[2026-04-07 16:44:10] ERROR: Failed to read RDS from https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_2021.rds: cannot open the connection to 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_2021.rds' 
+[2026-04-07 16:44:10] ERROR: Could not fetch schedule for 2021-22 
+[2026-04-07 16:44:12] INFO: Master: 1416 schedule rows, 1232 with PBP 
+[2026-04-07 16:44:12] INFO: === NHL Data Creation complete === 
