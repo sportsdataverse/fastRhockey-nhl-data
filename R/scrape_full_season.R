@@ -66,7 +66,7 @@ progressr::with_progress({
         }
       )
     },
-    .options = furrr::furrr_options(packages = "fastRhockey")
+    .options = furrr::furrr_options(packages = "fastRhockey", seed = TRUE)
   )
 })
 
