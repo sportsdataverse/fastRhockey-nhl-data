@@ -145,7 +145,7 @@ all_pbp <- all_pbp %>%
         empty_net = as.logical(empty_net)
     )
 
-# Feature engineering pipeline (identical to prepare_xg_data.R)
+# Feature engineering pipeline (identical to helper_nhl_prepare_xg_data.R)
 model_df <- all_pbp %>%
     # Remove shootouts
     filter(period_type != "SHOOTOUT") %>%

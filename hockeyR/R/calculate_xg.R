@@ -10,11 +10,11 @@
 #' @examples
 #' \dontrun{
 #' pbp <- load_pbp(2022) %>% dplyr::select(-xg)
-#' pbp_preds <- calculate_xg(pbp)
+#' pbp_preds <- helper_nhl_calculate_xg(pbp)
 #' }
-calculate_xg <- function(pbp) {
+helper_nhl_calculate_xg <- function(pbp) {
   # get model features
-  model_data <- prepare_xg_data(pbp)
+  model_data <- helper_nhl_prepare_xg_data(pbp)
 
   # make 5v5 predictions
   preds_5v5 <- stats::predict(

@@ -11,9 +11,9 @@
 #' @examples
 #' \dontrun{
 #' pbp <- load_pbp(2022) %>% dplyr::select(-xg)
-#' model_data <- prepare_xg_data(pbp)
+#' model_data <- helper_nhl_prepare_xg_data(pbp)
 #' }
-prepare_xg_data <- function(x) {
+helper_nhl_prepare_xg_data <- function(x) {
   model_df <- x %>%
     # filter out shootouts
     dplyr::filter(period_type != "SHOOTOUT") %>%

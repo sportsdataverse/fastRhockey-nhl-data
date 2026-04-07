@@ -1520,7 +1520,7 @@ scrape_game <- function(game_id) {
   # add xg
   # depends on strength state, needs shift data to be there
   pbp_return <- tryCatch(
-    calculate_xg(pbp_full),
+    helper_nhl_calculate_xg(pbp_full),
     warning = function(cond) {
       message(paste0(
         "There was a problem calulating xG for game id ",

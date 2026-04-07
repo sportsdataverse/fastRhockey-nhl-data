@@ -90,7 +90,7 @@ pbp_all <- purrr::map_dfr(rds_files, function(f) {
 cat("Total rows:", nrow(pbp_all), "\n\n")
 
 # --------------------------------------------------------------------------
-# 2. Feature engineering (replicates prepare_xg_data.R logic)
+# 2. Feature engineering (replicates helper_nhl_prepare_xg_data.R logic)
 # --------------------------------------------------------------------------
 cat("Engineering features...\n")
 

@@ -1,20 +1,34 @@
+---
+output: github_document
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.path = "README_files/figure-gfm/",
+  dpi = 150
+)
+suppressPackageStartupMessages(library(janitor))
+```
 
 # fastRhockey Expected Goals Model
 
 This repository contains the expected goals (xG) model built on
-[fastRhockey](https://github.com/sportsdataverse/fastRhockey) NHL
-play-by-play data. The model follows the same general approach as the
-[hockeyR expected goals
-model](https://github.com/danmorse314/hockeyR-models) (Morse 2022) but
-is retrained on a larger dataset spanning 16 NHL seasons (2010-11
-through 2025-26) and uses an expanded set of five era groupings to
+[fastRhockey](https://github.com/sportsdataverse/fastRhockey) NHL play-by-play
+data. The model follows the same general approach as the
+[hockeyR expected goals model](https://github.com/danmorse314/hockeyR-models)
+[@hockeyR-xg] but is retrained on a larger dataset spanning 16 NHL seasons
+(2010-11 through 2025-26) and uses an expanded set of five era groupings to
 capture rule changes over the longer time horizon.
 
-Expected goals models attempt to quantify the probability of any given
-unblocked shot becoming a goal, based on contextual information about
-the shot: where it was taken, how it was taken, and what happened
-immediately prior. The resulting xG values are useful for evaluating
-player and team performance beyond raw goal counts.
+Expected goals models attempt to quantify the probability of any given unblocked
+shot becoming a goal, based on contextual information about the shot: where it was
+taken, how it was taken, and what happened immediately prior. The resulting xG
+values are useful for evaluating player and team performance beyond raw goal
+counts.
 
 ## Data
 
@@ -22,10 +36,10 @@ The play-by-play data used to train this model comes from the
 [fastRhockey-nhl-data](https://github.com/sportsdataverse/fastRhockey-nhl-data)
 repository, originally sourced via the
 [fastRhockey](https://github.com/sportsdataverse/fastRhockey) R package
-(Gilani 2022). The data is stored as `.rds` files in
+[@fastRhockey]. The data is stored as `.rds` files in
 `nhl/pbp/full/rds/`.
 
-``` r
+```{r load-data}
 suppressPackageStartupMessages({
     library(dplyr)
     library(tidyr)
@@ -66,13 +80,7 @@ pbp_list <- map(rds_files, function(f) {
 pbp_all <- bind_rows(pbp_list)
 rm(pbp_list)  # free memory
 gc()  # reclaim ~10 GB from the list
-```
 
-    ##              used    (Mb) gc trigger    (Mb)   max used    (Mb)
-    ## Ncells   12132176   648.0   19946810  1065.3   12403729   662.5
-    ## Vcells 2110892063 16104.9 5647614053 43087.9 4826935529 36826.6
-
-``` r
 # --- Column harmonisation across seasons ---
 # event_team (full name) and event_team_abbr exist in all seasons.
 # home_name / away_name exist everywhere; create home_team / away_team aliases
@@ -97,15 +105,13 @@ cat(sprintf(
 ))
 ```
 
-    ## Loaded 13,553,239 play-by-play rows across 16 seasons (2010-2011 through 2025-2026)
-
 ### Strength States
 
-The NHL play-by-play data records the number of skaters on the ice for
-each team at the time of every event. As with most expected goals
-models, shots taken in different strength states need special handling.
+The NHL play-by-play data records the number of skaters on the ice for each
+team at the time of every event. As with most expected goals models, shots taken
+in different strength states need special handling.
 
-``` r
+```{r strength-states}
 # Define Fenwick events (unblocked shots only)
 fenwick <- c("SHOT", "MISSED_SHOT", "GOAL")
 
@@ -122,82 +128,57 @@ knitr::kable(
 )
 ```
 
-| Strength State |   Count | Pct (%) |
-|:---------------|--------:|--------:|
-| 5v5            | 1275839 |   75.45 |
-| 5v4            |  244117 |   14.44 |
-| 4v5            |   54149 |    3.20 |
-| 4v4            |   32300 |    1.91 |
-| 6v5            |   27390 |    1.62 |
-| 3v3            |   12748 |    0.75 |
-| 0v0            |   11215 |    0.66 |
-| 5v3            |    9766 |    0.58 |
-| 5v6            |    9027 |    0.53 |
-| 4v3            |    5482 |    0.32 |
-| 6v4            |    4138 |    0.24 |
-| 1v0            |    1576 |    0.09 |
-| 3v4            |     818 |    0.05 |
-| 4v6            |     717 |    0.04 |
-| 3v5            |     589 |    0.03 |
+The vast majority of Fenwick events occur at 5-on-5. For this model, a small
+number of events at unusual strength states (e.g. 6v3) and those with missing
+strength state information were removed from the training data. Penalty shots
+and shootout attempts were also excluded — shootouts are not assigned an xG
+value since they don't count as official goals, and penalty shots were assigned
+a constant xG of ~0.32, reflecting the ~32% conversion rate across all penalty
+shot and shootout attempts in the dataset.
 
-The vast majority of Fenwick events occur at 5-on-5. For this model, a
-small number of events at unusual strength states (e.g. 6v3) and those
-with missing strength state information were removed from the training
-data. Penalty shots and shootout attempts were also excluded — shootouts
-are not assigned an xG value since they don’t count as official goals,
-and penalty shots were assigned a constant xG of ~0.32, reflecting the
-~32% conversion rate across all penalty shot and shootout attempts in
-the dataset.
+Events with missing critical features (shot location, shot type) were also
+removed, as were blocked shots. Blocked shots are excluded because the NHL
+records the *location of the block*, not the location of the shooter, making the
+distance and angle calculations unreliable.[^1]
 
-Events with missing critical features (shot location, shot type) were
-also removed, as were blocked shots. Blocked shots are excluded because
-the NHL records the *location of the block*, not the location of the
-shooter, making the distance and angle calculations unreliable.[^1]
+[^1]: Unblocked shots are often referred to as "Fenwick," named after Matt
+    Fenwick, who proposed that blocked shots are worse scoring chances than
+    unblocked shots and don't add value to analysis. Read more
+    [here](https://www.pensionplanpuppets.com/2012/7/25/3184137/intro-to-advanced-hockey-statistics-fenwick).
 
 ## Feature Selection
 
-There are several excellent public xG models with readily available
-details:
+There are several excellent public xG models with readily available details:
 
-- Asmae Toumi and Dawson Sprigings created an [even-strength
-  model](https://hockey-graphs.com/2015/10/01/expected-goals-are-a-better-predictor-of-future-scoring-than-corsi-goals/)
-  with rush chance and rebound identifiers. (Sprigings and Toumi 2015)
+- Asmae Toumi and Dawson Sprigings created an [even-strength model](https://hockey-graphs.com/2015/10/01/expected-goals-are-a-better-predictor-of-future-scoring-than-corsi-goals/) with rush chance and rebound identifiers. [@hockey-graphs-xg]
 
-- Matthew Barlowe’s [public
-  model](https://rstudio-pubs-static.s3.amazonaws.com/311470_f6e88d4842da46e9941cc6547405a051.html)
-  covers all strengths and takes team strength as a variable. (Barlowe
-  2017)
+- Matthew Barlowe's [public model](https://rstudio-pubs-static.s3.amazonaws.com/311470_f6e88d4842da46e9941cc6547405a051.html) covers all strengths and takes team strength as a variable. [@barlowe-xg]
 
-- Peter Tanner’s [MoneyPuck.com model](https://moneypuck.com/about.htm)
-  utilizes information from the events immediately prior to the shot.
-  (Tanner 2016)
+- Peter Tanner's [MoneyPuck.com model](https://moneypuck.com/about.htm) utilizes information from the events immediately prior to the shot. [@moneypuck-xg]
 
-- Josh and Luke Younggren of
-  [evolving-hockey.com](https://evolving-hockey.com/) made [four
-  separate models](https://rpubs.com/evolvingwild/395136/) for different
-  strength states. (Younggren and Younggren 2018)
+- Josh and Luke Younggren of [evolving-hockey.com](https://evolving-hockey.com/) made [four separate models](https://rpubs.com/evolvingwild/395136/) for different strength states. [@evolving-wild-xg]
 
-All models agree that shot distance is the most important feature, with
-shot angle close behind. The `fastRhockey` model uses features similar
-to those listed above: distance and angle, rebound and rush chance
-classifiers, information about the prior event, and a `cross_ice_event`
-flag to indicate the goaltender had to move laterally across the crease.
+All models agree that shot distance is the most important feature, with shot
+angle close behind. The `fastRhockey` model uses features similar to those listed
+above: distance and angle, rebound and rush chance classifiers, information about
+the prior event, and a `cross_ice_event` flag to indicate the goaltender had to
+move laterally across the crease.
 
 ### Two-Model Architecture
 
-Following `hockeyR` (Morse 2022) and in the spirit of the Younggren
-models (Younggren and Younggren 2018), the `fastRhockey` xG model is
-split into two separate models:
+Following `hockeyR` [@hockeyR-xg] and in the spirit of the Younggren models
+[@evolving-wild-xg], the `fastRhockey` xG model is split into two separate
+models:
 
-1.  **5-on-5 model** — exclusively for 5-on-5 play
-2.  **Special teams model** — for all other non-5v5 situations (power
-    play, shorthanded, 4-on-4, 3-on-3, extra attacker, etc.)
+1. **5-on-5 model** — exclusively for 5-on-5 play
+2. **Special teams model** — for all other non-5v5 situations (power play,
+   shorthanded, 4-on-4, 3-on-3, extra attacker, etc.)
 
 The 4-on-4 and 3-on-3 situations are included in the special teams model
-rather than the 5v5 model because the increased open ice more closely
-resembles special teams play than the structured chaos of 5-on-5.
+rather than the 5v5 model because the increased open ice more closely resembles
+special teams play than the structured chaos of 5-on-5.
 
-``` r
+```{r goals-by-strength, fig.width=8, fig.height=5, fig.alt="NHL shooting percentages vary significantly by strength state. 4-on-4 and 3-on-3 strength states more closely resemble special teams shooting percentages."}
 real_strengths <- c(
     "5v5", "4v4", "3v3",
     "5v4", "5v3", "4v3", "6v4", "6v5",
@@ -244,117 +225,99 @@ ggplot(strength_goals, aes(reorder(strength_state, -sh_perc), sh_perc)) +
     )
 ```
 
-<img src="README_files/figure-gfm/goals-by-strength-1.png" alt="NHL shooting percentages vary significantly by strength state. 4-on-4 and 3-on-3 strength states more closely resemble special teams shooting percentages."  />
-
-The special teams model includes two additional features to capture the
-strength state: `total_skaters_on` (total skaters on ice, a proxy for
-available space) and `event_team_advantage` (shooting team’s skater
-count minus opposing team’s skater count). For example, a power play
-shot at 5-on-3 has `total_skaters_on` = 8 and `event_team_advantage` =
-2.
+The special teams model includes two additional features to capture the strength
+state: `total_skaters_on` (total skaters on ice, a proxy for available space)
+and `event_team_advantage` (shooting team's skater count minus opposing team's
+skater count). For example, a power play shot at 5-on-3 has `total_skaters_on`
+= 8 and `event_team_advantage` = 2.
 
 ### 5v5 Features
 
-| Feature | Description |
-|:---|:---|
-| `shot_distance` | Distance from shooter to net (ft) |
-| `shot_angle` | Angle between shooter and net (degrees) |
-| `shot_type` | Wrist, Slap, Snap, Backhand, Tip-In, Deflected, Wrap-Around, Cradle |
-| `rebound` | Binary: previous event was a Fenwick event within 2 seconds |
-| `rush` | Binary: previous event was in NZ/DZ within 4 seconds |
-| `last_event_type` | Type of the previous play-by-play event |
-| `time_since_last` | Seconds elapsed since the previous event |
-| `distance_from_last` | Distance from the previous event location (ft) |
-| `cross_ice_event` | Binary: goalie had to move laterally across crease |
-| `empty_net` | Binary: opposing net was empty |
-| `last_x`, `last_y` | Coordinates of the previous event |
-| `era_*` | Five era dummy variables (see below) |
+| Feature              | Description                                                         |
+| :------------------- | :------------------------------------------------------------------ |
+| `shot_distance`      | Distance from shooter to net (ft)                                   |
+| `shot_angle`         | Angle between shooter and net (degrees)                             |
+| `shot_type`          | Wrist, Slap, Snap, Backhand, Tip-In, Deflected, Wrap-Around, Cradle |
+| `rebound`            | Binary: previous event was a Fenwick event within 2 seconds         |
+| `rush`               | Binary: previous event was in NZ/DZ within 4 seconds                |
+| `last_event_type`    | Type of the previous play-by-play event                             |
+| `time_since_last`    | Seconds elapsed since the previous event                            |
+| `distance_from_last` | Distance from the previous event location (ft)                      |
+| `cross_ice_event`    | Binary: goalie had to move laterally across crease                  |
+| `empty_net`          | Binary: opposing net was empty                                      |
+| `last_x`, `last_y`   | Coordinates of the previous event                                   |
+| `era_*`              | Five era dummy variables (see below)                                |
 
 ### Special Teams Additional Features
 
 | Feature                | Description                                       |
-|:-----------------------|:--------------------------------------------------|
+| :--------------------- | :------------------------------------------------ |
 | `total_skaters_on`     | Total skaters on ice for both teams               |
 | `event_team_advantage` | Shooting team skaters minus opposing team skaters |
 
 ### Era Groupings
 
-Borrowing the era concept from `nflfastR` (Carl and Baldwin 2021) and
-its expected points model, the `fastRhockey` model uses five era
-groupings to account for changes in goal-scoring rates driven by NHL
-rule changes:
+Borrowing the era concept from `nflfastR` [@nflfastR] and its expected points
+model, the `fastRhockey` model uses five era groupings to account for changes
+in goal-scoring rates driven by NHL rule changes:
 
-| Era | Seasons | Rule Change |
-|:---|:---|:---|
-| `era_2011_2013` | 2010-11 through 2012-13 | Pre-equipment reduction baseline |
-| `era_2014_2018` | 2013-14 through 2017-18 | [Goaltender leg pad size reduction](https://www.nhl.com/news/nhl-goalies-to-use-shorter-leg-pads-in-2013-14/c-680812) |
+| Era             | Seasons                 | Rule Change                                                                                                                  |
+| :-------------- | :---------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| `era_2011_2013` | 2010-11 through 2012-13 | Pre-equipment reduction baseline                                                                                             |
+| `era_2014_2018` | 2013-14 through 2017-18 | [Goaltender leg pad size reduction](https://www.nhl.com/news/nhl-goalies-to-use-shorter-leg-pads-in-2013-14/c-680812)        |
 | `era_2019_2021` | 2018-19 through 2020-21 | [Goalie chest & arm protector reduction](https://www.nhl.com/news/nhl-nhlpa-add-chest-arm-pad-rules-for-goalies/c-300172856) |
-| `era_2022_2024` | 2021-22 through 2023-24 | [Cross-checking penalty emphasis](https://twitter.com/PR_NHL/status/1441493080637689859) |
-| `era_2025_on` | 2024-25 and beyond | Latest rules and trends |
+| `era_2022_2024` | 2021-22 through 2023-24 | [Cross-checking penalty emphasis](https://twitter.com/PR_NHL/status/1441493080637689859)                                     |
+| `era_2025_on`   | 2024-25 and beyond      | Latest rules and trends                                                                                                      |
 
-This is an expansion over the original `hockeyR` model’s four eras,
-adding a fifth era to capture the most recent seasons as the dataset has
-grown. Patrick Bacon’s expected goals model (Bacon 2020) also accounts
-for rule changes, though Bacon trains on smaller rolling windows near
-each season rather than using era dummy variables.
+This is an expansion over the original `hockeyR` model's four eras, adding a
+fifth era to capture the most recent seasons as the dataset has grown. Patrick
+Bacon's expected goals model [@topdownhockey-xg] also accounts for rule changes,
+though Bacon trains on smaller rolling windows near each season rather than using
+era dummy variables.
 
 ### Feature Importance
 
-Once the final models were trained, feature importance plots were
-generated. As with every other model mentioned above, shot distance is
-the dominant feature.
+Once the final models were trained, feature importance plots were generated. As
+with every other model mentioned above, shot distance is the dominant feature.
 
-<figure>
-<img src="figures/fastRhockey_xg_5v5_feature_importance.png"
-alt="Shot distance is the most important feature in the fastRhockey 5v5 expected goals model" />
-<figcaption aria-hidden="true">Shot distance is the most important
-feature in the fastRhockey 5v5 expected goals model</figcaption>
-</figure>
+![Shot distance is the most important feature in the fastRhockey 5v5 expected goals model](figures/fastRhockey_xg_5v5_feature_importance.png)
 
-<figure>
-<img src="figures/fastRhockey_xg_st_feature_importance.png"
-alt="Feature importance for the special teams model" />
-<figcaption aria-hidden="true">Feature importance for the special teams
-model</figcaption>
-</figure>
+![Feature importance for the special teams model](figures/fastRhockey_xg_st_feature_importance.png)
 
 ## Model Building and Tuning
 
-For full implementation details, see `R/build_xg_model.R` in this
-repository. The model was built with extreme gradient boosting using the
-`xgboost` R package (Chen et al. 2022). Rachael Tatman provides a great
-overview of how XGBoost models work
-[here](https://www.kaggle.com/code/rtatman/machine-learning-with-xgboost-in-r/notebook).
-(Tatman 2018)
+For full implementation details, see `R/build_xg_model.R` in this repository.
+The model was built with extreme gradient boosting using the `xgboost` R
+package [@xgboost]. Rachael Tatman provides a great overview of how XGBoost
+models work [here](https://www.kaggle.com/code/rtatman/machine-learning-with-xgboost-in-r/notebook).
+[@xgboost-tutorial]
 
-The 16 seasons of data were randomly split into training and testing
-sets at the game level — all events from any given game are in the same
-set to prevent data leakage from sequential event features. A modified
-random grid search was used to tune hyperparameters with 5-fold cross
-validation.
+The 16 seasons of data were randomly split into training and testing sets at
+the game level — all events from any given game are in the same set to prevent
+data leakage from sequential event features. A modified random grid search
+was used to tune hyperparameters with 5-fold cross validation.
 
 The final model performance:
 
 | Model | CV Log-loss | CV AUC |
-|:-----:|:-----------:|:------:|
+| :---: | :---------: | :----: |
 |  5v5  |   0.2053    | 0.8322 |
 |  ST   |   0.2567    | 0.8213 |
 
-Both log-loss and AUC are between 0 and 1. A *lower* log-loss is better;
-a *higher* AUC is better. Gaurav Dembla provides great resources on
-interpreting
+Both log-loss and AUC are between 0 and 1. A *lower* log-loss is better; a
+*higher* AUC is better. Gaurav Dembla provides great resources on interpreting
 [log-loss](https://towardsdatascience.com/intuition-behind-log-loss-score-4e0c9979680a)
-(Dembla 2020a) and
+[@logloss-intro] and
 [AUC](https://towardsdatascience.com/intuition-behind-roc-auc-score-1456439d1f30)
-(Dembla 2020b).
+[@auc-intro].
 
 ## Results
 
-With the models finalized, they can be applied to every season in the
-dataset. To validate the model, we can look at how well expected goals
-track actual goals at the player and team levels.
+With the models finalized, they can be applied to every season in the dataset.
+To validate the model, we can look at how well expected goals track actual goals
+at the player and team levels.
 
-``` r
+```{r apply-xg}
 # Load saved models and apply xG to the full dataset
 model_meta <- readRDS("models/xg_model_meta.rds")
 
@@ -531,14 +494,12 @@ cat(sprintf(
 ))
 ```
 
-    ## Applied xG to 1,274,786 Fenwick events (967,500 5v5 + 307,286 ST)
-
 ### Player-Level Validation
 
-The relationship between player-level expected goals and actual goals
-scored provides a strong validation of the model.
+The relationship between player-level expected goals and actual goals scored
+provides a strong validation of the model.
 
-``` r
+```{r player-xg-plot, fig.width=7, fig.height=6, fig.alt="Player-level goal scoring is highly correlated with player-level expected goals"}
 player_goals <- pbp %>%
     filter(season_type %in% c("R", "REG") & period < 5) %>%
     filter(event_type %in% fenwick) %>%
@@ -575,14 +536,12 @@ ggplot(player_goals, aes(xg, goals)) +
     )
 ```
 
-<img src="README_files/figure-gfm/player-xg-plot-1.png" alt="Player-level goal scoring is highly correlated with player-level expected goals"  />
-
 ### Team-Level Validation
 
-Performing the same analysis at the team level yields a strong
-correlation as well.
+Performing the same analysis at the team level yields a strong correlation as
+well.
 
-``` r
+```{r team-xg-plot, fig.width=7, fig.height=6, fig.alt="Team-level goal scoring is highly correlated with team-level expected goals"}
 team_goals <- pbp %>%
     filter(season_type %in% c("R", "REG") & period < 5) %>%
     filter(event_type %in% fenwick) %>%
@@ -616,16 +575,13 @@ ggplot(team_goals, aes(xg, goals)) +
     )
 ```
 
-<img src="README_files/figure-gfm/team-xg-plot-1.png" alt="Team-level goal scoring is highly correlated with team-level expected goals"  />
-
 ### Calibration
 
-Borrowing from `nflfastR` (Carl and Baldwin 2021) (and `nflscrapR`
-(Yurko, Ventura, and Horowitz 2018)), a calibration plot shows how well
-the model’s predicted probabilities match observed goal rates across
-different probability bins.
+Borrowing from `nflfastR` [@nflfastR] (and `nflscrapR` [@Yurko2018]), a
+calibration plot shows how well the model's predicted probabilities match
+observed goal rates across different probability bins.
 
-``` r
+```{r xg-calibration-plot, fig.width=7, fig.height=6, fig.alt="The expected goals model calibrates well for low-danger shots but tends to slightly undervalue high-danger scoring chances"}
 xg_bin_plot <- pbp %>%
     filter(!is.na(xg) & event_type %in% fenwick) %>%
     filter(season_type %in% c("R", "REG") & period < 5) %>%
@@ -662,15 +618,13 @@ ggplot(xg_bin_plot, aes(xg_bin, obs_goal_prob)) +
     )
 ```
 
-<img src="README_files/figure-gfm/xg-calibration-plot-1.png" alt="The expected goals model calibrates well for low-danger shots but tends to slightly undervalue high-danger scoring chances"  />
-
 ### Season-Level xG per Goal
 
-Checking the total expected goal count against observed goals by season
-shows how well the model tracks actual scoring rates. A ratio near 1.0
-indicates the model is well-calibrated overall.
+Checking the total expected goal count against observed goals by season shows
+how well the model tracks actual scoring rates. A ratio near 1.0 indicates the
+model is well-calibrated overall.
 
-``` r
+```{r xg-per-goal}
 xg_per_goal <- pbp %>%
     filter(season_type %in% c("R", "REG") & period < 5) %>%
     group_by(season) %>%
@@ -691,28 +645,7 @@ knitr::kable(
     col.names = c("Season", "Goals", "xG", "xG per Goal"),
     align = "lrrr"
 )
-```
 
-| Season    | Goals |     xG | xG per Goal |
-|:----------|------:|-------:|------------:|
-| 2010-2011 |  6498 | 6703.3 |       1.032 |
-| 2011-2012 |  6473 | 6612.9 |       1.022 |
-| 2012-2013 |  3765 | 3804.7 |       1.011 |
-| 2013-2014 |  6494 | 6689.7 |       1.030 |
-| 2014-2015 |  6474 | 6767.5 |       1.045 |
-| 2015-2016 |  6484 | 6796.7 |       1.048 |
-| 2016-2017 |  6630 | 6855.7 |       1.034 |
-| 2017-2018 |  7374 | 7429.1 |       1.007 |
-| 2018-2019 |  7500 | 7544.0 |       1.006 |
-| 2019-2020 |  6424 | 6476.9 |       1.008 |
-| 2020-2021 |  4948 | 4970.8 |       1.005 |
-| 2021-2022 |  8053 | 7870.8 |       0.977 |
-| 2022-2023 |  8001 | 7831.1 |       0.979 |
-| 2023-2024 |  4574 | 5891.6 |       1.288 |
-| 2024-2025 |  7421 | 8439.0 |       1.137 |
-| 2025-2026 |  3779 | 4487.4 |       1.187 |
-
-``` r
 overall_ratio <- round(sum(xg_per_goal$xg) / sum(xg_per_goal$goals), 3)
 cat(sprintf(
     "\nOverall: %.3f expected goals per observed goal across all seasons\n",
@@ -720,19 +653,15 @@ cat(sprintf(
 ))
 ```
 
-    ## 
-    ## Overall: 1.042 expected goals per observed goal across all seasons
-
 ## Model Details
 
 ### Penalty Shots
 
-Penalty shots and shootout attempts are handled separately from the two
-xgboost models. All penalty shot and shootout attempts across the
-dataset were assigned a constant xG value reflecting the observed
-conversion rate:
+Penalty shots and shootout attempts are handled separately from the two xgboost
+models. All penalty shot and shootout attempts across the dataset were assigned
+a constant xG value reflecting the observed conversion rate:
 
-``` r
+```{r penalty-shots}
 ps_data <- pbp_all %>%
     filter(
         event_type %in% fenwick &
@@ -750,17 +679,14 @@ cat(sprintf(
 ))
 ```
 
-    ## Penalty shot / shootout conversion: 3614 goals on 11,286 attempts = 32.02%
-
 ### Reproducibility
 
-The complete training code is available in `R/build_xg_model.R`. The
-trained models are saved in `models/` as:
+The complete training code is available in `R/build_xg_model.R`. The trained
+models are saved in `models/` as:
 
 - `xg_model_5v5.json` — XGBoost model for 5-on-5 play
 - `xg_model_st.json` — XGBoost model for special teams
-- `xg_model_meta.rds` — Metadata (penalty shot constant, feature lists,
-  training date)
+- `xg_model_meta.rds` — Metadata (penalty shot constant, feature lists, training date)
 
 Cross-validation results are saved in `data/`:
 
@@ -768,111 +694,3 @@ Cross-validation results are saved in `data/`:
 - `cv_results_st_final.rds` — ST CV evaluation log
 
 ## References
-
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
-
-<div id="ref-topdownhockey-xg" class="csl-entry">
-
-Bacon, Patrick. 2020. “A New Expected Goal Model That Is Better Than
-Corsi at Predicting Future Goals,” December.
-<https://topdownhockey.medium.com/a-new-expected-goal-model-that-is-better-than-corsi-at-predicting-future-goals-ecfa44dc84e9>.
-
-</div>
-
-<div id="ref-barlowe-xg" class="csl-entry">
-
-Barlowe, Matthew. 2017. “NHL Expected Goals Model,” September.
-<https://rstudio-pubs-static.s3.amazonaws.com/311470_f6e88d4842da46e9941cc6547405a051.html>.
-
-</div>
-
-<div id="ref-nflfastR" class="csl-entry">
-
-Carl, Sebastian, and Ben Baldwin. 2021. “nflfastR: Functions to
-Efficiently Access NFL Play by Play Data.”
-
-</div>
-
-<div id="ref-xgboost" class="csl-entry">
-
-Chen, Tianqi, Tong He, Michael Benesty, Vadim Khotilovich, Yuan Tang,
-Hyunsu Cho, Kailong Chen, et al. 2022. “Xgboost: Extreme Gradient
-Boosting.” <https://CRAN.R-project.org/package=xgboost>.
-
-</div>
-
-<div id="ref-logloss-intro" class="csl-entry">
-
-Dembla, Gaurav. 2020a. “Intuition Behind Log-Loss Score,” November.
-<https://towardsdatascience.com/intuition-behind-log-loss-score-4e0c9979680a>.
-
-</div>
-
-<div id="ref-auc-intro" class="csl-entry">
-
-———. 2020b. “Intuition Behind ROC-AUC Score,” December.
-<https://towardsdatascience.com/intuition-behind-roc-auc-score-1456439d1f30>.
-
-</div>
-
-<div id="ref-fastRhockey" class="csl-entry">
-
-Gilani, Saiem. 2022. “fastRhockey: Functions to Access Premier Hockey
-Federation and National Hockey League Play-by-Play Data.”
-<https://github.com/sportsdataverse/fastRhockey>.
-
-</div>
-
-<div id="ref-hockeyR-xg" class="csl-entry">
-
-Morse, Dan. 2022. “hockeyR Expected Goals Model.”
-<https://github.com/danmorse314/hockeyR-models>.
-
-</div>
-
-<div id="ref-hockey-graphs-xg" class="csl-entry">
-
-Sprigings, Dawson, and Asmae Toumi. 2015. “Expected Goals Are a Better
-Predictor of Future Scoring Than Corsi, Goals,” October.
-<https://hockey-graphs.com/2015/10/01/expected-goals-are-a-better-predictor-of-future-scoring-than-corsi-goals/>.
-
-</div>
-
-<div id="ref-moneypuck-xg" class="csl-entry">
-
-Tanner, Peter. 2016. “Shot Prediction Expected Goals Model.”
-<https://moneypuck.com/about.htm>.
-
-</div>
-
-<div id="ref-xgboost-tutorial" class="csl-entry">
-
-Tatman, Rachael. 2018. “Machine Learning with XGBoost (in r),” July.
-<https://www.kaggle.com/code/rtatman/machine-learning-with-xgboost-in-r/notebook>.
-
-</div>
-
-<div id="ref-evolving-wild-xg" class="csl-entry">
-
-Younggren, Josh, and Luke Younggren. 2018. “A New Expected Goals Model
-for Predicting Goals in the NHL,” June.
-<https://evolving-hockey.com/blog/a-new-expected-goals-model-for-predicting-goals-in-the-nhl/>.
-
-</div>
-
-<div id="ref-Yurko2018" class="csl-entry">
-
-Yurko, Ronald, Samuel Ventura, and Maksim Horowitz. 2018. “nflWAR: A
-Reproducible Method for Offensive Player Evaluation in Football.”
-<https://doi.org/10.48550/ARXIV.1802.00998>.
-
-</div>
-
-</div>
-
-[^1]: Unblocked shots are often referred to as “Fenwick,” named after
-    Matt Fenwick, who proposed that blocked shots are worse scoring
-    chances than unblocked shots and don’t add value to analysis. Read
-    more
-    [here](https://www.pensionplanpuppets.com/2012/7/25/3184137/intro-to-advanced-hockey-statistics-fenwick).

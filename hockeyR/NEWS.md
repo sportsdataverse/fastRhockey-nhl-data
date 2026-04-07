@@ -43,7 +43,7 @@
 * The `scrape_game` function has been adjusted to automatically add expected goals to the output
 
 ## New function:
-* `calculate_xg` adds expected goals column to pbp data (used inside `scrape_game`, not necessary to use this to get expected goal values)
+* `helper_nhl_calculate_xg` adds expected goals column to pbp data (used inside `scrape_game`, not necessary to use this to get expected goal values)
 
 ## Fixes:
 * Changed the `player_id` column in `get_draft_class` to `prospect_id` - proper NHL `player_id` column only returns with `player_details` set to `TRUE`
