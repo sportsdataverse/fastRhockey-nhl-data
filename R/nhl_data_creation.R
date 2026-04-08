@@ -24,13 +24,7 @@ suppressPackageStartupMessages(library(arrow))
 suppressPackageStartupMessages(library(optparse))
 suppressPackageStartupMessages(library(cli))
 
-# ── Logging ──────────────────────────────────────────────────────────────
-LOG_FILE <- "fastRhockey_nhl_data_logfile.txt"
-logging <- function(msg, level = "INFO") {
-  entry <- paste0(format(Sys.time(), "[%Y-%m-%d %H:%M:%S] "), level, ": ", msg)
-  cat(entry, "\n", file = LOG_FILE, append = TRUE)
-}
-logging("=== NHL Data Creation started ===")
+cli::cli_alert_info("=== NHL Data Creation started ===")
 
 option_list <- list(
   optparse::make_option(
@@ -55,7 +49,7 @@ options(scipen = 999)
 
 if (is.na(opt$end_year)) opt$end_year <- opt$start_year
 years_vec <- opt$start_year:opt$end_year
-logging(glue("Processing seasons: {paste(years_vec, collapse=', ')}"))
+cli::cli_alert_info("Processing seasons: {paste(years_vec, collapse=', ')}")
 
 RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main"
 
@@ -72,7 +66,7 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
       readRDS(con)
     },
     error = function(e) {
-      logging(glue("Failed to read RDS from {url}: {conditionMessage(e)}"), "ERROR")
+      cli::cli_alert_danger("Failed to read RDS from {url}: {conditionMessage(e)}")
       NULL
     }
   )
@@ -116,7 +110,7 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
                           unset = system("gh auth token", intern = TRUE))
     ),
     error = function(e) {
-      logging(glue("Failed to upload {file_name} to {release_tag}: {conditionMessage(e)}"), "WARN")
+      cli::cli_alert_warning("Failed to upload {file_name} to {release_tag}: {conditionMessage(e)}")
     }
   )
 }
@@ -134,7 +128,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
     substr(as.character(season_year), 3, 4)
   )
   cli::cli_h1("Processing {season_label} season")
-  logging(glue("=== {season_label} season ==="))
 
 
   # ──────────────────────────────────────────────────────────────────────
@@ -150,7 +143,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
 
   if (is.null(sched)) {
     cli::cli_alert_danger("Could not fetch schedule for {season_label}. Skipping.")
-    logging(glue("Could not fetch schedule for {season_label}"), "ERROR")
     return(NULL)
   }
 
@@ -166,12 +158,10 @@ all_games <- purrr::map(years_vec, function(season_year) {
   season_game_list <- season_json_games$game_id
   season_game_urls <- season_json_games$game_json_url
 
-  logging(glue("{length(season_game_list)} games with final JSON in raw repo"))
   cli::cli_alert_info("{length(season_game_list)} games with final JSON in raw repo")
 
   if (length(season_game_list) == 0) {
     cli::cli_alert_warning("No games with JSON. Skipping.")
-    logging("No games with JSON, skipping season", "WARN")
     return(NULL)
   }
 
@@ -209,7 +199,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
   )
 
   season_pbp <- dplyr::distinct(season_pbp)
-  logging(glue("{nrow(season_pbp)} PBP events compiled"))
   cli::cli_alert_info("{nrow(season_pbp)} PBP events")
 
   if (nrow(season_pbp) > 0) {
@@ -229,7 +218,7 @@ all_games <- purrr::map(years_vec, function(season_year) {
     pbp_lite |> arrow::write_parquet(glue("nhl/pbp/lite/parquet/{pbp_name}_lite.parquet"), compression = "gzip")
 
     # Upload to sportsdataverse-data releases
-    logging(glue("Uploading {pbp_name} to sportsdataverse-data releases"))
+    cli::cli_alert_info("Uploading {pbp_name} to sportsdataverse-data releases")
     .upload_to_release(season_pbp, pbp_name, "nhl_pbp_full", "NHL play-by-play data (full)")
     .upload_to_release(pbp_lite, glue("{pbp_name}_lite"), "nhl_pbp_lite", "NHL play-by-play data (lite)")
   }
@@ -311,7 +300,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
 
   if (nrow(season_team_box) > 0) {
     .save_dataset(season_team_box, "nhl/team_box", "team_box", season_year)
-    logging(glue("{nrow(season_team_box)} team_box rows"))
     cli::cli_alert_info("{nrow(season_team_box)} team_box rows")
     .upload_to_release(
       season_team_box, glue("team_box_{season_year}"),
@@ -321,7 +309,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
 
   if (nrow(season_player_box) > 0) {
     .save_dataset(season_player_box, "nhl/player_box", "player_box", season_year)
-    logging(glue("{nrow(season_skater_box)} skater + {nrow(season_goalie_box)} goalie rows"))
     cli::cli_alert_info("{nrow(season_skater_box)} skater + {nrow(season_goalie_box)} goalie rows")
     .upload_to_release(
       season_player_box, glue("player_box_{season_year}"),
@@ -367,7 +354,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
 
   if (nrow(season_rosters_unique) > 0) {
     .save_dataset(season_rosters_unique, "nhl/rosters", "rosters", season_year)
-    logging(glue("{nrow(season_rosters_unique)} unique roster entries"))
     cli::cli_alert_info("{nrow(season_rosters_unique)} unique roster entries")
     .upload_to_release(season_rosters_unique, glue("rosters_{season_year}"),
                        "nhl_rosters", "NHL rosters")
@@ -409,7 +395,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
   )
 
   cli::cli_alert_success("Done with {season_label}")
-  logging(glue("Completed {season_label}: {nrow(season_pbp)} PBP, {nrow(season_team_box)} team_box, {nrow(season_player_box)} player_box"))
 
   rm(
     season_pbp, pbp_lite, season_team_box, season_skater_box,
@@ -453,8 +438,7 @@ arrow::write_parquet(games_in_repo, "nhl/nhl_games_in_data_repo.parquet", compre
   "nhl_schedules", "NHL games available in fastRhockey data repo"
 )
 
-logging(glue("Master: {nrow(sched_all)} schedule rows, {nrow(games_in_repo)} with PBP"))
 cli::cli_alert_success("{nrow(sched_all)} total schedule rows, {nrow(games_in_repo)} with PBP")
 
-logging("=== NHL Data Creation complete ===")
+cli::cli_alert_info("=== NHL Data Creation complete ===")
 cli::cli_h1("All done!")
