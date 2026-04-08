@@ -108,3 +108,15 @@
 [2026-04-08 01:39:23] INFO: Completed 2009-10: 400512 PBP, 2636 team_box, 52720 player_box 
 [2026-04-08 01:39:25] INFO: Master: 9823 schedule rows, 9100 with PBP 
 [2026-04-08 01:39:25] INFO: === NHL Data Creation complete === 
+[2026-04-08 02:26:51] INFO: === NHL Data Creation started === 
+[2026-04-08 02:26:51] INFO: Processing seasons: 2010 
+[2026-04-08 02:26:51] INFO: === 2010-11 season === 
+[2026-04-08 02:26:51] INFO: 1318 games with final JSON in raw repo 
+[2026-04-08 02:28:31] INFO: 837139 PBP events compiled 
+[2026-04-08 02:31:33] INFO: Uploading play_by_play_2010_11 to sportsdataverse-data releases 
+[2026-04-08 02:38:05] INFO: 2636 team_box rows 
+[2026-04-08 02:38:09] INFO: 47436 skater + 5272 goalie rows 
+[2026-04-08 02:40:01] INFO: 1096 unique roster entries 
+[2026-04-08 02:40:03] INFO: Completed 2010-11: 837139 PBP, 2636 team_box, 52708 player_box 
+[2026-04-08 02:40:06] INFO: Master: 11246 schedule rows, 10418 with PBP 
+[2026-04-08 02:40:06] INFO: === NHL Data Creation complete === 
