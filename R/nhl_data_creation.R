@@ -1,7 +1,13 @@
 ## Compile NHL season datasets from fastRhockey-nhl-raw repo
+##
+## NOTE ON SEASON CONVENTION:
+##   -s / -e refer to the *end year* of the season (e.g., 2026 for 2025-26).
+##   All compiled dataset files are named using the end year convention:
+##     play_by_play_{end_year}.rds, nhl_schedule_{end_year}.rds, etc.
+##
 ## Usage:
-##   Rscript R/nhl_data_creation.R -s 2024           (single season)
-##   Rscript R/nhl_data_creation.R -s 2023 -e 2024   (range of seasons)
+##   Rscript R/nhl_data_creation.R -s 2026           (single season: 2025-26)
+##   Rscript R/nhl_data_creation.R -s 2024 -e 2026   (range: 2023-24 through 2025-26)
 ##
 ## Reads from: sportsdataverse/fastRhockey-nhl-raw (schedules + final game JSON)
 ## Produces:   PBP, team_box, player_box, rosters, schedules, master files
@@ -30,16 +36,16 @@ option_list <- list(
   optparse::make_option(
     c("-s", "--start_year"),
     action = "store",
-    default = fastRhockey:::most_recent_nhl_season(),
+    default = fastRhockey::most_recent_nhl_season(),
     type = "integer",
-    help = "Start year of the seasons to process [default: current season]"
+    help = "Start season's end year to process, e.g. 2026 for 2025-26 [default: most recent]"
   ),
   optparse::make_option(
     c("-e", "--end_year"),
     action = "store",
     default = NA_integer_,
     type = "integer",
-    help = "End year of the seasons to process [default: same as start_year]"
+    help = "End season's end year to process [default: same as start_year]"
   )
 )
 
@@ -121,9 +127,11 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
 # ═══════════════════════════════════════════════════════════════════════
 
 all_games <- purrr::map(years_vec, function(season_year) {
+  # season_year is the END year (e.g., 2026 for 2025-26)
+  season_start <- season_year - 1
   season_label <- paste0(
-    season_year, "-",
-    substr(as.character(season_year + 1), 3, 4)
+    season_start, "-",
+    substr(as.character(season_year), 3, 4)
   )
   cli::cli_h1("Processing {season_label} season")
   logging(glue("=== {season_label} season ==="))
@@ -205,9 +213,8 @@ all_games <- purrr::map(years_vec, function(season_year) {
   cli::cli_alert_info("{nrow(season_pbp)} PBP events")
 
   if (nrow(season_pbp) > 0) {
-    season_first <- as.character(season_year)
-    season_last <- substr(as.character(season_year + 1), 3, 4)
-    pbp_name <- glue("play_by_play_{season_first}_{season_last}")
+    # Files are named by the season's END year, e.g. play_by_play_2026 for 2025-26
+    pbp_name <- glue("play_by_play_{season_year}")
     pbp_lite <- season_pbp |> dplyr::filter(event_type != "CHANGE")
 
     for (sub in c(
@@ -395,6 +402,12 @@ all_games <- purrr::map(years_vec, function(season_year) {
     compression = "gzip"
   )
 
+  # Upload the single-season schedule (with data availability flags) to release
+  .upload_to_release(
+    final_sched, glue("nhl_schedule_{season_year}"),
+    "nhl_schedules", "NHL schedule"
+  )
+
   cli::cli_alert_success("Done with {season_label}")
   logging(glue("Completed {season_label}: {nrow(season_pbp)} PBP, {nrow(season_team_box)} team_box, {nrow(season_player_box)} player_box"))
 
@@ -433,8 +446,12 @@ if (!dir.exists("nhl")) dir.create("nhl")
 saveRDS(games_in_repo, "nhl/nhl_games_in_data_repo.rds", compress = "xz")
 arrow::write_parquet(games_in_repo, "nhl/nhl_games_in_data_repo.parquet", compression = "gzip")
 
-# Upload schedules to release
+# Upload schedules and games index to release
 .upload_to_release(sched_all, "nhl_schedule_master", "nhl_schedules", "NHL schedules")
+.upload_to_release(
+  games_in_repo, "nhl_games_in_data_repo",
+  "nhl_schedules", "NHL games available in fastRhockey data repo"
+)
 
 logging(glue("Master: {nrow(sched_all)} schedule rows, {nrow(games_in_repo)} with PBP"))
 cli::cli_alert_success("{nrow(sched_all)} total schedule rows, {nrow(games_in_repo)} with PBP")

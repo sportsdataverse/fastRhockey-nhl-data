@@ -1,3 +1,8 @@
+## Push existing local NHL data files to sportsdataverse-data releases.
+##
+## NOTE: All files use the *end year* convention (e.g. `play_by_play_2026.rds`
+## for the 2025-26 season) which matches `most_recent_nhl_season()`.
+
 lib_path <- Sys.getenv("R_LIBS")
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman", lib = Sys.getenv("R_LIBS"), repos = "http://cran.us.r-project.org")
@@ -13,18 +18,13 @@ suppressPackageStartupMessages(suppressMessages(library(glue, lib.loc = lib_path
 suppressPackageStartupMessages(suppressMessages(library(optparse, lib.loc = lib_path)))
 
 
-
-sched_list <- list.files(path = glue::glue("nhl/schedules/rds/"))
-sched_g <- purrr::map(sched_list, function(x) {
-  sched <- readRDS(paste0("nhl/schedules/rds/", x)) %>%
-    dplyr::mutate(
-      id = as.integer(.data$id),
-      game_id = as.integer(.data$game_id),
-      status_display_clock = as.character(.data$status_display_clock)
+# --- Schedules (per-season) ---
+sched_list <- list.files(path = "nhl/schedules/rds/")
+purrr::walk(sched_list, function(x) {
+  sched <- readRDS(paste0("nhl/schedules/rds/", x)) |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL Schedule from fastRhockey data repository", Sys.time()
     )
-
-  sched <- sched %>%
-    fastRhockey:::make_fastRhockey_data("NHL Schedule from fastRhockey data repository", Sys.time())
   y <- stringr::str_extract(x, "\\d+")
   sportsdataversedata::sportsdataverse_save(
     data_frame = sched,
@@ -35,53 +35,87 @@ sched_g <- purrr::map(sched_list, function(x) {
     .token = Sys.getenv("GITHUB_PAT")
   )
 })
-rm(sched_g)
 
-pbp_list <- list.files(path = glue::glue("nhl/pbp/full/rds/"))
-pbp_g <- purrr::map(pbp_list, function(x) {
-  pbp <- readRDS(paste0("nhl/pbp/full/rds/", x))
+# --- Master schedule + games-in-repo index ---
+if (file.exists("nhl/nhl_schedule_master.rds")) {
+  master_sched <- readRDS("nhl/nhl_schedule_master.rds") |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL master schedule from fastRhockey data repository", Sys.time()
+    )
+  sportsdataversedata::sportsdataverse_save(
+    data_frame = master_sched,
+    file_name = "nhl_schedule_master",
+    sportsdataverse_type = "schedule data",
+    release_tag = "nhl_schedules",
+    file_types = c("rds", "csv", "parquet"),
+    .token = Sys.getenv("GITHUB_PAT")
+  )
+}
 
-  pbp <- pbp %>%
-    fastRhockey:::make_fastRhockey_data("NHL Play-by-Play - Full version with Game Shifts from fastRhockey data repository", Sys.time())
+if (file.exists("nhl/nhl_games_in_data_repo.rds")) {
+  games_in_repo <- readRDS("nhl/nhl_games_in_data_repo.rds") |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL games available in fastRhockey data repo", Sys.time()
+    )
+  sportsdataversedata::sportsdataverse_save(
+    data_frame = games_in_repo,
+    file_name = "nhl_games_in_data_repo",
+    sportsdataverse_type = "schedule data",
+    release_tag = "nhl_schedules",
+    file_types = c("rds", "csv", "parquet"),
+    .token = Sys.getenv("GITHUB_PAT")
+  )
+}
+
+# --- PBP full ---
+pbp_list <- list.files(path = "nhl/pbp/full/rds/")
+purrr::walk(pbp_list, function(x) {
+  pbp <- readRDS(paste0("nhl/pbp/full/rds/", x)) |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL Play-by-Play (full, with shifts) from fastRhockey data repository",
+      Sys.time()
+    )
   y <- stringr::str_extract(x, "\\d+")
   sportsdataversedata::sportsdataverse_save(
     data_frame = pbp,
-    file_name = glue::glue("nhl_play_by_play_{y}"),
+    file_name = glue::glue("play_by_play_{y}"),
     sportsdataverse_type = "Play-by-Play data",
     release_tag = "nhl_pbp_full",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
 })
-rm(pbp_g)
 
-pbp_list <- list.files(path = glue::glue("nhl/pbp/lite/rds/"))
-pbp_g <- purrr::map(pbp_list, function(x) {
-  pbp <- readRDS(paste0("nhl/pbp/lite/rds/", x))
-
-  pbp <- pbp %>%
-    fastRhockey:::make_fastRhockey_data("NHL Play-by-Play - Lite version without Game Shifts from fastRhockey data repository", Sys.time())
+# --- PBP lite ---
+pbp_list <- list.files(path = "nhl/pbp/lite/rds/")
+purrr::walk(pbp_list, function(x) {
+  pbp <- readRDS(paste0("nhl/pbp/lite/rds/", x)) |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL Play-by-Play (lite, no CHANGE events) from fastRhockey data repository",
+      Sys.time()
+    )
   y <- stringr::str_extract(x, "\\d+")
   sportsdataversedata::sportsdataverse_save(
     data_frame = pbp,
-    file_name = glue::glue("nhl_play_by_play_{y}"),
+    file_name = glue::glue("play_by_play_{y}_lite"),
     sportsdataverse_type = "Play-by-Play data",
     release_tag = "nhl_pbp_lite",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
 })
-rm(pbp_g)
 
-team_box_list <- list.files(path = glue::glue("nhl/team_box/rds/"))
-team_box_g <- purrr::map(team_box_list, function(x) {
-  team_box <- readRDS(paste0("nhl/team_box/rds/", x))
-  team_box <- team_box %>%
-    fastRhockey:::make_fastRhockey_data("NHL Team Boxscores from fastRhockey data repository", Sys.time())
+# --- Team box ---
+team_box_list <- list.files(path = "nhl/team_box/rds/")
+purrr::walk(team_box_list, function(x) {
+  team_box <- readRDS(paste0("nhl/team_box/rds/", x)) |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL Team Boxscores from fastRhockey data repository", Sys.time()
+    )
   y <- stringr::str_extract(x, "\\d+")
   sportsdataversedata::sportsdataverse_save(
     data_frame = team_box,
-    file_name = glue::glue("nhl_team_box_{y}"),
+    file_name = glue::glue("team_box_{y}"),
     sportsdataverse_type = "Team Boxscores data",
     release_tag = "nhl_team_boxscores",
     file_types = c("rds", "csv", "parquet"),
@@ -89,17 +123,17 @@ team_box_g <- purrr::map(team_box_list, function(x) {
   )
 })
 
-rm(team_box_g)
-
-player_box_list <- list.files(path = glue::glue("nhl/player_box/rds/"))
-player_box_g <- purrr::map(player_box_list, function(x) {
-  player_box <- readRDS(paste0("nhl/player_box/rds/", x))
-  player_box <- player_box %>%
-    fastRhockey:::make_fastRhockey_data("NHL Player Boxscores from fastRhockey data repository", Sys.time())
+# --- Player box ---
+player_box_list <- list.files(path = "nhl/player_box/rds/")
+purrr::walk(player_box_list, function(x) {
+  player_box <- readRDS(paste0("nhl/player_box/rds/", x)) |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL Player Boxscores from fastRhockey data repository", Sys.time()
+    )
   y <- stringr::str_extract(x, "\\d+")
   sportsdataversedata::sportsdataverse_save(
     data_frame = player_box,
-    file_name = glue::glue("nhl_player_box_{y}"),
+    file_name = glue::glue("player_box_{y}"),
     sportsdataverse_type = "Player Boxscores data",
     release_tag = "nhl_player_boxscores",
     file_types = c("rds", "csv", "parquet"),
@@ -107,4 +141,20 @@ player_box_g <- purrr::map(player_box_list, function(x) {
   )
 })
 
-rm(player_box_g)
+# --- Rosters ---
+roster_list <- list.files(path = "nhl/rosters/rds/")
+purrr::walk(roster_list, function(x) {
+  rosters <- readRDS(paste0("nhl/rosters/rds/", x)) |>
+    fastRhockey:::make_fastRhockey_data(
+      "NHL Rosters from fastRhockey data repository", Sys.time()
+    )
+  y <- stringr::str_extract(x, "\\d+")
+  sportsdataversedata::sportsdataverse_save(
+    data_frame = rosters,
+    file_name = glue::glue("rosters_{y}"),
+    sportsdataverse_type = "Rosters data",
+    release_tag = "nhl_rosters",
+    file_types = c("rds", "csv", "parquet"),
+    .token = Sys.getenv("GITHUB_PAT")
+  )
+})
