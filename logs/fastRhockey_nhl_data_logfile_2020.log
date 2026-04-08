@@ -1,0 +1,85 @@
+ℹ === NHL Data Creation started ===
+ℹ Processing seasons: 2020
+
+── Processing 2019-20 season ───────────────────────────────────────────────────
+ℹ Downloading 2019-20 schedule from nhl-raw
+ℹ 1212 games with final JSON in raw repo
+ℹ Downloading 2019-20 schedule from nhl-raw✔ Downloaded 2019-20 schedule [224ms]
+
+ℹ Compiling 2019-20 PBP (1212 games)
+ℹ 719519 PBP events
+ℹ Compiling 2019-20 PBP (1212 games)ℹ Uploading play_by_play_2020 to sportsdataverse-data releases
+ℹ Compiling 2019-20 PBP (1212 games)→ Uploading 3 files!
+ℹ Compiling 2019-20 PBP (1212 games)ℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_pbp_full
+ℹ Compiling 2019-20 PBP (1212 games)✔ Upload successfully completed.
+ℹ Compiling 2019-20 PBP (1212 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-04-08 11:44:57.012935
+ℹ Compiling 2019-20 PBP (1212 games)→ Uploading 3 files!
+ℹ Compiling 2019-20 PBP (1212 games)ℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_pbp_lite
+ℹ Compiling 2019-20 PBP (1212 games)✔ Upload successfully completed.
+ℹ Compiling 2019-20 PBP (1212 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-04-08 11:45:13.656618
+ℹ Compiling 2019-20 PBP (1212 games)✔ Compiled 2019-20 PBP! [5m 27.3s]
+
+ℹ Compiling 2019-20 boxscores
+ℹ 2424 team_box rows
+ℹ Compiling 2019-20 boxscores→ Uploading 3 files!
+ℹ Compiling 2019-20 boxscoresℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_team_boxscores
+ℹ Compiling 2019-20 boxscores✔ Upload successfully completed.
+ℹ Compiling 2019-20 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-04-08 11:51:08.557125
+ℹ Compiling 2019-20 boxscoresℹ 43632 skater + 4850 goalie rows
+ℹ Compiling 2019-20 boxscores→ Uploading 3 files!
+ℹ Compiling 2019-20 boxscoresℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_player_boxscores
+ℹ Compiling 2019-20 boxscores✔ Upload successfully completed.
+ℹ Compiling 2019-20 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-04-08 11:51:12.432986
+ℹ Compiling 2019-20 boxscores✔ Compiled 2019-20 boxscores! [5m 58.8s]
+
+ℹ Compiling 2019-20 rosters
+ℹ 1070 unique roster entries
+ℹ Compiling 2019-20 rosters→ Uploading 3 files!
+ℹ Compiling 2019-20 rostersℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_rosters
+ℹ Compiling 2019-20 rosters✔ Upload successfully completed.
+ℹ Compiling 2019-20 rosters→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-04-08 11:53:03.844273
+ℹ Compiling 2019-20 rosters✔ Compiled 2019-20 rosters! [1m 51.4s]
+
+ℹ Updating 2019-20 schedule flags
+→ Uploading 3 files!
+ℹ Updating 2019-20 schedule flagsℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Updating 2019-20 schedule flags✔ Upload successfully completed.
+ℹ Updating 2019-20 schedule flags→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-08 11:53:05.669067
+ℹ Updating 2019-20 schedule flags✔ Done with 2019-20
+ℹ Updating 2019-20 schedule flags✔ Updated 2019-20 schedule flags [2s]
+
+Warning message:
+In checkNumberOfLocalWorkers(workers) :
+  Careful, you are setting up 6 localhost parallel workers with only 4 CPU cores available for this R process (per ‘system’), which could result in a 150% load. The soft limit is set to 100%. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine. See help("parallelly.maxWorkers.localhost", package = "parallelly") for further explanations and how to override the soft limit that triggered this warning
+ℹ Building master schedule + nhl_games_in_data_repo
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-08 11:53:09.5643
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-150-137"
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-08 11:53:11.721346
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-150-148"
+✔ 23476 total schedule rows, 21779 with PBP
+ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
+ℹ Building master schedule + nhl_games_in_data_repo
+ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
+ℹ Building master schedule + nhl_games_in_data_repo
