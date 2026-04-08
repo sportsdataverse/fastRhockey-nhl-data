@@ -156,3 +156,15 @@
 [2026-04-08 05:02:06] INFO: Completed 2013-14: 853324 PBP, 2646 team_box, 52917 player_box 
 [2026-04-08 05:02:10] INFO: Master: 14903 schedule rows, 13863 with PBP 
 [2026-04-08 05:02:10] INFO: === NHL Data Creation complete === 
+[2026-04-08 05:39:37] INFO: === NHL Data Creation started === 
+[2026-04-08 05:39:37] INFO: Processing seasons: 2014 
+[2026-04-08 05:39:37] INFO: === 2013-14 season === 
+[2026-04-08 05:39:37] INFO: 1319 games with final JSON in raw repo 
+[2026-04-08 05:41:14] INFO: 859844 PBP events compiled 
+[2026-04-08 05:44:49] INFO: Uploading play_by_play_2014 to sportsdataverse-data releases 
+[2026-04-08 05:51:18] INFO: 2638 team_box rows 
+[2026-04-08 05:51:22] INFO: 47481 skater + 5276 goalie rows 
+[2026-04-08 05:53:08] INFO: 1100 unique roster entries 
+[2026-04-08 05:53:12] INFO: Completed 2013-14: 859844 PBP, 2638 team_box, 52757 player_box 
+[2026-04-08 05:53:16] INFO: Master: 14900 schedule rows, 13859 with PBP 
+[2026-04-08 05:53:16] INFO: === NHL Data Creation complete === 
