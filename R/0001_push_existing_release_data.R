@@ -3,19 +3,20 @@
 ## NOTE: All files use the *end year* convention (e.g. `play_by_play_2026.rds`
 ## for the 2025-26 season) which matches `most_recent_nhl_season()`.
 
-lib_path <- Sys.getenv("R_LIBS")
-if (!requireNamespace("pacman", quietly = TRUE)) {
-  install.packages("pacman", lib = Sys.getenv("R_LIBS"), repos = "http://cran.us.r-project.org")
-}
-suppressPackageStartupMessages(suppressMessages(library(dplyr, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(magrittr, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(jsonlite, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(purrr, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(progressr, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(data.table, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(arrow, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(glue, lib.loc = lib_path)))
-suppressPackageStartupMessages(suppressMessages(library(optparse, lib.loc = lib_path)))
+## In CI, R_LIBS is set so we honor lib.loc; locally we fall back to default libs.
+lib_path <- Sys.getenv("R_LIBS", unset = "")
+.lib_args <- if (nzchar(lib_path) && dir.exists(lib_path)) list(lib.loc = lib_path) else list()
+.lib <- function(pkg) do.call(library, c(list(pkg), .lib_args))
+
+suppressPackageStartupMessages(suppressMessages(.lib("dplyr")))
+suppressPackageStartupMessages(suppressMessages(.lib("magrittr")))
+suppressPackageStartupMessages(suppressMessages(.lib("jsonlite")))
+suppressPackageStartupMessages(suppressMessages(.lib("purrr")))
+suppressPackageStartupMessages(suppressMessages(.lib("progressr")))
+suppressPackageStartupMessages(suppressMessages(.lib("data.table")))
+suppressPackageStartupMessages(suppressMessages(.lib("arrow")))
+suppressPackageStartupMessages(suppressMessages(.lib("glue")))
+suppressPackageStartupMessages(suppressMessages(.lib("stringr")))
 
 
 # --- Schedules (per-season) ---
@@ -31,6 +32,7 @@ purrr::walk(sched_list, function(x) {
     file_name = glue::glue("nhl_schedule_{y}"),
     sportsdataverse_type = "schedule data",
     release_tag = "nhl_schedules",
+    pkg_function = "fastRhockey::load_nhl_schedule()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -47,6 +49,7 @@ if (file.exists("nhl/nhl_schedule_master.rds")) {
     file_name = "nhl_schedule_master",
     sportsdataverse_type = "schedule data",
     release_tag = "nhl_schedules",
+    pkg_function = "fastRhockey::load_nhl_schedule()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -62,6 +65,7 @@ if (file.exists("nhl/nhl_games_in_data_repo.rds")) {
     file_name = "nhl_games_in_data_repo",
     sportsdataverse_type = "schedule data",
     release_tag = "nhl_schedules",
+    pkg_function = "fastRhockey:::load_nhl_games()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -81,6 +85,7 @@ purrr::walk(pbp_list, function(x) {
     file_name = glue::glue("play_by_play_{y}"),
     sportsdataverse_type = "Play-by-Play data",
     release_tag = "nhl_pbp_full",
+    pkg_function = "fastRhockey::load_nhl_pbp()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -100,6 +105,7 @@ purrr::walk(pbp_list, function(x) {
     file_name = glue::glue("play_by_play_{y}_lite"),
     sportsdataverse_type = "Play-by-Play data",
     release_tag = "nhl_pbp_lite",
+    pkg_function = "fastRhockey::load_nhl_pbp_lite()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -118,6 +124,7 @@ purrr::walk(team_box_list, function(x) {
     file_name = glue::glue("team_box_{y}"),
     sportsdataverse_type = "Team Boxscores data",
     release_tag = "nhl_team_boxscores",
+    pkg_function = "fastRhockey::load_nhl_team_box()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -136,6 +143,7 @@ purrr::walk(player_box_list, function(x) {
     file_name = glue::glue("player_box_{y}"),
     sportsdataverse_type = "Player Boxscores data",
     release_tag = "nhl_player_boxscores",
+    pkg_function = "fastRhockey::load_nhl_player_box()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
@@ -154,6 +162,7 @@ purrr::walk(roster_list, function(x) {
     file_name = glue::glue("rosters_{y}"),
     sportsdataverse_type = "Rosters data",
     release_tag = "nhl_rosters",
+    pkg_function = "fastRhockey::load_nhl_rosters()",
     file_types = c("rds", "csv", "parquet"),
     .token = Sys.getenv("GITHUB_PAT")
   )
