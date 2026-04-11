@@ -4,24 +4,24 @@
 ── Processing 2025-26 season ───────────────────────────────────────────────────
 ℹ Downloading 2025-26 schedule from nhl-raw
 ℹ 1260 games with final JSON in raw repo
-ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [162ms]
+ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [212ms]
 
 ℹ Compiling 2025-26 PBP (1260 games)
-ℹ 758571 PBP events
+ℹ 758570 PBP events
 ℹ Compiling 2025-26 PBP (1260 games)ℹ Uploading play_by_play_2026 to sportsdataverse-data releases
 ℹ Compiling 2025-26 PBP (1260 games)→ Uploading 3 files!
 ℹ Compiling 2025-26 PBP (1260 games)ℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_full
 ℹ Compiling 2025-26 PBP (1260 games)✔ Upload successfully completed.
-ℹ Compiling 2025-26 PBP (1260 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-04-10 10:23:44.839481
+ℹ Compiling 2025-26 PBP (1260 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-04-11 09:43:58.253728
 ℹ Compiling 2025-26 PBP (1260 games)→ Uploading 3 files!
 ℹ Compiling 2025-26 PBP (1260 games)ℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_lite
 ℹ Compiling 2025-26 PBP (1260 games)✔ Upload successfully completed.
-ℹ Compiling 2025-26 PBP (1260 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-04-10 10:23:59.609346
-ℹ Compiling 2025-26 PBP (1260 games)✔ Compiled 2025-26 PBP! [5m 6.6s]
+ℹ Compiling 2025-26 PBP (1260 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-04-11 09:44:15.115861
+ℹ Compiling 2025-26 PBP (1260 games)✔ Compiled 2025-26 PBP! [5m 23.5s]
 
 ℹ Compiling 2025-26 boxscores
 ℹ 2520 team_box rows
@@ -30,15 +30,15 @@ nhl_pbp_lite
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_team_boxscores
 ℹ Compiling 2025-26 boxscores✔ Upload successfully completed.
-ℹ Compiling 2025-26 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-04-10 10:29:06.537339
+ℹ Compiling 2025-26 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-04-11 09:50:31.969778
 ℹ Compiling 2025-26 boxscoresℹ 45359 skater + 5040 goalie rows
 ℹ Compiling 2025-26 boxscores→ Uploading 3 files!
 ℹ Compiling 2025-26 boxscoresℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_player_boxscores
 ℹ Compiling 2025-26 boxscores✔ Upload successfully completed.
-ℹ Compiling 2025-26 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-04-10 10:29:10.557506
-ℹ Compiling 2025-26 boxscores✔ Compiled 2025-26 boxscores! [5m 10.9s]
+ℹ Compiling 2025-26 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-04-11 09:50:35.876598
+ℹ Compiling 2025-26 boxscores✔ Compiled 2025-26 boxscores! [6m 20.8s]
 
 ℹ Compiling 2025-26 rosters
 ℹ 1136 unique roster entries
@@ -47,8 +47,8 @@ nhl_player_boxscores
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_rosters
 ℹ Compiling 2025-26 rosters✔ Upload successfully completed.
-ℹ Compiling 2025-26 rosters→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-04-10 10:30:51.907385
-ℹ Compiling 2025-26 rosters✔ Compiled 2025-26 rosters! [1m 41.3s]
+ℹ Compiling 2025-26 rosters→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-04-11 09:52:34.257326
+ℹ Compiling 2025-26 rosters✔ Compiled 2025-26 rosters! [1m 58.4s]
 
 ℹ Updating 2025-26 schedule flags
 → Uploading 3 files!
@@ -56,9 +56,9 @@ nhl_rosters
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Updating 2025-26 schedule flags✔ Upload successfully completed.
-ℹ Updating 2025-26 schedule flags→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-10 10:30:53.773438
+ℹ Updating 2025-26 schedule flags→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-11 09:52:35.969501
 ℹ Updating 2025-26 schedule flags✔ Done with 2025-26
-ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [2.1s]
+ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [1.9s]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
@@ -69,14 +69,14 @@ In checkNumberOfLocalWorkers(workers) :
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-10 10:30:57.326365
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-11 09:52:39.419194
 ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-175-137"
 → Uploading 3 files!
 ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-10 10:30:59.140781
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-11 09:52:41.282076
 ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-175-148"
 ✔ 23476 total schedule rows, 21807 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
