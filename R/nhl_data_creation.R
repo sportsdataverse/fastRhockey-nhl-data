@@ -10,7 +10,9 @@
 ##   Rscript R/nhl_data_creation.R -s 2024 -e 2026   (range: 2023-24 through 2025-26)
 ##
 ## Reads from: sportsdataverse/fastRhockey-nhl-raw (schedules + final game JSON)
-## Produces:   PBP, team_box, player_box, rosters, schedules, master files
+## Produces:   PBP (full/lite), skater_box, goalie_box, player_box, team_box,
+##             game_info, game_rosters, scoring, penalties, three_stars,
+##             scratches, linescore, shifts, rosters, schedules, master files
 ## Uploads to: sportsdataverse/sportsdataverse-data (GitHub releases)
 
 suppressPackageStartupMessages(library(fastRhockey))
@@ -55,6 +57,34 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# Compile-spec table
+#
+# Each row defines one season-level dataset compiled from the per-game
+# final JSON. The order matches what we export per season; new datasets
+# only need a row added here plus a sub-dir under `nhl/`.
+# ═══════════════════════════════════════════════════════════════════════
+
+DATASETS <- tibble::tribble(
+  ~key,              ~json_field,        ~file_prefix,        ~release_tag,             ~description,
+  "pbp",             "all_plays",        "play_by_play",      "nhl_pbp_full",           "NHL play-by-play data (full)",
+  "skater_box",      "skater_stats",     "skater_box",        "nhl_skater_boxscores",   "NHL skater boxscores",
+  "goalie_box",      "goalie_stats",     "goalie_box",        "nhl_goalie_boxscores",   "NHL goalie boxscores",
+  "team_box",        "team_box_parsed",  "team_box",          "nhl_team_boxscores",     "NHL team boxscores",
+  "game_info",       "game_info",        "game_info",         "nhl_game_info",          "NHL game info",
+  "game_rosters",    "rosters",          "game_rosters",      "nhl_game_rosters",       "NHL per-game rosters",
+  "shifts",          "shifts",           "shifts",            "nhl_shifts",             "NHL shifts",
+  "scoring",         "scoring",          "scoring",           "nhl_scoring",            "NHL scoring summary",
+  "penalties",       "penalties",        "penalties",         "nhl_penalties",          "NHL penalty summary",
+  "scratches",       "scratches",        "scratches",         "nhl_scratches",          "NHL scratches",
+  "linescore",       "linescore",        "linescore",         "nhl_linescore",          "NHL linescore",
+  "three_stars",     "decisions",        "three_stars",       "nhl_three_stars",        "NHL three stars / decisions",
+  "officials",       "officials",        "officials",         "nhl_officials",          "NHL on-ice officials",
+  "shots_by_period", "shots_by_period",  "shots_by_period",   "nhl_shots_by_period",    "NHL shots by period",
+  "shootout",        "shootout",         "shootout_summary",  "nhl_shootout",           "NHL shootout summary"
+)
+
+
+# ═══════════════════════════════════════════════════════════════════════
 # Helpers
 # ═══════════════════════════════════════════════════════════════════════
 
@@ -75,10 +105,156 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
 .json_from_url <- function(url) {
   tryCatch(
     {
-      jsonlite::fromJSON(url, simplifyVector = TRUE, flatten = TRUE)
+      jsonlite::fromJSON(url, simplifyVector = TRUE, flatten = FALSE)
     },
     error = function(e) NULL
   )
+}
+
+# Pull all configured datasets out of one parsed game JSON in a single pass.
+# Returns a named list mapping dataset key -> data.frame (possibly NULL).
+.extract_all <- function(game_json) {
+  if (is.null(game_json)) {
+    return(setNames(
+      vector("list", nrow(DATASETS) + 1),
+      c(DATASETS$key, "player_box")
+    ))
+  }
+
+  out <- setNames(
+    vector("list", nrow(DATASETS) + 1),
+    c(DATASETS$key, "player_box")
+  )
+
+  for (i in seq_len(nrow(DATASETS))) {
+    key <- DATASETS$key[i]
+    field <- DATASETS$json_field[i]
+    val <- game_json[[field]]
+
+    if (key == "scoring" || key == "penalties") {
+      # These are nested list-of-period structures; flatten to data.frame
+      if (is.list(val) && length(val) > 0) {
+        parts <- purrr::map(val, function(period_block) {
+          period_desc <- period_block$periodDescriptor
+          items <- if (key == "scoring") period_block$goals else period_block$penalties
+          if (is.data.frame(items) && nrow(items) > 0) {
+            items$period_number <- period_desc$number
+            items$period_type <- period_desc$periodType
+            items
+          } else {
+            NULL
+          }
+        })
+        parts <- purrr::compact(parts)
+        if (length(parts) > 0) {
+          out[[key]] <- tryCatch(dplyr::bind_rows(parts), error = function(e) parts[[1]])
+        }
+      }
+    } else if (key == "linescore") {
+      # Linescore is a nested list; flatten key parts into a single-row data.frame
+      if (is.list(val) && length(val) > 0) {
+        ls_row <- tryCatch(
+          {
+            home_team <- val$teams$home$team
+            away_team <- val$teams$away$team
+            tibble::tibble(
+              game_id = game_json$game_info$game_id %||%
+                game_json$game_info[[1]]$game_id %||% NA_integer_,
+              home_team_id = home_team$id,
+              home_team_abbr = home_team$abbreviation,
+              home_goals = val$teams$home$goals,
+              home_shots = val$teams$home$shotsOnGoal,
+              away_team_id = away_team$id,
+              away_team_abbr = away_team$abbreviation,
+              away_goals = val$teams$away$goals,
+              away_shots = val$teams$away$shotsOnGoal,
+              has_shootout = val$shootout$hasShootout %||% FALSE
+            )
+          },
+          error = function(e) NULL
+        )
+        out[[key]] <- ls_row
+      }
+    } else if (key == "three_stars") {
+      # Decisions is a nested list too; flatten
+      if (is.list(val) && !is.null(val$threeStars)) {
+        ts_df <- tryCatch(
+          {
+            ts <- val$threeStars
+            if (is.data.frame(ts)) {
+              game_id_val <- game_json$game_info$game_id %||%
+                game_json$game_info[[1]]$game_id %||% NA_integer_
+              ts$game_id <- game_id_val
+              ts$winner_id <- val$winner$id
+              ts$winner_name <- val$winner$name
+              ts$loser_id <- val$loser$id
+              ts$loser_name <- val$loser$name
+              ts
+            } else {
+              NULL
+            }
+          },
+          error = function(e) NULL
+        )
+        out[[key]] <- ts_df
+      }
+    } else if (key == "scratches") {
+      # Scratches is a list of {id, firstName, lastName}; convert to data.frame
+      if (is.list(val) && length(val) > 0) {
+        sc_df <- tryCatch(
+          {
+            df <- if (is.data.frame(val)) val else dplyr::bind_rows(val)
+            if (nrow(df) > 0) {
+              game_id_val <- game_json$game_info$game_id %||%
+                game_json$game_info[[1]]$game_id %||% NA_integer_
+              df$game_id <- game_id_val
+            }
+            df
+          },
+          error = function(e) NULL
+        )
+        out[[key]] <- sc_df
+      }
+    } else if (key %in% c("officials", "shots_by_period", "shootout")) {
+      # All three are lists-of-named-lists produced by scrape_nhl_raw helpers.
+      # bind_rows + attach game_id; some installs may surface them as
+      # data.frames already (when jsonlite simplifies).
+      if (length(val) > 0) {
+        df <- tryCatch(
+          if (is.data.frame(val)) val else dplyr::bind_rows(val),
+          error = function(e) NULL
+        )
+        if (!is.null(df) && nrow(df) > 0) {
+          game_id_val <- game_json$game_info$game_id %||%
+            game_json$game_info[[1]]$game_id %||% NA_integer_
+          df$game_id <- game_id_val
+          # Pull season + game_date in for downstream joins
+          df$season <- game_json$game_info$season %||%
+            game_json$game_info[[1]]$season %||% NA_integer_
+          df$game_date <- game_json$game_info$game_date %||%
+            game_json$game_info[[1]]$game_date %||% NA_character_
+          out[[key]] <- df
+        }
+      }
+    } else {
+      # Standard case: json_field is a data.frame or list convertible to one
+      if (is.data.frame(val) && nrow(val) > 0) {
+        out[[key]] <- val
+      } else if (is.list(val) && length(val) > 0 && !is.data.frame(val)) {
+        # Try to convert single-row game_info etc. to tibble
+        df <- tryCatch(dplyr::bind_rows(val), error = function(e) NULL)
+        if (!is.null(df) && nrow(df) > 0) out[[key]] <- df
+      }
+    }
+  }
+
+  # Player box = bind of skater_box + goalie_box
+  parts <- purrr::compact(list(out[["skater_box"]], out[["goalie_box"]]))
+  if (length(parts) > 0) {
+    out[["player_box"]] <- tryCatch(dplyr::bind_rows(parts), error = function(e) parts[[1]])
+  }
+
+  out
 }
 
 .save_dataset <- function(df, dir_base, name, season) {
@@ -93,7 +269,39 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
   )
 }
 
+# Cache release-existence checks so we hit `gh` once per tag, not once per file.
+.release_cache <- new.env(parent = emptyenv())
+.release_exists <- function(release_tag,
+                            repo = "sportsdataverse/sportsdataverse-data") {
+  key <- paste0(repo, "@", release_tag)
+  if (exists(key, envir = .release_cache, inherits = FALSE)) {
+    return(get(key, envir = .release_cache, inherits = FALSE))
+  }
+  ok <- tryCatch(
+    {
+      res <- suppressWarnings(system2(
+        "gh",
+        c("release", "view", release_tag, "-R", repo, "--json", "tagName"),
+        stdout = TRUE, stderr = TRUE
+      ))
+      st <- attr(res, "status")
+      (is.null(st) || st == 0) &&
+        length(res) > 0 &&
+        !any(grepl("release not found", res, ignore.case = TRUE))
+    },
+    error = function(e) FALSE
+  )
+  assign(key, ok, envir = .release_cache)
+  ok
+}
+
 .upload_to_release <- function(df, file_name, release_tag, description) {
+  if (!.release_exists(release_tag)) {
+    cli::cli_alert_warning(
+      "Release tag {.val {release_tag}} does not exist on sportsdataverse-data; skipping upload of {.val {file_name}}. Create the release once with `gh release create {release_tag} -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run."
+    )
+    return(invisible(NULL))
+  }
   retry_rate <- purrr::rate_backoff(pause_base = 1, pause_min = 60, max_times = 10)
   tryCatch(
     purrr::insistently(
@@ -120,13 +328,9 @@ RAW_BASE <- "https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-r
 # Main loop: per season
 # ═══════════════════════════════════════════════════════════════════════
 
-all_games <- purrr::map(years_vec, function(season_year) {
-  # season_year is the END year (e.g., 2026 for 2025-26)
+invisible(purrr::map(years_vec, function(season_year) {
   season_start <- season_year - 1
-  season_label <- paste0(
-    season_start, "-",
-    substr(as.character(season_year), 3, 4)
-  )
+  season_label <- paste0(season_start, "-", substr(as.character(season_year), 3, 4))
   cli::cli_h1("Processing {season_label} season")
 
 
@@ -154,7 +358,7 @@ all_games <- purrr::map(years_vec, function(season_year) {
     compression = "gzip"
   )
 
-  season_json_games <- sched %>% dplyr::filter(game_json == TRUE)
+  season_json_games <- sched %>% dplyr::filter(.data$game_json == TRUE)
   season_game_list <- season_json_games$game_id
   season_game_urls <- season_json_games$game_json_url
 
@@ -167,196 +371,116 @@ all_games <- purrr::map(years_vec, function(season_year) {
 
 
   # ──────────────────────────────────────────────────────────────────────
-  # STEP 2: Compile play-by-play
+  # STEP 2: Single-pass extraction of every per-game dataset
   # ──────────────────────────────────────────────────────────────────────
 
   cli::cli_progress_step(
-    msg = "Compiling {season_label} PBP ({length(season_game_list)} games)",
-    msg_done = "Compiled {season_label} PBP!"
+    msg = "Reading {length(season_game_urls)} game JSONs and extracting datasets",
+    msg_done = "Extracted per-game datasets"
   )
 
   future::plan(future::multisession, workers = 6)
 
-  season_pbp <- furrr::future_map_dfr(
+  # Bind helpers + spec table to local names for furrr's globals detection
+  json_from_url <- .json_from_url
+  extract_all   <- .extract_all
+  datasets_spec <- DATASETS
+
+  per_game <- furrr::future_map(
     season_game_urls,
     function(url) {
-      tryCatch(
-        {
-          game_json <- .json_from_url(url)
-          if (is.null(game_json)) {
-            return(NULL)
-          }
-          pbp <- game_json$all_plays
-          if (is.data.frame(pbp) && nrow(pbp) > 0) {
-            return(pbp)
-          }
-          NULL
-        },
-        error = function(e) NULL
-      )
+      tryCatch(extract_all(json_from_url(url)),
+        error = function(e) NULL)
     },
-    .options = furrr::furrr_options(seed = TRUE)
+    .options = furrr::furrr_options(
+      seed = TRUE,
+      globals = list(
+        json_from_url = json_from_url,
+        extract_all = extract_all,
+        DATASETS = datasets_spec
+      ),
+      packages = c("jsonlite", "dplyr", "purrr", "tibble")
+    )
   )
 
-  season_pbp <- dplyr::distinct(season_pbp)
-  cli::cli_alert_info("{nrow(season_pbp)} PBP events")
+  # Pivot list-of-named-lists into named-list-of-frames, one per dataset key.
+  all_keys <- c(DATASETS$key, "player_box")
 
-  if (nrow(season_pbp) > 0) {
-    # Files are named by the season's END year, e.g. play_by_play_2026 for 2025-26
-    pbp_name <- glue("play_by_play_{season_year}")
-    pbp_lite <- season_pbp |> dplyr::filter(event_type != "CHANGE")
+  compiled <- purrr::map(all_keys, function(key) {
+    parts <- purrr::map(per_game, ~ .x[[key]])
+    parts <- purrr::compact(parts)
+    if (length(parts) == 0) return(NULL)
+    tryCatch(
+      dplyr::bind_rows(parts) |> dplyr::distinct(),
+      error = function(e) {
+        cli::cli_alert_warning("bind_rows failed for {key}: {conditionMessage(e)}")
+        parts[[1]]
+      }
+    )
+  })
+  names(compiled) <- all_keys
 
-    for (sub in c(
-      "nhl/pbp/full/rds", "nhl/pbp/full/parquet",
-      "nhl/pbp/lite/rds", "nhl/pbp/lite/parquet"
-    )) {
-      if (!dir.exists(sub)) dir.create(sub, recursive = TRUE)
+
+  # ──────────────────────────────────────────────────────────────────────
+  # STEP 3: Save + upload each dataset from the spec table
+  # ──────────────────────────────────────────────────────────────────────
+
+  for (i in seq_len(nrow(DATASETS))) {
+    key   <- DATASETS$key[i]
+    pref  <- DATASETS$file_prefix[i]
+    rtag  <- DATASETS$release_tag[i]
+    desc  <- DATASETS$description[i]
+    df    <- compiled[[key]]
+
+    if (is.null(df) || nrow(df) == 0) {
+      cli::cli_alert_info("{key}: 0 rows -> skipped")
+      next
     }
-    season_pbp |> saveRDS(glue("nhl/pbp/full/rds/{pbp_name}.rds"), compress = "xz")
-    pbp_lite |> saveRDS(glue("nhl/pbp/lite/rds/{pbp_name}_lite.rds"), compress = "xz")
-    season_pbp |> arrow::write_parquet(glue("nhl/pbp/full/parquet/{pbp_name}.parquet"), compression = "gzip")
-    pbp_lite |> arrow::write_parquet(glue("nhl/pbp/lite/parquet/{pbp_name}_lite.parquet"), compression = "gzip")
 
-    # Upload to sportsdataverse-data releases
-    cli::cli_alert_info("Uploading {pbp_name} to sportsdataverse-data releases")
-    .upload_to_release(season_pbp, pbp_name, "nhl_pbp_full", "NHL play-by-play data (full)")
-    .upload_to_release(pbp_lite, glue("{pbp_name}_lite"), "nhl_pbp_lite", "NHL play-by-play data (lite)")
+    cli::cli_alert_info("{key}: {nrow(df)} rows")
+    .save_dataset(df, file.path("nhl", key), pref, season_year)
+    .upload_to_release(df, glue("{pref}_{season_year}"), rtag, desc)
+  }
+
+  # PBP lite (PBP without CHANGE events)
+  pbp_full <- compiled[["pbp"]]
+  if (!is.null(pbp_full) && nrow(pbp_full) > 0) {
+    pbp_lite <- pbp_full |> dplyr::filter(.data$event_type != "CHANGE")
+    .save_dataset(pbp_lite, "nhl/pbp_lite", "play_by_play_lite", season_year)
+    .upload_to_release(pbp_lite, glue("play_by_play_{season_year}_lite"),
+      "nhl_pbp_lite", "NHL play-by-play data (lite)")
+    cli::cli_alert_info("pbp_lite: {nrow(pbp_lite)} rows")
+  }
+
+  # Player box (combined skater + goalie)
+  player_box <- compiled[["player_box"]]
+  if (!is.null(player_box) && nrow(player_box) > 0) {
+    .save_dataset(player_box, "nhl/player_box", "player_box", season_year)
+    .upload_to_release(player_box, glue("player_box_{season_year}"),
+      "nhl_player_boxscores", "NHL player boxscores")
+    cli::cli_alert_info("player_box: {nrow(player_box)} rows")
   }
 
 
   # ──────────────────────────────────────────────────────────────────────
-  # STEP 3: Compile team + player boxscores
+  # STEP 4: Compile season rosters (unique players from game_rosters)
   # ──────────────────────────────────────────────────────────────────────
 
   cli::cli_progress_step(
-    msg = "Compiling {season_label} boxscores",
-    msg_done = "Compiled {season_label} boxscores!"
+    msg = "Compiling {season_label} season rosters",
+    msg_done = "Compiled {season_label} season rosters"
   )
 
-  season_team_box <- furrr::future_map_dfr(
-    season_game_urls,
-    function(url) {
-      tryCatch(
-        {
-          game_json <- .json_from_url(url)
-          if (is.null(game_json)) {
-            return(NULL)
-          }
-          tb <- game_json$team_box_parsed
-          if (is.data.frame(tb) && nrow(tb) > 0) {
-            return(tb)
-          }
-          NULL
-        },
-        error = function(e) NULL
-      )
-    },
-    .options = furrr::furrr_options(seed = TRUE)
-  )
-
-  season_skater_box <- furrr::future_map_dfr(
-    season_game_urls,
-    function(url) {
-      tryCatch(
-        {
-          game_json <- .json_from_url(url)
-          if (is.null(game_json)) {
-            return(NULL)
-          }
-          sk <- game_json$skater_stats
-          if (is.data.frame(sk) && nrow(sk) > 0) {
-            return(sk)
-          }
-          NULL
-        },
-        error = function(e) NULL
-      )
-    },
-    .options = furrr::furrr_options(seed = TRUE)
-  )
-
-  season_goalie_box <- furrr::future_map_dfr(
-    season_game_urls,
-    function(url) {
-      tryCatch(
-        {
-          game_json <- .json_from_url(url)
-          if (is.null(game_json)) {
-            return(NULL)
-          }
-          gl <- game_json$goalie_stats
-          if (is.data.frame(gl) && nrow(gl) > 0) {
-            return(gl)
-          }
-          NULL
-        },
-        error = function(e) NULL
-      )
-    },
-    .options = furrr::furrr_options(seed = TRUE)
-  )
-
-  season_player_box <- dplyr::bind_rows(season_skater_box, season_goalie_box)
-
-  if (nrow(season_team_box) > 0) {
-    .save_dataset(season_team_box, "nhl/team_box", "team_box", season_year)
-    cli::cli_alert_info("{nrow(season_team_box)} team_box rows")
-    .upload_to_release(
-      season_team_box, glue("team_box_{season_year}"),
-      "nhl_team_boxscores", "NHL team boxscores"
-    )
-  }
-
-  if (nrow(season_player_box) > 0) {
-    .save_dataset(season_player_box, "nhl/player_box", "player_box", season_year)
-    cli::cli_alert_info("{nrow(season_skater_box)} skater + {nrow(season_goalie_box)} goalie rows")
-    .upload_to_release(
-      season_player_box, glue("player_box_{season_year}"),
-      "nhl_player_boxscores", "NHL player boxscores"
-    )
-  }
-
-
-  # ──────────────────────────────────────────────────────────────────────
-  # STEP 4: Compile rosters
-  # ──────────────────────────────────────────────────────────────────────
-
-  cli::cli_progress_step(
-    msg = "Compiling {season_label} rosters",
-    msg_done = "Compiled {season_label} rosters!"
-  )
-
-  season_rosters <- furrr::future_map_dfr(
-    season_game_urls,
-    function(url) {
-      tryCatch(
-        {
-          game_json <- .json_from_url(url)
-          if (is.null(game_json)) {
-            return(NULL)
-          }
-          rosters <- game_json$rosters
-          if (is.data.frame(rosters) && nrow(rosters) > 0) {
-            return(rosters)
-          }
-          NULL
-        },
-        error = function(e) NULL
-      )
-    },
-    .options = furrr::furrr_options(seed = TRUE)
-  )
-
-  season_rosters_unique <- season_rosters %>%
-    dplyr::select(-dplyr::any_of("game_id")) %>%
-    dplyr::distinct()
-  season_rosters_unique$season <- season_year
-
-  if (nrow(season_rosters_unique) > 0) {
-    .save_dataset(season_rosters_unique, "nhl/rosters", "rosters", season_year)
-    cli::cli_alert_info("{nrow(season_rosters_unique)} unique roster entries")
-    .upload_to_release(season_rosters_unique, glue("rosters_{season_year}"),
-                       "nhl_rosters", "NHL rosters")
+  season_rosters <- compiled[["game_rosters"]]
+  if (!is.null(season_rosters) && nrow(season_rosters) > 0) {
+    rosters_unique <- season_rosters |>
+      dplyr::select(-dplyr::any_of("game_id")) |>
+      dplyr::distinct()
+    rosters_unique$season <- season_year
+    .save_dataset(rosters_unique, "nhl/rosters", "rosters", season_year)
+    .upload_to_release(rosters_unique, glue("rosters_{season_year}"),
+      "nhl_rosters", "NHL rosters")
+    cli::cli_alert_info("rosters: {nrow(rosters_unique)} unique entries")
   }
 
 
@@ -369,18 +493,33 @@ all_games <- purrr::map(years_vec, function(season_year) {
     msg_done = "Updated {season_label} schedule flags"
   )
 
-  pbp_ids <- if (nrow(season_pbp) > 0) unique(season_pbp$game_id) else integer(0)
-  team_box_ids <- if (nrow(season_team_box) > 0) unique(season_team_box$game_id) else integer(0)
-  player_ids <- if (nrow(season_player_box) > 0) unique(season_player_box$game_id) else integer(0)
+  ids_with <- function(key) {
+    df <- compiled[[key]]
+    if (is.null(df) || !"game_id" %in% names(df)) integer(0)
+    else as.integer(unique(df$game_id))
+  }
 
-  final_sched <- sched %>%
+  final_sched <- sched |>
     dplyr::mutate(
-      PBP        = game_id %in% pbp_ids,
-      team_box   = game_id %in% team_box_ids,
-      player_box = game_id %in% player_ids
-    ) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(dplyr::desc(game_date))
+      PBP             = as.integer(.data$game_id) %in% ids_with("pbp"),
+      team_box        = as.integer(.data$game_id) %in% ids_with("team_box"),
+      player_box      = as.integer(.data$game_id) %in% ids_with("player_box"),
+      skater_box      = as.integer(.data$game_id) %in% ids_with("skater_box"),
+      goalie_box      = as.integer(.data$game_id) %in% ids_with("goalie_box"),
+      game_info       = as.integer(.data$game_id) %in% ids_with("game_info"),
+      game_rosters    = as.integer(.data$game_id) %in% ids_with("game_rosters"),
+      scoring         = as.integer(.data$game_id) %in% ids_with("scoring"),
+      penalties       = as.integer(.data$game_id) %in% ids_with("penalties"),
+      scratches       = as.integer(.data$game_id) %in% ids_with("scratches"),
+      linescore       = as.integer(.data$game_id) %in% ids_with("linescore"),
+      three_stars     = as.integer(.data$game_id) %in% ids_with("three_stars"),
+      shifts          = as.integer(.data$game_id) %in% ids_with("shifts"),
+      officials       = as.integer(.data$game_id) %in% ids_with("officials"),
+      shots_by_period = as.integer(.data$game_id) %in% ids_with("shots_by_period"),
+      shootout        = as.integer(.data$game_id) %in% ids_with("shootout")
+    ) |>
+    dplyr::distinct() |>
+    dplyr::arrange(dplyr::desc(.data$game_date))
 
   saveRDS(final_sched, glue("nhl/schedules/rds/nhl_schedule_{season_year}.rds"))
   arrow::write_parquet(final_sched,
@@ -388,7 +527,6 @@ all_games <- purrr::map(years_vec, function(season_year) {
     compression = "gzip"
   )
 
-  # Upload the single-season schedule (with data availability flags) to release
   .upload_to_release(
     final_sched, glue("nhl_schedule_{season_year}"),
     "nhl_schedules", "NHL schedule"
@@ -396,15 +534,10 @@ all_games <- purrr::map(years_vec, function(season_year) {
 
   cli::cli_alert_success("Done with {season_label}")
 
-  rm(
-    season_pbp, pbp_lite, season_team_box, season_skater_box,
-    season_goalie_box, season_player_box, season_rosters,
-    season_rosters_unique, final_sched, sched
-  )
+  rm(compiled, per_game, final_sched, sched)
   gc()
-
-  return(NULL)
-}) # end purrr::map
+  NULL
+}))
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -417,21 +550,21 @@ cli::cli_progress_step(
 )
 
 sched_files <- list.files("nhl/schedules/rds", pattern = "\\.rds$", full.names = TRUE)
-sched_all <- purrr::map_dfr(sched_files, readRDS) %>%
-  dplyr::arrange(dplyr::desc(game_date))
+sched_all <- purrr::map(sched_files, readRDS) |>
+  dplyr::bind_rows() |>
+  dplyr::arrange(dplyr::desc(.data$game_date))
 
 saveRDS(sched_all, "nhl/nhl_schedule_master.rds", compress = "xz")
 arrow::write_parquet(sched_all, "nhl/nhl_schedule_master.parquet", compression = "gzip")
 
-games_in_repo <- sched_all %>%
-  dplyr::filter(PBP == TRUE) %>%
-  dplyr::arrange(dplyr::desc(game_date))
+games_in_repo <- sched_all |>
+  dplyr::filter(.data$PBP == TRUE) |>
+  dplyr::arrange(dplyr::desc(.data$game_date))
 
 if (!dir.exists("nhl")) dir.create("nhl")
 saveRDS(games_in_repo, "nhl/nhl_games_in_data_repo.rds", compress = "xz")
 arrow::write_parquet(games_in_repo, "nhl/nhl_games_in_data_repo.parquet", compression = "gzip")
 
-# Upload schedules and games index to release
 .upload_to_release(sched_all, "nhl_schedule_master", "nhl_schedules", "NHL schedules")
 .upload_to_release(
   games_in_repo, "nhl_games_in_data_repo",
