@@ -4,10 +4,10 @@
 ── Processing 2025-26 season ───────────────────────────────────────────────────
 ℹ Downloading 2025-26 schedule from nhl-raw
 ℹ 1312 games with final JSON in raw repo
-ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [177ms]
+ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [239ms]
 
 ℹ Reading 1312 game JSONs and extracting datasets
-ℹ pbp: 798289 rows
+ℹ pbp: 798287 rows
 ℹ Reading 1312 game JSONs and extracting datasets! Release tag "nhl_pbp_full" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2026". Create the release once with `gh release create nhl_pbp_full -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Reading 1312 game JSONs and extracting datasetsℹ skater_box: 47231 rows
 ℹ Reading 1312 game JSONs and extracting datasets! Release tag "nhl_skater_boxscores" does not exist on sportsdataverse-data; skipping upload of "skater_box_2026". Create the release once with `gh release create nhl_skater_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
@@ -32,20 +32,20 @@
 ℹ Reading 1312 game JSONs and extracting datasetsℹ shots_by_period: 0 rows -> skipped
 ℹ Reading 1312 game JSONs and extracting datasetsℹ shootout: 0 rows -> skipped
 ℹ Reading 1312 game JSONs and extracting datasets! Release tag "nhl_pbp_lite" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2026_lite". Create the release once with `gh release create nhl_pbp_lite -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1312 game JSONs and extracting datasetsℹ pbp_lite: 413860 rows
+ℹ Reading 1312 game JSONs and extracting datasetsℹ pbp_lite: 413859 rows
 ℹ Reading 1312 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2026". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Reading 1312 game JSONs and extracting datasetsℹ player_box: 50222 rows
-ℹ Reading 1312 game JSONs and extracting datasets✔ Extracted per-game datasets [4m 47.6s]
+ℹ Reading 1312 game JSONs and extracting datasets✔ Extracted per-game datasets [4m 27.7s]
 
 ℹ Compiling 2025-26 season rosters
 ! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2026". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Compiling 2025-26 season rostersℹ rosters: 1164 unique entries
-ℹ Compiling 2025-26 season rosters✔ Compiled 2025-26 season rosters [99ms]
+ℹ Compiling 2025-26 season rosters✔ Compiled 2025-26 season rosters [80ms]
 
 ℹ Updating 2025-26 schedule flags
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2026". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Updating 2025-26 schedule flags✔ Done with 2025-26
-ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [395ms]
+ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [418ms]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
