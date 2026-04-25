@@ -3,49 +3,49 @@
 
 ── Processing 2025-26 season ───────────────────────────────────────────────────
 ℹ Downloading 2025-26 schedule from nhl-raw
-ℹ 1330 games with final JSON in raw repo
-ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [378ms]
+ℹ 1333 games with final JSON in raw repo
+ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [190ms]
 
-ℹ Reading 1330 game JSONs and extracting datasets
-ℹ pbp: 812190 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_pbp_full" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2026". Create the release once with `gh release create nhl_pbp_full -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ skater_box: 47879 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_skater_boxscores" does not exist on sportsdataverse-data; skipping upload of "skater_box_2026". Create the release once with `gh release create nhl_skater_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ goalie_box: 3028 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_goalie_boxscores" does not exist on sportsdataverse-data; skipping upload of "goalie_box_2026". Create the release once with `gh release create nhl_goalie_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ team_box: 2660 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_team_boxscores" does not exist on sportsdataverse-data; skipping upload of "team_box_2026". Create the release once with `gh release create nhl_team_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ game_info: 1330 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_game_info" does not exist on sportsdataverse-data; skipping upload of "game_info_2026". Create the release once with `gh release create nhl_game_info -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ game_rosters: 1164 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_game_rosters" does not exist on sportsdataverse-data; skipping upload of "game_rosters_2026". Create the release once with `gh release create nhl_game_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ shifts: 0 rows -> skipped
-ℹ Reading 1330 game JSONs and extracting datasetsℹ scoring: 0 rows -> skipped
-ℹ Reading 1330 game JSONs and extracting datasetsℹ penalties: 0 rows -> skipped
-ℹ Reading 1330 game JSONs and extracting datasetsℹ scratches: 8353 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_scratches" does not exist on sportsdataverse-data; skipping upload of "scratches_2026". Create the release once with `gh release create nhl_scratches -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ linescore: 1330 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_linescore" does not exist on sportsdataverse-data; skipping upload of "linescore_2026". Create the release once with `gh release create nhl_linescore -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ three_stars: 3990 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_three_stars" does not exist on sportsdataverse-data; skipping upload of "three_stars_2026". Create the release once with `gh release create nhl_three_stars -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ officials: 0 rows -> skipped
-ℹ Reading 1330 game JSONs and extracting datasetsℹ shots_by_period: 0 rows -> skipped
-ℹ Reading 1330 game JSONs and extracting datasetsℹ shootout: 0 rows -> skipped
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_pbp_lite" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2026_lite". Create the release once with `gh release create nhl_pbp_lite -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ pbp_lite: 420846 rows
-ℹ Reading 1330 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2026". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Reading 1330 game JSONs and extracting datasetsℹ player_box: 50907 rows
-ℹ Reading 1330 game JSONs and extracting datasets✔ Extracted per-game datasets [4m 58.9s]
+ℹ Reading 1333 game JSONs and extracting datasets
+ℹ pbp: 811996 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_pbp_full" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2026". Create the release once with `gh release create nhl_pbp_full -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ skater_box: 47987 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_skater_boxscores" does not exist on sportsdataverse-data; skipping upload of "skater_box_2026". Create the release once with `gh release create nhl_skater_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ goalie_box: 3034 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_goalie_boxscores" does not exist on sportsdataverse-data; skipping upload of "goalie_box_2026". Create the release once with `gh release create nhl_goalie_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ team_box: 2666 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_team_boxscores" does not exist on sportsdataverse-data; skipping upload of "team_box_2026". Create the release once with `gh release create nhl_team_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ game_info: 1333 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_game_info" does not exist on sportsdataverse-data; skipping upload of "game_info_2026". Create the release once with `gh release create nhl_game_info -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ game_rosters: 1164 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_game_rosters" does not exist on sportsdataverse-data; skipping upload of "game_rosters_2026". Create the release once with `gh release create nhl_game_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ shifts: 0 rows -> skipped
+ℹ Reading 1333 game JSONs and extracting datasetsℹ scoring: 0 rows -> skipped
+ℹ Reading 1333 game JSONs and extracting datasetsℹ penalties: 0 rows -> skipped
+ℹ Reading 1333 game JSONs and extracting datasetsℹ scratches: 8390 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_scratches" does not exist on sportsdataverse-data; skipping upload of "scratches_2026". Create the release once with `gh release create nhl_scratches -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ linescore: 1333 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_linescore" does not exist on sportsdataverse-data; skipping upload of "linescore_2026". Create the release once with `gh release create nhl_linescore -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ three_stars: 3999 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_three_stars" does not exist on sportsdataverse-data; skipping upload of "three_stars_2026". Create the release once with `gh release create nhl_three_stars -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ officials: 0 rows -> skipped
+ℹ Reading 1333 game JSONs and extracting datasetsℹ shots_by_period: 0 rows -> skipped
+ℹ Reading 1333 game JSONs and extracting datasetsℹ shootout: 0 rows -> skipped
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_pbp_lite" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2026_lite". Create the release once with `gh release create nhl_pbp_lite -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ pbp_lite: 421850 rows
+ℹ Reading 1333 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2026". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1333 game JSONs and extracting datasetsℹ player_box: 51021 rows
+ℹ Reading 1333 game JSONs and extracting datasets✔ Extracted per-game datasets [5m 4.2s]
 
 ℹ Compiling 2025-26 season rosters
 ! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2026". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Compiling 2025-26 season rostersℹ rosters: 1164 unique entries
-ℹ Compiling 2025-26 season rosters✔ Compiled 2025-26 season rosters [99ms]
+ℹ Compiling 2025-26 season rosters✔ Compiled 2025-26 season rosters [105ms]
 
 ℹ Updating 2025-26 schedule flags
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2026". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Updating 2025-26 schedule flags✔ Done with 2025-26
-ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [406ms]
+ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [450ms]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
@@ -53,7 +53,7 @@ In checkNumberOfLocalWorkers(workers) :
 ℹ Building master schedule + nhl_games_in_data_repo
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_master". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Building master schedule + nhl_games_in_data_repo! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_games_in_data_repo". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Building master schedule + nhl_games_in_data_repo✔ 23532 total schedule rows, 21877 with PBP
+ℹ Building master schedule + nhl_games_in_data_repo✔ 23532 total schedule rows, 21880 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
