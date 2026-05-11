@@ -1,0 +1,62 @@
+From https://github.com/sportsdataverse/fastRhockey-nhl-data
+   e957b15..8a8f156  main       -> origin/main
+ℹ === NHL Data Creation started ===
+ℹ Processing seasons: 2010
+
+── Processing 2009-10 season ───────────────────────────────────────────────────
+ℹ Downloading 2009-10 schedule from nhl-raw
+ℹ 1318 games with final JSON in raw repo
+ℹ Downloading 2009-10 schedule from nhl-raw✔ Downloaded 2009-10 schedule [374ms]
+
+ℹ Reading 1318 game JSONs and extracting datasets
+ℹ pbp: 400512 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_pbp_full" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2010". Create the release once with `gh release create nhl_pbp_full -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ skater_box: 47446 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_skater_boxscores" does not exist on sportsdataverse-data; skipping upload of "skater_box_2010". Create the release once with `gh release create nhl_skater_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ goalie_box: 3051 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_goalie_boxscores" does not exist on sportsdataverse-data; skipping upload of "goalie_box_2010". Create the release once with `gh release create nhl_goalie_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ team_box: 2636 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_team_boxscores" does not exist on sportsdataverse-data; skipping upload of "team_box_2010". Create the release once with `gh release create nhl_team_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ game_info: 1318 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_game_info" does not exist on sportsdataverse-data; skipping upload of "game_info_2010". Create the release once with `gh release create nhl_game_info -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ game_rosters: 1095 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_game_rosters" does not exist on sportsdataverse-data; skipping upload of "game_rosters_2010". Create the release once with `gh release create nhl_game_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ shifts: 0 rows -> skipped
+ℹ Reading 1318 game JSONs and extracting datasetsℹ scoring: 0 rows -> skipped
+ℹ Reading 1318 game JSONs and extracting datasetsℹ penalties: 0 rows -> skipped
+ℹ Reading 1318 game JSONs and extracting datasetsℹ scratches: 8213 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_scratches" does not exist on sportsdataverse-data; skipping upload of "scratches_2010". Create the release once with `gh release create nhl_scratches -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ linescore: 1318 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_linescore" does not exist on sportsdataverse-data; skipping upload of "linescore_2010". Create the release once with `gh release create nhl_linescore -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ three_stars: 970 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_three_stars" does not exist on sportsdataverse-data; skipping upload of "three_stars_2010". Create the release once with `gh release create nhl_three_stars -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ officials: 0 rows -> skipped
+ℹ Reading 1318 game JSONs and extracting datasetsℹ shots_by_period: 0 rows -> skipped
+ℹ Reading 1318 game JSONs and extracting datasetsℹ shootout: 0 rows -> skipped
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_pbp_lite" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2010_lite". Create the release once with `gh release create nhl_pbp_lite -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ pbp_lite: 400512 rows
+ℹ Reading 1318 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2010". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1318 game JSONs and extracting datasetsℹ player_box: 50497 rows
+ℹ Reading 1318 game JSONs and extracting datasets✔ Extracted per-game datasets [2m 50.7s]
+
+ℹ Compiling 2009-10 season rosters
+! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2010". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Compiling 2009-10 season rostersℹ rosters: 1095 unique entries
+ℹ Compiling 2009-10 season rosters✔ Compiled 2009-10 season rosters [98ms]
+
+ℹ Updating 2009-10 schedule flags
+! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2010". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Updating 2009-10 schedule flags✔ Done with 2009-10
+ℹ Updating 2009-10 schedule flags✔ Updated 2009-10 schedule flags [369ms]
+
+Warning message:
+In checkNumberOfLocalWorkers(workers) :
+  Careful, you are setting up 6 localhost parallel workers with only 4 CPU cores available for this R process (per ‘system’), which could result in a 150% load. The soft limit is set to 100%. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine. See help("parallelly.maxWorkers.localhost", package = "parallelly") for further explanations and how to override the soft limit that triggered this warning
+ℹ Building master schedule + nhl_games_in_data_repo
+! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_master". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Building master schedule + nhl_games_in_data_repo! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_games_in_data_repo". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Building master schedule + nhl_games_in_data_repo✔ 23332 total schedule rows, 21918 with PBP
+ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
+ℹ Building master schedule + nhl_games_in_data_repo
+ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
+ℹ Building master schedule + nhl_games_in_data_repo
