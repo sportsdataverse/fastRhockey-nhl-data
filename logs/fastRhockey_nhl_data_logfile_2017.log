@@ -1,84 +1,61 @@
+From https://github.com/sportsdataverse/fastRhockey-nhl-data
+   8a8f156..20e67b9  main       -> origin/main
 ℹ === NHL Data Creation started ===
 ℹ Processing seasons: 2017
 
 ── Processing 2016-17 season ───────────────────────────────────────────────────
 ℹ Downloading 2016-17 schedule from nhl-raw
-ℹ 1355 games with final JSON in raw repo
-ℹ Downloading 2016-17 schedule from nhl-raw✔ Downloaded 2016-17 schedule [201ms]
+ℹ 1317 games with final JSON in raw repo
+ℹ Downloading 2016-17 schedule from nhl-raw✔ Downloaded 2016-17 schedule [260ms]
 
-ℹ Compiling 2016-17 PBP (1355 games)
-ℹ 870270 PBP events
-ℹ Compiling 2016-17 PBP (1355 games)ℹ Uploading play_by_play_2017 to sportsdataverse-data releases
-ℹ Compiling 2016-17 PBP (1355 games)→ Uploading 3 files!
-ℹ Compiling 2016-17 PBP (1355 games)ℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_pbp_full
-ℹ Compiling 2016-17 PBP (1355 games)✔ Upload successfully completed.
-ℹ Compiling 2016-17 PBP (1355 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-04-08 09:11:02.462996
-ℹ Compiling 2016-17 PBP (1355 games)→ Uploading 3 files!
-ℹ Compiling 2016-17 PBP (1355 games)ℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_pbp_lite
-ℹ Compiling 2016-17 PBP (1355 games)✔ Upload successfully completed.
-ℹ Compiling 2016-17 PBP (1355 games)→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-04-08 09:11:20.975883
-ℹ Compiling 2016-17 PBP (1355 games)✔ Compiled 2016-17 PBP! [6m 31.6s]
+ℹ Reading 1317 game JSONs and extracting datasets
+ℹ pbp: 848385 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_pbp_full" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2017". Create the release once with `gh release create nhl_pbp_full -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ skater_box: 47409 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_skater_boxscores" does not exist on sportsdataverse-data; skipping upload of "skater_box_2017". Create the release once with `gh release create nhl_skater_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ goalie_box: 3054 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_goalie_boxscores" does not exist on sportsdataverse-data; skipping upload of "goalie_box_2017". Create the release once with `gh release create nhl_goalie_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ team_box: 2634 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_team_boxscores" does not exist on sportsdataverse-data; skipping upload of "team_box_2017". Create the release once with `gh release create nhl_team_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ game_info: 1317 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_game_info" does not exist on sportsdataverse-data; skipping upload of "game_info_2017". Create the release once with `gh release create nhl_game_info -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ game_rosters: 1074 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_game_rosters" does not exist on sportsdataverse-data; skipping upload of "game_rosters_2017". Create the release once with `gh release create nhl_game_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ shifts: 0 rows -> skipped
+ℹ Reading 1317 game JSONs and extracting datasetsℹ scoring: 0 rows -> skipped
+ℹ Reading 1317 game JSONs and extracting datasetsℹ penalties: 0 rows -> skipped
+ℹ Reading 1317 game JSONs and extracting datasetsℹ scratches: 8978 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_scratches" does not exist on sportsdataverse-data; skipping upload of "scratches_2017". Create the release once with `gh release create nhl_scratches -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ linescore: 1317 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_linescore" does not exist on sportsdataverse-data; skipping upload of "linescore_2017". Create the release once with `gh release create nhl_linescore -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ three_stars: 3945 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_three_stars" does not exist on sportsdataverse-data; skipping upload of "three_stars_2017". Create the release once with `gh release create nhl_three_stars -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ officials: 0 rows -> skipped
+ℹ Reading 1317 game JSONs and extracting datasetsℹ shots_by_period: 0 rows -> skipped
+ℹ Reading 1317 game JSONs and extracting datasetsℹ shootout: 0 rows -> skipped
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_pbp_lite" does not exist on sportsdataverse-data; skipping upload of "play_by_play_2017_lite". Create the release once with `gh release create nhl_pbp_lite -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ pbp_lite: 413339 rows
+ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2017". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Reading 1317 game JSONs and extracting datasetsℹ player_box: 50463 rows
+ℹ Reading 1317 game JSONs and extracting datasets✔ Extracted per-game datasets [5m 20.5s]
 
-ℹ Compiling 2016-17 boxscores
-ℹ 2710 team_box rows
-ℹ Compiling 2016-17 boxscores→ Uploading 3 files!
-ℹ Compiling 2016-17 boxscoresℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_team_boxscores
-ℹ Compiling 2016-17 boxscores✔ Upload successfully completed.
-ℹ Compiling 2016-17 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-04-08 09:16:58.926736
-ℹ Compiling 2016-17 boxscoresℹ 48780 skater + 5420 goalie rows
-ℹ Compiling 2016-17 boxscores→ Uploading 3 files!
-ℹ Compiling 2016-17 boxscoresℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_player_boxscores
-ℹ Compiling 2016-17 boxscores✔ Upload successfully completed.
-ℹ Compiling 2016-17 boxscores→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-04-08 09:17:03.266905
-ℹ Compiling 2016-17 boxscores✔ Compiled 2016-17 boxscores! [5m 42.3s]
-
-ℹ Compiling 2016-17 rosters
-ℹ 1097 unique roster entries
-ℹ Compiling 2016-17 rosters→ Uploading 3 files!
-ℹ Compiling 2016-17 rostersℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_rosters
-ℹ Compiling 2016-17 rosters✔ Upload successfully completed.
-ℹ Compiling 2016-17 rosters→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-04-08 09:18:53.800381
-ℹ Compiling 2016-17 rosters✔ Compiled 2016-17 rosters! [1m 50.5s]
+ℹ Compiling 2016-17 season rosters
+! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2017". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Compiling 2016-17 season rostersℹ rosters: 1074 unique entries
+ℹ Compiling 2016-17 season rosters✔ Compiled 2016-17 season rosters [148ms]
 
 ℹ Updating 2016-17 schedule flags
-→ Uploading 3 files!
-ℹ Updating 2016-17 schedule flagsℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_schedules
-ℹ Updating 2016-17 schedule flags✔ Upload successfully completed.
-ℹ Updating 2016-17 schedule flags→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-08 09:18:55.529837
+! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2017". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Updating 2016-17 schedule flags✔ Done with 2016-17
-ℹ Updating 2016-17 schedule flags✔ Updated 2016-17 schedule flags [2s]
+ℹ Updating 2016-17 schedule flags✔ Updated 2016-17 schedule flags [456ms]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
   Careful, you are setting up 6 localhost parallel workers with only 4 CPU cores available for this R process (per ‘system’), which could result in a 150% load. The soft limit is set to 100%. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine. See help("parallelly.maxWorkers.localhost", package = "parallelly") for further explanations and how to override the soft limit that triggered this warning
 ℹ Building master schedule + nhl_games_in_data_repo
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_schedules
-ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-08 09:18:59.294966
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-150-137"
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
-<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
-nhl_schedules
-ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-04-08 09:19:01.284343
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-150-148"
-✔ 19210 total schedule rows, 17852 with PBP
+! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_master". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Building master schedule + nhl_games_in_data_repo! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_games_in_data_repo". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
+ℹ Building master schedule + nhl_games_in_data_repo✔ 23186 total schedule rows, 21880 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
