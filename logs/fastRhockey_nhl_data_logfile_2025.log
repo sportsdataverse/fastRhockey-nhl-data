@@ -4,7 +4,7 @@
 ── Processing 2024-25 season ───────────────────────────────────────────────────
 ℹ Downloading 2024-25 schedule from nhl-raw
 ℹ 1398 games with final JSON in raw repo
-ℹ Downloading 2024-25 schedule from nhl-raw✔ Downloaded 2024-25 schedule [105ms]
+ℹ Downloading 2024-25 schedule from nhl-raw✔ Downloaded 2024-25 schedule [223ms]
 
 ℹ Reading 1398 game JSONs and extracting datasets
 ℹ pbp: 1089567 rows
@@ -35,7 +35,7 @@
 ℹ Reading 1398 game JSONs and extracting datasetsℹ pbp_lite: 451857 rows
 ℹ Reading 1398 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2025". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Reading 1398 game JSONs and extracting datasetsℹ player_box: 53515 rows
-ℹ Reading 1398 game JSONs and extracting datasets✔ Extracted per-game datasets [6m]
+ℹ Reading 1398 game JSONs and extracting datasets✔ Extracted per-game datasets [7m 23.9s]
 
 ℹ Compiling 2024-25 season rosters
 ! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2025". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
@@ -45,7 +45,7 @@
 ℹ Updating 2024-25 schedule flags
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2025". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Updating 2024-25 schedule flags✔ Done with 2024-25
-ℹ Updating 2024-25 schedule flags✔ Updated 2024-25 schedule flags [437ms]
+ℹ Updating 2024-25 schedule flags✔ Updated 2024-25 schedule flags [432ms]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
@@ -53,7 +53,7 @@ In checkNumberOfLocalWorkers(workers) :
 ℹ Building master schedule + nhl_games_in_data_repo
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_master". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Building master schedule + nhl_games_in_data_repo! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_games_in_data_repo". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Building master schedule + nhl_games_in_data_repo✔ 22972 total schedule rows, 21880 with PBP
+ℹ Building master schedule + nhl_games_in_data_repo✔ 22872 total schedule rows, 21890 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
