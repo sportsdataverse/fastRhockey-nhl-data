@@ -1,12 +1,10 @@
-From https://github.com/sportsdataverse/fastRhockey-nhl-data
-   8a8f156..20e67b9  main       -> origin/main
 ℹ === NHL Data Creation started ===
 ℹ Processing seasons: 2017
 
 ── Processing 2016-17 season ───────────────────────────────────────────────────
 ℹ Downloading 2016-17 schedule from nhl-raw
 ℹ 1317 games with final JSON in raw repo
-ℹ Downloading 2016-17 schedule from nhl-raw✔ Downloaded 2016-17 schedule [260ms]
+ℹ Downloading 2016-17 schedule from nhl-raw✔ Downloaded 2016-17 schedule [160ms]
 
 ℹ Reading 1317 game JSONs and extracting datasets
 ℹ pbp: 848385 rows
@@ -37,17 +35,17 @@ From https://github.com/sportsdataverse/fastRhockey-nhl-data
 ℹ Reading 1317 game JSONs and extracting datasetsℹ pbp_lite: 413339 rows
 ℹ Reading 1317 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2017". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Reading 1317 game JSONs and extracting datasetsℹ player_box: 50463 rows
-ℹ Reading 1317 game JSONs and extracting datasets✔ Extracted per-game datasets [5m 20.5s]
+ℹ Reading 1317 game JSONs and extracting datasets✔ Extracted per-game datasets [5m 21.4s]
 
 ℹ Compiling 2016-17 season rosters
 ! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2017". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Compiling 2016-17 season rostersℹ rosters: 1074 unique entries
-ℹ Compiling 2016-17 season rosters✔ Compiled 2016-17 season rosters [148ms]
+ℹ Compiling 2016-17 season rosters✔ Compiled 2016-17 season rosters [146ms]
 
 ℹ Updating 2016-17 schedule flags
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2017". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Updating 2016-17 schedule flags✔ Done with 2016-17
-ℹ Updating 2016-17 schedule flags✔ Updated 2016-17 schedule flags [456ms]
+ℹ Updating 2016-17 schedule flags✔ Updated 2016-17 schedule flags [535ms]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
@@ -55,7 +53,7 @@ In checkNumberOfLocalWorkers(workers) :
 ℹ Building master schedule + nhl_games_in_data_repo
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_master". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Building master schedule + nhl_games_in_data_repo! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_games_in_data_repo". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Building master schedule + nhl_games_in_data_repo✔ 23186 total schedule rows, 21880 with PBP
+ℹ Building master schedule + nhl_games_in_data_repo✔ 22224 total schedule rows, 21887 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
