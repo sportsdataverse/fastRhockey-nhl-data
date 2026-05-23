@@ -1,12 +1,10 @@
-From https://github.com/sportsdataverse/fastRhockey-nhl-data
-   20e67b9..619e52c  main       -> origin/main
 ℹ === NHL Data Creation started ===
 ℹ Processing seasons: 2023
 
 ── Processing 2022-23 season ───────────────────────────────────────────────────
 ℹ Downloading 2022-23 schedule from nhl-raw
 ℹ 1400 games with final JSON in raw repo
-ℹ Downloading 2022-23 schedule from nhl-raw✔ Downloaded 2022-23 schedule [200ms]
+ℹ Downloading 2022-23 schedule from nhl-raw✔ Downloaded 2022-23 schedule [181ms]
 
 ℹ Reading 1400 game JSONs and extracting datasets
 ℹ pbp: 1103989 rows
@@ -37,17 +35,17 @@ From https://github.com/sportsdataverse/fastRhockey-nhl-data
 ℹ Reading 1400 game JSONs and extracting datasetsℹ pbp_lite: 440786 rows
 ℹ Reading 1400 game JSONs and extracting datasets! Release tag "nhl_player_boxscores" does not exist on sportsdataverse-data; skipping upload of "player_box_2023". Create the release once with `gh release create nhl_player_boxscores -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Reading 1400 game JSONs and extracting datasetsℹ player_box: 53597 rows
-ℹ Reading 1400 game JSONs and extracting datasets✔ Extracted per-game datasets [6m 46.7s]
+ℹ Reading 1400 game JSONs and extracting datasets✔ Extracted per-game datasets [5m 58.3s]
 
 ℹ Compiling 2022-23 season rosters
 ! Release tag "nhl_rosters" does not exist on sportsdataverse-data; skipping upload of "rosters_2023". Create the release once with `gh release create nhl_rosters -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Compiling 2022-23 season rostersℹ rosters: 1192 unique entries
-ℹ Compiling 2022-23 season rosters✔ Compiled 2022-23 season rosters [100ms]
+ℹ Compiling 2022-23 season rosters✔ Compiled 2022-23 season rosters [103ms]
 
 ℹ Updating 2022-23 schedule flags
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_2023". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Updating 2022-23 schedule flags✔ Done with 2022-23
-ℹ Updating 2022-23 schedule flags✔ Updated 2022-23 schedule flags [443ms]
+ℹ Updating 2022-23 schedule flags✔ Updated 2022-23 schedule flags [458ms]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
@@ -55,7 +53,7 @@ In checkNumberOfLocalWorkers(workers) :
 ℹ Building master schedule + nhl_games_in_data_repo
 ! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_schedule_master". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
 ℹ Building master schedule + nhl_games_in_data_repo! Release tag "nhl_schedules" does not exist on sportsdataverse-data; skipping upload of "nhl_games_in_data_repo". Create the release once with `gh release create nhl_schedules -R sportsdataverse/sportsdataverse-data --notes 'init'` and re-run.
-ℹ Building master schedule + nhl_games_in_data_repo✔ 23078 total schedule rows, 21880 with PBP
+ℹ Building master schedule + nhl_games_in_data_repo✔ 22639 total schedule rows, 21878 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
