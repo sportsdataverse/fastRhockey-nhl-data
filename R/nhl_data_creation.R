@@ -132,12 +132,24 @@ DATASETS <- tibble::tribble(
     val <- game_json[[field]]
 
     if (key == "scoring" || key == "penalties") {
-      # These are nested list-of-period structures; flatten to data.frame
-      if (is.list(val) && length(val) > 0) {
-        parts <- purrr::map(val, function(period_block) {
-          period_desc <- period_block$periodDescriptor
-          items <- if (key == "scoring") period_block$goals else period_block$penalties
+      # The NHL JSON has these as an array of period-blocks. jsonlite with
+      # simplifyVector=TRUE flattens that into a data.frame whose rows are
+      # periods and whose columns are `periodDescriptor` + `goals`/`penalties`
+      # (a list-column of nested data.frames). A naive `purrr::map(val, ...)`
+      # iterates over the *columns* of that frame, never over the rows; we
+      # must walk the rows explicitly. Also support the un-simplified case
+      # where val is still a plain list of period-block lists.
+      items_col <- if (key == "scoring") "goals" else "penalties"
+      game_id_val <- game_json$game_info$game_id %||%
+        game_json$game_info[[1]]$game_id %||% NA_integer_
+
+      parts <- NULL
+      if (is.data.frame(val) && nrow(val) > 0 && items_col %in% names(val)) {
+        parts <- purrr::map(seq_len(nrow(val)), function(i) {
+          period_desc <- val$periodDescriptor[i, , drop = FALSE]
+          items <- val[[items_col]][[i]]
           if (is.data.frame(items) && nrow(items) > 0) {
+            items$game_id <- game_id_val
             items$period_number <- period_desc$number
             items$period_type <- period_desc$periodType
             items
@@ -145,10 +157,24 @@ DATASETS <- tibble::tribble(
             NULL
           }
         })
-        parts <- purrr::compact(parts)
-        if (length(parts) > 0) {
-          out[[key]] <- tryCatch(dplyr::bind_rows(parts), error = function(e) parts[[1]])
-        }
+      } else if (is.list(val) && length(val) > 0) {
+        parts <- purrr::map(val, function(period_block) {
+          period_desc <- period_block$periodDescriptor
+          items <- if (key == "scoring") period_block$goals else period_block$penalties
+          if (is.data.frame(items) && nrow(items) > 0) {
+            items$game_id <- game_id_val
+            items$period_number <- period_desc$number
+            items$period_type <- period_desc$periodType
+            items
+          } else {
+            NULL
+          }
+        })
+      }
+
+      parts <- purrr::compact(parts)
+      if (length(parts) > 0) {
+        out[[key]] <- tryCatch(dplyr::bind_rows(parts), error = function(e) parts[[1]])
       }
     } else if (key == "linescore") {
       # Linescore is a nested list; flatten key parts into a single-row data.frame
@@ -176,19 +202,28 @@ DATASETS <- tibble::tribble(
         out[[key]] <- ls_row
       }
     } else if (key == "three_stars") {
-      # Decisions is a nested list too; flatten
+      # `decisions.threeStars` is the per-game 3-row data.frame we want; the
+      # surrounding decisions.{winner,loser} are scalar-ish objects, but the
+      # NHL API occasionally returns them as multi-element vectors or omits
+      # them entirely (preseason/postponed games). Coerce each to a single
+      # scalar before assigning so we don't accidentally introduce a
+      # list-column or a length-mismatched column that blows up downstream
+      # bind_rows across games.
       if (is.list(val) && !is.null(val$threeStars)) {
         ts_df <- tryCatch(
           {
             ts <- val$threeStars
-            if (is.data.frame(ts)) {
+            if (is.data.frame(ts) && nrow(ts) > 0) {
+              .scalar1 <- function(x, default = NA) {
+                if (is.null(x) || length(x) == 0) default else unname(unlist(x))[[1]]
+              }
               game_id_val <- game_json$game_info$game_id %||%
                 game_json$game_info[[1]]$game_id %||% NA_integer_
               ts$game_id <- game_id_val
-              ts$winner_id <- val$winner$id
-              ts$winner_name <- val$winner$name
-              ts$loser_id <- val$loser$id
-              ts$loser_name <- val$loser$name
+              ts$winner_id   <- .scalar1(val$winner$id,   NA_integer_)
+              ts$winner_name <- .scalar1(val$winner$name, NA_character_)
+              ts$loser_id    <- .scalar1(val$loser$id,    NA_integer_)
+              ts$loser_name  <- .scalar1(val$loser$name,  NA_character_)
               ts
             } else {
               NULL
