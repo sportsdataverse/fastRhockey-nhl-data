@@ -148,4 +148,7 @@ nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
-ℹ Building master schedule + nhl_games_in_data_repo
+ℹ Building master schedule + nhl_games_in_data_repo[main 40a380f] NHL Data Updated (Start: 2024 End: 2024)
+ 1 file changed, 111 insertions(+), 20 deletions(-)
+To https://github.com/sportsdataverse/fastRhockey-nhl-data
+   6ae8142..40a380f  main -> main
