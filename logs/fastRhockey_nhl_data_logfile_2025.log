@@ -4,7 +4,7 @@
 ── Processing 2024-25 season ───────────────────────────────────────────────────
 ℹ Downloading 2024-25 schedule from nhl-raw
 ℹ 1398 games with final JSON in raw repo
-ℹ Downloading 2024-25 schedule from nhl-raw✔ Downloaded 2024-25 schedule [214ms]
+ℹ Downloading 2024-25 schedule from nhl-raw✔ Downloaded 2024-25 schedule [464ms]
 
 ℹ Reading 1398 game JSONs and extracting datasets
 ℹ pbp: 1116251 rows
@@ -12,59 +12,65 @@
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_full
-ℹ Reading 1398 game JSONs and extracting datasetsHTTP 404: Not Found (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105436/assets?label=&name=play_by_play_2025.parquet)
+ℹ Reading 1398 game JSONs and extracting datasetsHTTP 422: Validation Failed (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105436/assets?label=&name=package_function.txt)
+ReleaseAsset.name already exists
 → Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_full
-ℹ Reading 1398 game JSONs and extracting datasetsHTTP 404: Not Found (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105436/assets?label=&name=play_by_play_2025.rds)
+ℹ Reading 1398 game JSONs and extracting datasetsHTTP 404: Not Found (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105436/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_pbp_full
+ℹ Reading 1398 game JSONs and extracting datasetsHTTP 404: Not Found (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105436/assets?label=&name=play_by_play_2025.csv)
 → Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_full
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-05-29 19:10:31.928635
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-05-29 19:10:59.37254
 ℹ Reading 1398 game JSONs and extracting datasetsℹ skater_box: 50321 rows
 ℹ Reading 1398 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_skater_boxscores
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_skater_boxscores on 2026-05-29 19:10:37.17584
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_skater_boxscores on 2026-05-29 19:11:04.81863
 ℹ Reading 1398 game JSONs and extracting datasetsℹ goalie_box: 3194 rows
 ℹ Reading 1398 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_goalie_boxscores
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_goalie_boxscores on 2026-05-29 19:10:40.457086
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_goalie_boxscores on 2026-05-29 19:11:08.486253
 ℹ Reading 1398 game JSONs and extracting datasetsℹ team_box: 2796 rows
 ℹ Reading 1398 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_team_boxscores
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-05-29 19:10:43.967659
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-05-29 19:11:12.091131
 ℹ Reading 1398 game JSONs and extracting datasetsℹ game_info: 1398 rows
 ℹ Reading 1398 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_game_info
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_info on 2026-05-29 19:10:47.056926
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_info on 2026-05-29 19:11:15.751077
 ℹ Reading 1398 game JSONs and extracting datasetsℹ game_rosters: 1180 rows
 ℹ Reading 1398 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_game_rosters
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_rosters on 2026-05-29 19:10:50.081545
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_rosters on 2026-05-29 19:11:19.254682
 ℹ Reading 1398 game JSONs and extracting datasetsℹ shifts: 655442 rows
 ℹ Reading 1398 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1398 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @ nhl_shifts
 ℹ Reading 1398 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shifts on 2026-05-29 19:11:44.346589
+ℹ Reading 1398 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shifts on 2026-05-29 19:12:14.17245
 ℹ Reading 1398 game JSONs and extracting datasetsℹ scoring: 8512 rows
 ℹ Reading 1398 game JSONs and extracting datasetsError in `purrr::map()`:
 ℹ In index: 1.
@@ -96,13 +102,26 @@ Backtrace:
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
   Careful, you are setting up 6 localhost parallel workers with only 4 CPU cores available for this R process (per ‘system’), which could result in a 150% load. The soft limit is set to 100%. Overusing the CPUs has negative impact on the current R process, but also on all other processes of yours and others running on the same machine. See help("parallelly.maxWorkers.localhost", package = "parallelly") for further explanations and how to override the soft limit that triggered this warning
-✖ Reading 1398 game JSONs and extracting datasets [7m 36.2s]
+✖ Reading 1398 game JSONs and extracting datasets [7m 51.9s]
 
 Execution halted
-[main d6701b2] NHL Data Updated (Start: 2025 End: 2025)
- 7 files changed, 0 insertions(+), 0 deletions(-)
- create mode 100644 nhl/scoring/rds/scoring_2025.rds
- create mode 100644 nhl/shifts/parquet/shifts_2025.parquet
- create mode 100644 nhl/shifts/rds/shifts_2025.rds
-To https://github.com/sportsdataverse/fastRhockey-nhl-data
-   256d8f6..d6701b2  main -> main
+From https://github.com/sportsdataverse/fastRhockey-nhl-data
+   256d8f6..656d4b5  main       -> origin/main
+error: Your local changes to the following files would be overwritten by merge:
+	nhl/pbp/parquet/play_by_play_2025.parquet
+	nhl/pbp/rds/play_by_play_2025.rds
+	nhl/schedules/parquet/nhl_schedule_2025.parquet
+	nhl/schedules/rds/nhl_schedule_2025.rds
+Please commit your changes or stash them before you merge.
+error: The following untracked working tree files would be overwritten by merge:
+	nhl/scoring/rds/scoring_2025.rds
+	nhl/shifts/parquet/shifts_2025.parquet
+	nhl/shifts/rds/shifts_2025.rds
+Please move or remove them before you merge.
+Aborting
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+No changes to commit
+Everything up-to-date
