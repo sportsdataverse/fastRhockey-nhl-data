@@ -279,10 +279,12 @@ DATASETS <- tibble::tribble(
   }
   ok <- tryCatch(
     {
+      pat <- Sys.getenv("GITHUB_PAT", unset = "")
+      gh_env <- if (nzchar(pat)) paste0("GH_TOKEN=", pat) else character(0)
       res <- suppressWarnings(system2(
         "gh",
         c("release", "view", release_tag, "-R", repo, "--json", "tagName"),
-        stdout = TRUE, stderr = TRUE
+        stdout = TRUE, stderr = TRUE, env = gh_env
       ))
       st <- attr(res, "status")
       (is.null(st) || st == 0) &&
