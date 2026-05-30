@@ -273,12 +273,31 @@ DATASETS <- tibble::tribble(
       }
     } else {
       # Standard case: json_field is a data.frame or list convertible to one
+      df <- NULL
       if (is.data.frame(val) && nrow(val) > 0) {
-        out[[key]] <- val
+        df <- val
       } else if (is.list(val) && length(val) > 0 && !is.data.frame(val)) {
         # Try to convert single-row game_info etc. to tibble
         df <- tryCatch(dplyr::bind_rows(val), error = function(e) NULL)
-        if (!is.null(df) && nrow(df) > 0) out[[key]] <- df
+      }
+      if (!is.null(df) && nrow(df) > 0) {
+        # Attach game identifiers so the box-score datasets (skater_box,
+        # goalie_box, team_box, game_rosters) are joinable to a game. These
+        # fall through to this branch and previously shipped without a
+        # game_id column. game_info already carries them, so only fill when
+        # absent.
+        gid <- game_json$game_info$game_id %||%
+          game_json$game_info[[1]]$game_id %||% NA_integer_
+        if (!"game_id" %in% names(df)) df$game_id <- gid
+        if (!"season" %in% names(df)) {
+          df$season <- game_json$game_info$season %||%
+            game_json$game_info[[1]]$season %||% NA_integer_
+        }
+        if (!"game_date" %in% names(df)) {
+          df$game_date <- game_json$game_info$game_date %||%
+            game_json$game_info[[1]]$game_date %||% NA_character_
+        }
+        out[[key]] <- df
       }
     }
   }
@@ -537,6 +556,22 @@ invisible(purrr::map(years_vec, function(season_year) {
     tryCatch(
       {
         df_flat <- .flatten_struct_cols(df)
+        # Tidy the shots_by_period frame: the NHL JSON nests the period under a
+        # `periodDescriptor` struct that flattens to ugly dotted names. Rename
+        # to clean columns and drop the regulation/OT-count noise so the
+        # released frame is `game_id, season, game_date, home, away, period,
+        # period_type`.
+        if (key == "shots_by_period") {
+          df_flat <- df_flat |>
+            dplyr::rename(dplyr::any_of(c(
+              period = "periodDescriptor.number",
+              period_type = "periodDescriptor.periodType"
+            ))) |>
+            dplyr::select(-dplyr::any_of(c(
+              "periodDescriptor.maxRegulationPeriods",
+              "periodDescriptor.otPeriods"
+            )))
+        }
         .save_dataset(df_flat, file.path("nhl", key), pref, season_year)
         .upload_to_release(df_flat, glue("{pref}_{season_year}"), rtag, desc)
       },
@@ -555,7 +590,11 @@ invisible(purrr::map(years_vec, function(season_year) {
     tryCatch({
       pbp_lite_flat <- .flatten_struct_cols(pbp_lite)
       .save_dataset(pbp_lite_flat, "nhl/pbp_lite", "play_by_play_lite", season_year)
-      .upload_to_release(pbp_lite_flat, glue("play_by_play_{season_year}_lite"),
+      # Asset name MUST match the loader's `{file_prefix}_{season}` pattern
+      # (load_nhl_pbp_lite uses file_prefix = "play_by_play_lite"). The old
+      # `play_by_play_{season}_lite` ordering 404'd, so the loader returned 0
+      # rows despite the release existing.
+      .upload_to_release(pbp_lite_flat, glue("play_by_play_lite_{season_year}"),
         "nhl_pbp_lite", "NHL play-by-play data (lite)")
     }, error = function(e) {
       cli::cli_alert_warning("pbp_lite: save/upload failed -- {conditionMessage(e)}")
