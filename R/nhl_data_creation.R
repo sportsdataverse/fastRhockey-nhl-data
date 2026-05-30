@@ -558,18 +558,15 @@ invisible(purrr::map(years_vec, function(season_year) {
         df_flat <- .flatten_struct_cols(df)
         # Tidy the shots_by_period frame: the NHL JSON nests the period under a
         # `periodDescriptor` struct that flattens to ugly dotted names. Rename
-        # to clean columns and drop the regulation/OT-count noise so the
-        # released frame is `game_id, season, game_date, home, away, period,
-        # period_type`.
+        # them to clean snake_case columns -- keeping every field (no columns
+        # are dropped).
         if (key == "shots_by_period") {
           df_flat <- df_flat |>
             dplyr::rename(dplyr::any_of(c(
               period = "periodDescriptor.number",
-              period_type = "periodDescriptor.periodType"
-            ))) |>
-            dplyr::select(-dplyr::any_of(c(
-              "periodDescriptor.maxRegulationPeriods",
-              "periodDescriptor.otPeriods"
+              period_type = "periodDescriptor.periodType",
+              max_regulation_periods = "periodDescriptor.maxRegulationPeriods",
+              ot_periods = "periodDescriptor.otPeriods"
             )))
         }
         .save_dataset(df_flat, file.path("nhl", key), pref, season_year)
