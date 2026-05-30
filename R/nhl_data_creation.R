@@ -311,16 +311,49 @@ DATASETS <- tibble::tribble(
   )
 }
 
-# Walk the columns of `df` and unfold any nested data.frame columns
-# ("structs") into dot-prefixed scalar columns. jsonlite::flatten() does the
-# one-pass unfold; loop until no struct columns remain so deeply-nested
-# `firstName.default.x` cases resolve to scalars before parquet writes.
+# Walk the columns of `df` and unfold any structure that `arrow` can't
+# write to parquet. Two sources of trouble:
+#
+#   1. Nested data.frame columns (jsonlite produces these when a JSON field
+#      is itself an object; flatten = FALSE keeps them nested). For these,
+#      jsonlite::flatten() unfolds one level per call -- loop up to 5
+#      times so even multi-level nests resolve to scalar dot-prefixed
+#      columns like `lastName.default`.
+#   2. List columns where each row holds a per-row named list (NHL's
+#      multi-locale name objects when row schemas differ across games).
+#      jsonlite::flatten() does NOT touch these because the column type is
+#      `list` rather than `data.frame`. For each such column, extract the
+#      most useful scalar: if every element has a `$default` key (the NHL
+#      localized-name pattern), pull that. Otherwise JSON-stringify so the
+#      cell survives as character.
 .flatten_struct_cols <- function(df) {
   if (!is.data.frame(df) || nrow(df) == 0) return(df)
+
   for (iter in seq_len(5L)) {
     if (!any(vapply(df, is.data.frame, logical(1)))) break
     df <- jsonlite::flatten(df)
   }
+
+  for (col in names(df)) {
+    x <- df[[col]]
+    if (is.list(x) && !is.data.frame(x)) {
+      df[[col]] <- vapply(x, function(elem) {
+        if (is.null(elem) || length(elem) == 0) {
+          NA_character_
+        } else if (is.list(elem) && !is.null(elem$default)) {
+          as.character(elem$default)[[1]]
+        } else if (is.atomic(elem) && length(elem) == 1L) {
+          as.character(elem)
+        } else {
+          tryCatch(
+            jsonlite::toJSON(elem, auto_unbox = TRUE, na = "null"),
+            error = function(e) NA_character_
+          )
+        }
+      }, character(1))
+    }
+  }
+
   df
 }
 
@@ -497,11 +530,15 @@ invisible(purrr::map(years_vec, function(season_year) {
     cli::cli_alert_info("{key}: {nrow(df)} rows")
     # Per-dataset tryCatch: a single dataset's save/upload failure
     # (e.g. arrow refusing a struct column, transient release upload
-    # 5xx) should not abort the rest of the season's compile.
+    # 5xx) should not abort the rest of the season's compile. Flatten
+    # once up front so .save_dataset, .upload_to_release, and any
+    # tibble construction inside sportsdataverse_save all see scalar
+    # dot-prefixed columns rather than nested data.frame / list cols.
     tryCatch(
       {
-        .save_dataset(df, file.path("nhl", key), pref, season_year)
-        .upload_to_release(df, glue("{pref}_{season_year}"), rtag, desc)
+        df_flat <- .flatten_struct_cols(df)
+        .save_dataset(df_flat, file.path("nhl", key), pref, season_year)
+        .upload_to_release(df_flat, glue("{pref}_{season_year}"), rtag, desc)
       },
       error = function(e) {
         cli::cli_alert_warning(
@@ -515,18 +552,28 @@ invisible(purrr::map(years_vec, function(season_year) {
   pbp_full <- compiled[["pbp"]]
   if (!is.null(pbp_full) && nrow(pbp_full) > 0) {
     pbp_lite <- pbp_full |> dplyr::filter(.data$event_type != "CHANGE")
-    .save_dataset(pbp_lite, "nhl/pbp_lite", "play_by_play_lite", season_year)
-    .upload_to_release(pbp_lite, glue("play_by_play_{season_year}_lite"),
-      "nhl_pbp_lite", "NHL play-by-play data (lite)")
+    tryCatch({
+      pbp_lite_flat <- .flatten_struct_cols(pbp_lite)
+      .save_dataset(pbp_lite_flat, "nhl/pbp_lite", "play_by_play_lite", season_year)
+      .upload_to_release(pbp_lite_flat, glue("play_by_play_{season_year}_lite"),
+        "nhl_pbp_lite", "NHL play-by-play data (lite)")
+    }, error = function(e) {
+      cli::cli_alert_warning("pbp_lite: save/upload failed -- {conditionMessage(e)}")
+    })
     cli::cli_alert_info("pbp_lite: {nrow(pbp_lite)} rows")
   }
 
   # Player box (combined skater + goalie)
   player_box <- compiled[["player_box"]]
   if (!is.null(player_box) && nrow(player_box) > 0) {
-    .save_dataset(player_box, "nhl/player_box", "player_box", season_year)
-    .upload_to_release(player_box, glue("player_box_{season_year}"),
-      "nhl_player_boxscores", "NHL player boxscores")
+    tryCatch({
+      player_box_flat <- .flatten_struct_cols(player_box)
+      .save_dataset(player_box_flat, "nhl/player_box", "player_box", season_year)
+      .upload_to_release(player_box_flat, glue("player_box_{season_year}"),
+        "nhl_player_boxscores", "NHL player boxscores")
+    }, error = function(e) {
+      cli::cli_alert_warning("player_box: save/upload failed -- {conditionMessage(e)}")
+    })
     cli::cli_alert_info("player_box: {nrow(player_box)} rows")
   }
 
@@ -546,9 +593,14 @@ invisible(purrr::map(years_vec, function(season_year) {
       dplyr::select(-dplyr::any_of("game_id")) |>
       dplyr::distinct()
     rosters_unique$season <- season_year
-    .save_dataset(rosters_unique, "nhl/rosters", "rosters", season_year)
-    .upload_to_release(rosters_unique, glue("rosters_{season_year}"),
-      "nhl_rosters", "NHL rosters")
+    tryCatch({
+      rosters_unique_flat <- .flatten_struct_cols(rosters_unique)
+      .save_dataset(rosters_unique_flat, "nhl/rosters", "rosters", season_year)
+      .upload_to_release(rosters_unique_flat, glue("rosters_{season_year}"),
+        "nhl_rosters", "NHL rosters")
+    }, error = function(e) {
+      cli::cli_alert_warning("rosters: save/upload failed -- {conditionMessage(e)}")
+    })
     cli::cli_alert_info("rosters: {nrow(rosters_unique)} unique entries")
   }
 
@@ -590,16 +642,20 @@ invisible(purrr::map(years_vec, function(season_year) {
     dplyr::distinct() |>
     dplyr::arrange(dplyr::desc(.data$game_date))
 
-  saveRDS(final_sched, glue("nhl/schedules/rds/nhl_schedule_{season_year}.rds"))
-  arrow::write_parquet(final_sched,
-    glue("nhl/schedules/parquet/nhl_schedule_{season_year}.parquet"),
-    compression = "gzip"
-  )
-
-  .upload_to_release(
-    final_sched, glue("nhl_schedule_{season_year}"),
-    "nhl_schedules", "NHL schedule"
-  )
+  tryCatch({
+    final_sched_flat <- .flatten_struct_cols(final_sched)
+    saveRDS(final_sched_flat, glue("nhl/schedules/rds/nhl_schedule_{season_year}.rds"))
+    arrow::write_parquet(final_sched_flat,
+      glue("nhl/schedules/parquet/nhl_schedule_{season_year}.parquet"),
+      compression = "gzip"
+    )
+    .upload_to_release(
+      final_sched_flat, glue("nhl_schedule_{season_year}"),
+      "nhl_schedules", "NHL schedule"
+    )
+  }, error = function(e) {
+    cli::cli_alert_warning("schedule {season_year}: save/upload failed -- {conditionMessage(e)}")
+  })
 
   cli::cli_alert_success("Done with {season_label}")
 
@@ -623,22 +679,31 @@ sched_all <- purrr::map(sched_files, readRDS) |>
   dplyr::bind_rows() |>
   dplyr::arrange(dplyr::desc(.data$game_date))
 
-saveRDS(sched_all, "nhl/nhl_schedule_master.rds", compress = "xz")
-arrow::write_parquet(sched_all, "nhl/nhl_schedule_master.parquet", compression = "gzip")
+tryCatch({
+  sched_all_flat <- .flatten_struct_cols(sched_all)
+  saveRDS(sched_all_flat, "nhl/nhl_schedule_master.rds", compress = "xz")
+  arrow::write_parquet(sched_all_flat, "nhl/nhl_schedule_master.parquet", compression = "gzip")
+  .upload_to_release(sched_all_flat, "nhl_schedule_master", "nhl_schedules", "NHL schedules")
+}, error = function(e) {
+  cli::cli_alert_warning("schedule_master: save/upload failed -- {conditionMessage(e)}")
+})
 
 games_in_repo <- sched_all |>
   dplyr::filter(.data$PBP == TRUE) |>
   dplyr::arrange(dplyr::desc(.data$game_date))
 
 if (!dir.exists("nhl")) dir.create("nhl")
-saveRDS(games_in_repo, "nhl/nhl_games_in_data_repo.rds", compress = "xz")
-arrow::write_parquet(games_in_repo, "nhl/nhl_games_in_data_repo.parquet", compression = "gzip")
-
-.upload_to_release(sched_all, "nhl_schedule_master", "nhl_schedules", "NHL schedules")
-.upload_to_release(
-  games_in_repo, "nhl_games_in_data_repo",
-  "nhl_schedules", "NHL games available in fastRhockey data repo"
-)
+tryCatch({
+  games_in_repo_flat <- .flatten_struct_cols(games_in_repo)
+  saveRDS(games_in_repo_flat, "nhl/nhl_games_in_data_repo.rds", compress = "xz")
+  arrow::write_parquet(games_in_repo_flat, "nhl/nhl_games_in_data_repo.parquet", compression = "gzip")
+  .upload_to_release(
+    games_in_repo_flat, "nhl_games_in_data_repo",
+    "nhl_schedules", "NHL games available in fastRhockey data repo"
+  )
+}, error = function(e) {
+  cli::cli_alert_warning("games_in_data_repo: save/upload failed -- {conditionMessage(e)}")
+})
 
 cli::cli_alert_success("{nrow(sched_all)} total schedule rows, {nrow(games_in_repo)} with PBP")
 
