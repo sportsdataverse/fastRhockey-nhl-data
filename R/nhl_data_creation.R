@@ -299,9 +299,29 @@ DATASETS <- tibble::tribble(
     if (!dir.exists(d)) dir.create(d, recursive = TRUE)
   }
   saveRDS(df, file.path(rds_dir, glue("{name}_{season}.rds")), compress = "xz")
-  arrow::write_parquet(df, file.path(parquet_dir, glue("{name}_{season}.parquet")),
+  # arrow::write_parquet can't write nested data.frame columns ("structs").
+  # Several NHL fields (firstName/lastName localized-name objects, period
+  # descriptors, etc.) come through as nested data.frame columns because
+  # the per-game JSON is parsed with flatten = FALSE. Recursively flatten
+  # before writing parquet so each leaf scalar becomes its own dot-prefixed
+  # column. The RDS write above keeps the original nested shape.
+  arrow::write_parquet(.flatten_struct_cols(df),
+    file.path(parquet_dir, glue("{name}_{season}.parquet")),
     compression = "gzip"
   )
+}
+
+# Walk the columns of `df` and unfold any nested data.frame columns
+# ("structs") into dot-prefixed scalar columns. jsonlite::flatten() does the
+# one-pass unfold; loop until no struct columns remain so deeply-nested
+# `firstName.default.x` cases resolve to scalars before parquet writes.
+.flatten_struct_cols <- function(df) {
+  if (!is.data.frame(df) || nrow(df) == 0) return(df)
+  for (iter in seq_len(5L)) {
+    if (!any(vapply(df, is.data.frame, logical(1)))) break
+    df <- jsonlite::flatten(df)
+  }
+  df
 }
 
 # Cache release-existence checks so we hit `gh` once per tag, not once per file.
@@ -475,8 +495,20 @@ invisible(purrr::map(years_vec, function(season_year) {
     }
 
     cli::cli_alert_info("{key}: {nrow(df)} rows")
-    .save_dataset(df, file.path("nhl", key), pref, season_year)
-    .upload_to_release(df, glue("{pref}_{season_year}"), rtag, desc)
+    # Per-dataset tryCatch: a single dataset's save/upload failure
+    # (e.g. arrow refusing a struct column, transient release upload
+    # 5xx) should not abort the rest of the season's compile.
+    tryCatch(
+      {
+        .save_dataset(df, file.path("nhl", key), pref, season_year)
+        .upload_to_release(df, glue("{pref}_{season_year}"), rtag, desc)
+      },
+      error = function(e) {
+        cli::cli_alert_warning(
+          "{key}: save/upload failed -- {conditionMessage(e)}"
+        )
+      }
+    )
   }
 
   # PBP lite (PBP without CHANGE events)
