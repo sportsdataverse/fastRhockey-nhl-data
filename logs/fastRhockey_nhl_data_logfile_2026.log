@@ -4,7 +4,7 @@
 ── Processing 2025-26 season ───────────────────────────────────────────────────
 ℹ Downloading 2025-26 schedule from nhl-raw
 ℹ 1388 games with final JSON in raw repo
-ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [172ms]
+ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [165ms]
 
 ℹ Reading 1388 game JSONs and extracting datasets
 ℹ pbp: 1094485 rows
@@ -12,120 +12,125 @@
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_full
+ℹ Reading 1388 game JSONs and extracting datasetsHTTP 404: Not Found (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105436/assets?label=&name=play_by_play_2026.csv)
+→ Uploading 3 files!
+ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_pbp_full
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-05-31 11:06:53.977751
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-05-31 15:32:30.891946
 ℹ Reading 1388 game JSONs and extracting datasetsℹ skater_box: 49967 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_skater_boxscores
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_skater_boxscores on 2026-05-31 11:06:58.000969
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_skater_boxscores on 2026-05-31 15:32:35.198455
 ℹ Reading 1388 game JSONs and extracting datasetsℹ goalie_box: 5551 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_goalie_boxscores
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_goalie_boxscores on 2026-05-31 11:07:00.149086
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_goalie_boxscores on 2026-05-31 15:32:37.514194
 ℹ Reading 1388 game JSONs and extracting datasetsℹ team_box: 2776 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_team_boxscores
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-05-31 11:07:02.207108
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-05-31 15:32:40.612867
 ℹ Reading 1388 game JSONs and extracting datasetsℹ game_info: 1388 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_game_info
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_info on 2026-05-31 11:07:04.183846
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_info on 2026-05-31 15:32:43.144052
 ℹ Reading 1388 game JSONs and extracting datasetsℹ game_rosters: 55518 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_game_rosters
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_rosters on 2026-05-31 11:07:07.572206
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_game_rosters on 2026-05-31 15:32:46.618481
 ℹ Reading 1388 game JSONs and extracting datasetsℹ shifts: 653159 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @ nhl_shifts
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shifts on 2026-05-31 11:08:10.791885
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shifts on 2026-05-31 15:33:45.65401
 ℹ Reading 1388 game JSONs and extracting datasetsℹ scoring: 8649 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_scoring
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_scoring on 2026-05-31 11:08:22.782776
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_scoring on 2026-05-31 15:33:57.60804
 ℹ Reading 1388 game JSONs and extracting datasetsℹ penalties: 10406 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_penalties
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_penalties on 2026-05-31 11:08:25.476218
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_penalties on 2026-05-31 15:34:00.432386
 ℹ Reading 1388 game JSONs and extracting datasetsℹ scratches: 9315 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_scratches
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_scratches on 2026-05-31 11:08:27.623098
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_scratches on 2026-05-31 15:34:02.569911
 ℹ Reading 1388 game JSONs and extracting datasetsℹ linescore: 1388 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_linescore
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_linescore on 2026-05-31 11:08:29.7931
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_linescore on 2026-05-31 15:34:04.660877
 ℹ Reading 1388 game JSONs and extracting datasetsℹ three_stars: 4164 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_three_stars
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_three_stars on 2026-05-31 11:08:31.85803
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_three_stars on 2026-05-31 15:34:07.158237
 ℹ Reading 1388 game JSONs and extracting datasetsℹ officials: 5550 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_officials
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_officials on 2026-05-31 11:08:33.953688
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_officials on 2026-05-31 15:34:09.400338
 ℹ Reading 1388 game JSONs and extracting datasetsℹ shots_by_period: 4632 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_shots_by_period
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shots_by_period on 2026-05-31 11:08:36.182891
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shots_by_period on 2026-05-31 15:34:11.462021
 ℹ Reading 1388 game JSONs and extracting datasetsℹ shootout: 929 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_shootout
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shootout on 2026-05-31 11:08:38.271272
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_shootout on 2026-05-31 15:34:13.630614
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_pbp_lite
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-05-31 11:10:04.733374
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-05-31 15:35:38.549222
 ℹ Reading 1388 game JSONs and extracting datasetsℹ pbp_lite: 441326 rows
 ℹ Reading 1388 game JSONs and extracting datasets→ Uploading 3 files!
 ℹ Reading 1388 game JSONs and extracting datasetsℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_player_boxscores
 ℹ Reading 1388 game JSONs and extracting datasets✔ Upload successfully completed.
-ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-05-31 11:10:09.541
+ℹ Reading 1388 game JSONs and extracting datasets→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-05-31 15:35:43.37958
 ℹ Reading 1388 game JSONs and extracting datasetsℹ player_box: 55518 rows
-ℹ Reading 1388 game JSONs and extracting datasets✔ Extracted per-game datasets [9m 28.7s]
+ℹ Reading 1388 game JSONs and extracting datasets✔ Extracted per-game datasets [9m 25s]
 
 ℹ Compiling 2025-26 season rosters
 → Uploading 3 files!
@@ -133,7 +138,7 @@ nhl_player_boxscores
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_rosters
 ℹ Compiling 2025-26 season rosters✔ Upload successfully completed.
-ℹ Compiling 2025-26 season rosters→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-05-31 11:10:13.297406
+ℹ Compiling 2025-26 season rosters→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-05-31 15:35:47.15864
 ℹ Compiling 2025-26 season rostersℹ rosters: 55518 unique entries
 ℹ Compiling 2025-26 season rosters✔ Compiled 2025-26 season rosters [3.8s]
 
@@ -143,9 +148,9 @@ nhl_rosters
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Updating 2025-26 schedule flags✔ Upload successfully completed.
-ℹ Updating 2025-26 schedule flags→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-05-31 11:10:15.346719
+ℹ Updating 2025-26 schedule flags→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-05-31 15:35:49.394157
 ℹ Updating 2025-26 schedule flags✔ Done with 2025-26
-ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [2.6s]
+ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [2.7s]
 
 Warning message:
 In checkNumberOfLocalWorkers(workers) :
@@ -156,22 +161,20 @@ In checkNumberOfLocalWorkers(workers) :
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-05-31 11:10:19.216174
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-313"
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-05-31 15:35:53.417293
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-327"
 → Uploading 3 files!
 ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-05-31 11:10:22.379599
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-324"
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-05-31 15:35:56.493525
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-338"
 ✔ 22003 total schedule rows, 20493 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
-ℹ Building master schedule + nhl_games_in_data_repoOn branch main
-Your branch is up to date with 'origin/main'.
-
-nothing to commit, working tree clean
-No changes to commit
-Everything up-to-date
+ℹ Building master schedule + nhl_games_in_data_repo[main 0a287eb] NHL Data Updated (Start: 2026 End: 2026)
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+To https://github.com/sportsdataverse/fastRhockey-nhl-data
+   b7e7ede..0a287eb  main -> main
