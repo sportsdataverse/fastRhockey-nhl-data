@@ -148,10 +148,11 @@ dropping a configurable set of columns; it shares the same compile path as
 - **`repository_dispatch`** event type `daily_nhl_data` — fired by
   `fastRhockey-nhl-raw` after its daily push. The dispatch payload's
   `commit_message` is regex-grepped for two integers, which become
-  `START_YEAR` / `END_YEAR`. The raw-side commit format `"NHL Raw Update
-  (Start: 2026 End: 2026)"` is therefore load-bearing — do not change it
-  without updating the regex in step `Check fastRhockey_nhl_data_trigger
-  for inputs`.
+  `START_YEAR` / `END_YEAR`. The raw-side commit format is `"NHL Raw
+  Updated (Start: 2026 End: 2026)"` — the regex (`grep -o -E '[0-9]+'`,
+  `head -1` / `tail -1`) only needs the first/last integers in the
+  subject, so keep those two years present and outermost when changing
+  the raw-side message.
 - **`workflow_dispatch`** inputs: `start_year`, `end_year` strings.
 - Empty inputs fall back to `fastRhockey:::most_recent_nhl_season()`.
 - Calls `bash scripts/daily_nhl_R_processor.sh -s $START_YEAR -e $END_YEAR`.
