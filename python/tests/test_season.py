@@ -40,3 +40,25 @@ def test_build_and_write(tmp_path: Path) -> None:
     # nested datasets are flattened on write
     scoring = pl.read_parquet(out / "scoring" / "parquet" / "scoring_2025.parquet")
     assert "firstName.default" in scoring.columns
+
+
+def test_build_season_batch_invariant() -> None:
+    # The streaming/batched compile must be invariant to batch_size: splitting games across
+    # batch boundaries must not change the per-dataset output. A string-remapped copy is a
+    # distinct second game so the boundary actually combines two games' rows.
+    import json
+
+    from nhl_data_build.build import build_season
+
+    text = (FIX / f"final_{GID}.json").read_text(encoding="utf-8")
+    g1 = json.loads(text)
+    g2 = json.loads(text.replace(str(GID), str(GID + 1)))
+    games = [g1, g2]
+    one = build_season(games, batch_size=1)  # each game its own batch -> cross-batch concat
+    big = build_season(games, batch_size=100)  # single batch, no boundary
+    assert set(one) == set(big)
+    for k in one:
+        assert one[k].height == big[k].height, f"{k}: {one[k].height} vs {big[k].height}"
+        assert sorted(one[k].columns) == sorted(big[k].columns), k
+    # the boundary actually combined two games (more pbp rows than a single game alone)
+    assert one["pbp"].height > build_season([g1])["pbp"].height
