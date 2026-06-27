@@ -84,6 +84,25 @@ def _extract_three_stars(val: dict, gid: int | None) -> list[dict]:
     return rows
 
 
+def _extract_shootout(val: object, gid: object, season: object, gdate: object) -> list[dict]:
+    """Port of R's ``bind_rows(shootout)`` on the ``{liveScore, events}`` object. R binds the
+    1-row ``liveScore`` (home/away only) and the ``events`` (attempts) into one frame, so the
+    released ``shootout_summary`` carries, per game, a leading liveScore-only row (home/away
+    set, attempt fields null) followed by one row per attempt (attempt fields set, home/away
+    null). Reproduced faithfully so the dataset is a drop-in replacement."""
+    if not isinstance(val, dict):
+        return []
+    ids = {"game_id": gid, "season": season, "game_date": gdate}
+    out = []
+    live = val.get("liveScore")
+    if isinstance(live, dict) and live:
+        out.append({"home": live.get("home"), "away": live.get("away"), **ids})
+    for ev in val.get("events") or []:
+        if isinstance(ev, dict):
+            out.append({**ev, **ids})
+    return out
+
+
 def extract_all(game_json: dict | None) -> dict[str, list[dict]]:
     """Port of ``.extract_all`` — one final.json -> {dataset_key: list[row-dict]}."""
     if not game_json:
@@ -112,9 +131,17 @@ def extract_all(game_json: dict | None) -> dict[str, list[dict]]:
             if rows:
                 out[key] = rows
         elif key == "scratches":
+            if isinstance(val, dict):  # singleton -> one-row list
+                val = [val]
             if val:
                 out[key] = [{**dict(s), "game_id": gid} for s in val]
-        elif key in ("officials", "shots_by_period", "shootout"):
+        elif key == "shootout":
+            rows = _extract_shootout(val, gid, season, gdate)
+            if rows:
+                out[key] = rows
+        elif key in ("officials", "shots_by_period"):
+            if isinstance(val, dict):  # singleton -> one-row list
+                val = [val]
             if val:
                 out[key] = [{**dict(s), "game_id": gid, "season": season, "game_date": gdate} for s in val]
 
