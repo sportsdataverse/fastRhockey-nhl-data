@@ -108,3 +108,35 @@ def test_nested_dataset_parity(key: str, sort_key: list[str], exclude: list[str]
     for gr, orow in zip(g, o):
         for c in shared:
             assert _eq(gr[c], orow[c]), f"{key} col {c}: {gr[c]!r} vs {orow[c]!r}"
+
+
+def test_extract_shootout_livescore_plus_attempts() -> None:
+    # R binds the 1-row liveScore (home/away) + the events (attempts) into one frame, so the
+    # output is a leading liveScore-only row (home/away set, attempt fields null) + one row per
+    # attempt (attempt fields set, home/away NOT broadcast). See _extract_shootout docstring.
+    from nhl_data_build.extract import _extract_shootout
+
+    val = {
+        "liveScore": {"home": 1, "away": 2},
+        "events": [
+            {"sequence": 1, "playerId": 100, "shotType": "wrist", "result": "save"},
+            {"sequence": 2, "playerId": 200, "shotType": "deke", "result": "goal"},
+        ],
+    }
+    rows = _extract_shootout(val, gid=2024020022, season=20242025, gdate="2024-10-12")
+    assert len(rows) == 3  # 1 liveScore + 2 attempts
+    ls = rows[0]
+    assert ls["home"] == 1 and ls["away"] == 2 and "sequence" not in ls
+    assert ls["game_id"] == 2024020022 and ls["season"] == 20242025
+    attempts = rows[1:]
+    assert all("home" not in a and "away" not in a for a in attempts)  # not broadcast
+    assert [a["sequence"] for a in attempts] == [1, 2]
+    assert all(a["game_id"] == 2024020022 for a in attempts)
+
+
+def test_extract_shootout_non_dict_is_empty() -> None:
+    from nhl_data_build.extract import _extract_shootout
+
+    assert _extract_shootout(None, 1, 2, "d") == []
+    assert _extract_shootout([], 1, 2, "d") == []
+    assert _extract_shootout({"liveScore": {}, "events": []}, 1, 2, "d") == []
