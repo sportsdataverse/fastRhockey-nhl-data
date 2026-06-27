@@ -5,7 +5,7 @@
 ℹ Downloading 43- schedule from nhl-raw
 ✖ Failed to read RDS from https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_44.rds: cannot open the connection to 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_44.rds'
 ℹ Downloading 43- schedule from nhl-raw✖ Could not fetch schedule for 43-. Skipping.
-ℹ Downloading 43- schedule from nhl-raw✔ Downloaded 43- schedule [94ms]
+ℹ Downloading 43- schedule from nhl-raw✔ Downloaded 43- schedule [117ms]
 
 Warning message:
 In readRDS(con) :
@@ -16,22 +16,20 @@ In readRDS(con) :
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:51:08.275421
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:53:05.375904
 ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-33"
 → Uploading 3 files!
 ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:51:11.415094
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:53:08.386227
 ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-44"
 ✔ 22002 total schedule rows, 21897 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
-ℹ Building master schedule + nhl_games_in_data_repoFrom https://github.com/sportsdataverse/fastRhockey-nhl-data
-   2f39a77..a1e3a83  main       -> origin/main
-On branch main
+ℹ Building master schedule + nhl_games_in_data_repoOn branch main
 Your branch is up to date with 'origin/main'.
 
 nothing to commit, working tree clean
