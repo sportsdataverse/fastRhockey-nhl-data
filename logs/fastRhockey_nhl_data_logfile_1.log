@@ -1,0 +1,37 @@
+ℹ === NHL Data Creation started ===
+ℹ Processing seasons: 1
+
+── Processing 0- season ────────────────────────────────────────────────────────
+ℹ Downloading 0- schedule from nhl-raw
+✖ Failed to read RDS from https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_1.rds: cannot open the connection to 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_1.rds'
+ℹ Downloading 0- schedule from nhl-raw✖ Could not fetch schedule for 0-. Skipping.
+ℹ Downloading 0- schedule from nhl-raw✔ Downloaded 0- schedule [89ms]
+
+Warning message:
+In readRDS(con) :
+  cannot open URL 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_1.rds': HTTP status was '404 Not Found'
+ℹ Building master schedule + nhl_games_in_data_repo
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 05:36:00.826003
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-33"
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 05:36:04.251268
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-44"
+✔ 22002 total schedule rows, 21897 with PBP
+ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
+ℹ Building master schedule + nhl_games_in_data_repo
+ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
+ℹ Building master schedule + nhl_games_in_data_repoOn branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+No changes to commit
+Everything up-to-date
