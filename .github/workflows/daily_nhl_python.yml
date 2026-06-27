@@ -1,0 +1,98 @@
+name: Update NHL Data (Python)
+
+# Python port of the NHL data reshaper (python/nhl_data_build). Reads the per-game
+# final.json from fastRhockey-nhl-raw, compiles the season-level datasets, and publishes
+# them to the sportsdataverse-data nhl_* releases — the same outputs as the R daily_nhl.yml.
+#
+# Starts as workflow_dispatch + repository_dispatch only (no cron) so it can be validated
+# before cutover; add the daily_nhl.yml cron schedule here (and retire it there) to switch.
+#
+# Credential scoping: the cross-repo publish PAT (SDV_GH_TOKEN) is set only on the publish
+# step; the external nhl-raw checkout sets persist-credentials:false.
+on:
+  workflow_dispatch:
+    inputs:
+      start_year:
+        description: 'Start season end-year (e.g. 2025 for 2024-25)'
+        required: false
+        type: string
+      end_year:
+        description: 'End season end-year (default: start)'
+        required: false
+        type: string
+      publish:
+        description: 'Publish parquet datasets to sportsdataverse-data releases'
+        required: false
+        type: boolean
+        default: true
+  repository_dispatch:
+    types: [daily_nhl_data]
+
+permissions:
+  contents: write
+
+jobs:
+  nhl_data_python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - name: Checkout nhl-data
+        uses: actions/checkout@v5
+
+      # The per-game final JSONs live in fastRhockey-nhl-raw. Sparse-checkout the final/
+      # tree (the reshaper reads it via --final-dir).
+      - name: Sparse-checkout nhl-raw finals
+        uses: actions/checkout@v5
+        with:
+          repository: sportsdataverse/fastRhockey-nhl-raw
+          path: _raw
+          sparse-checkout: |
+            nhl/json/final
+          sparse-checkout-cone-mode: true
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: python/uv.lock
+
+      - name: Sync deps
+        run: uv sync || uv pip install --system polars pyarrow numpy
+
+      - name: Resolve season range
+        id: years
+        run: |
+          START="${{ github.event.inputs.start_year }}"
+          if [ -z "$START" ]; then
+            Y=$(date +%Y); M=$(date +%m)
+            START=$([ "$M" -ge 8 ] && echo $((Y + 1)) || echo "$Y")   # NHL season end-year
+          fi
+          END="${{ github.event.inputs.end_year }}"; [ -z "$END" ] && END="$START"
+          echo "start=$START" >> "$GITHUB_OUTPUT"; echo "end=$END" >> "$GITHUB_OUTPUT"
+
+      - name: Compile season datasets
+        run: |
+          uv run python -m nhl_data_build.season \
+            -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }} \
+            --final-dir "$GITHUB_WORKSPACE/_raw/nhl/json/final" --out-dir "$GITHUB_WORKSPACE/nhl"
+
+      - name: Publish to sportsdataverse-data releases
+        if: ${{ github.event.inputs.publish != 'false' }}
+        env:
+          GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
+        run: |
+          for y in $(seq ${{ steps.years.outputs.start }} ${{ steps.years.outputs.end }}); do
+            uv run python -c "from nhl_data_build.publish import publish_season; print(publish_season('$GITHUB_WORKSPACE/nhl', $y))"
+          done
+
+      - name: Commit compiled parquets
+        working-directory: .
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add nhl
+          git commit -m "ci(data): compile NHL datasets (Python) ${{ steps.years.outputs.start }}-${{ steps.years.outputs.end }}" || echo "no changes"
+          git push || echo "nothing to push"
