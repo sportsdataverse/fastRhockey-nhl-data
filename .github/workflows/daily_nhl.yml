@@ -1,12 +1,13 @@
-name: Update NHL Data
+name: Update NHL Data (R — retired)
 
+# RETIRED: superseded by daily_nhl_python.yml (the Python reshaper). The schedule is removed
+# so this no longer runs on cron; repository_dispatch + workflow_dispatch are kept as a manual
+# fallback during the transition. Delete this workflow once the Python pipeline is proven.
 on:
-  schedule:
-    # NHL regular season: October through April
-    - cron: '0 9 * 10-12 *'
-    - cron: '0 9 * 1-4 *'
-    # Playoffs: April through June
-    - cron: '0 9 * 5-6 *'
+  # schedule:  # de-scheduled at cutover — see daily_nhl_python.yml
+  #   - cron: '0 9 * 10-12 *'
+  #   - cron: '0 9 * 1-4 *'
+  #   - cron: '0 9 * 5-6 *'
   repository_dispatch:
     types: [daily_nhl_data]
   workflow_dispatch:

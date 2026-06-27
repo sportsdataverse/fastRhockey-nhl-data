@@ -4,12 +4,18 @@ name: Update NHL Data (Python)
 # final.json from fastRhockey-nhl-raw, compiles the season-level datasets, and publishes
 # them to the sportsdataverse-data nhl_* releases — the same outputs as the R daily_nhl.yml.
 #
-# Starts as workflow_dispatch + repository_dispatch only (no cron) so it can be validated
-# before cutover; add the daily_nhl.yml cron schedule here (and retire it there) to switch.
+# This is the production reshaper (cutover from the R daily_nhl.yml, now de-scheduled).
+# Validated at full-season scale: pbp byte-exact vs the released nhl_pbp_full, shootout
+# exact (590 rows, 0 attempt-value mismatches), extract_all smoke-clean across all 17 seasons.
 #
 # Credential scoping: the cross-repo publish PAT (SDV_GH_TOKEN) is set only on the publish
 # step; the external nhl-raw checkout sets persist-credentials:false.
 on:
+  schedule:
+    # Mirrors the retired daily_nhl.yml cadence — 09:00 UTC, NHL season Oct-Apr + playoffs Apr-Jun.
+    - cron: '0 9 * 10-12 *'
+    - cron: '0 9 * 1-4 *'
+    - cron: '0 9 * 5-6 *'
   workflow_dispatch:
     inputs:
       start_year:
