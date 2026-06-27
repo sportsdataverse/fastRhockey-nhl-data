@@ -78,3 +78,33 @@ def test_pbp_full_and_lite_shape() -> None:
 # 90/90, xG 90/90, on-ice 294/294). The local pbp oracle here predates CHANGE-in-all_plays and
 # was scraped from an earlier API snapshot (revised coordinates), so a re-assertion would be
 # both redundant and unreliable. The shape test above is the reshaper-side check.
+
+
+# ----- Nested datasets: flatten_struct_cols -> dotted columns -----
+# The season parquet binds all games' goals/penalties, so it carries extra columns (other
+# games' French clip URLs, more name-langs) absent from a single game. Parity here is
+# therefore SUBSET (my flattened cols ⊆ oracle) + value-match on the shared columns.
+@pytest.mark.parametrize(
+    "key,sort_key,exclude,must_have",
+    [
+        ("shots_by_period", ["period"], [], "period"),
+        ("three_stars", ["star"], [], "name.default"),
+        ("scoring", ["eventId"], ["assists"], "firstName.default"),
+        ("penalties", ["timeInPeriod", "type"], [], "committedByPlayer.firstName.default"),
+    ],
+)
+def test_nested_dataset_parity(key: str, sort_key: list[str], exclude: list[str], must_have: str) -> None:
+    from nhl_data_build.flatten import prepare_for_parquet
+
+    got = prepare_for_parquet(_season()[key], key)
+    oracle = pl.read_parquet(FIX / f"oracle_{key}_{GID}.parquet")
+    assert must_have in got.columns, f"{key}: flatten did not produce {must_have}"
+    assert set(got.columns) <= set(oracle.columns), f"{key} unexpected cols: {set(got.columns) - set(oracle.columns)}"
+    assert got.height == oracle.height, f"{key} rows {got.height} vs {oracle.height}"
+
+    shared = [c for c in got.columns if c not in exclude]
+    g = got.select(shared).sort(sort_key).to_dicts()
+    o = oracle.select(shared).sort(sort_key).to_dicts()
+    for gr, orow in zip(g, o):
+        for c in shared:
+            assert _eq(gr[c], orow[c]), f"{key} col {c}: {gr[c]!r} vs {orow[c]!r}"
