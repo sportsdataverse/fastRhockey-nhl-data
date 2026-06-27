@@ -5,7 +5,7 @@
 ℹ Downloading 13- schedule from nhl-raw
 ✖ Failed to read RDS from https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_14.rds: cannot open the connection to 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_14.rds'
 ℹ Downloading 13- schedule from nhl-raw✖ Could not fetch schedule for 13-. Skipping.
-ℹ Downloading 13- schedule from nhl-raw✔ Downloaded 13- schedule [84ms]
+ℹ Downloading 13- schedule from nhl-raw✔ Downloaded 13- schedule [179ms]
 
 Warning message:
 In readRDS(con) :
@@ -16,16 +16,16 @@ In readRDS(con) :
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-03 03:04:12.176811
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 05:20:57.625602
 ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-33"
 → Uploading 3 files!
 ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-03 03:04:15.477544
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 05:21:01.07456
 ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-44"
-✔ 22003 total schedule rows, 20493 with PBP
+✔ 22002 total schedule rows, 21897 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
