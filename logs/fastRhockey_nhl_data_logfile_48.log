@@ -5,7 +5,7 @@
 ℹ Downloading 47- schedule from nhl-raw
 ✖ Failed to read RDS from https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_48.rds: cannot open the connection to 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/schedules/rds/nhl_schedule_48.rds'
 ℹ Downloading 47- schedule from nhl-raw✖ Could not fetch schedule for 47-. Skipping.
-ℹ Downloading 47- schedule from nhl-raw✔ Downloaded 47- schedule [183ms]
+ℹ Downloading 47- schedule from nhl-raw✔ Downloaded 47- schedule [76ms]
 
 Warning message:
 In readRDS(con) :
@@ -15,22 +15,605 @@ In readRDS(con) :
 ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
-ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:51:53.141429
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-33"
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 422: Validation Failed (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=package_function.txt)
+ReleaseAsset.name already exists
 → Uploading 3 files!
 ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
 <https://github.com/sportsdataverse/sportsdataverse-data/releases> @
 nhl_schedules
 ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:51:56.357443
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-44"
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 19:53:51.976217
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-47"
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 404: Not Found (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/459696719)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:EAA72:169D22E:4B3ECD3:6A402A52 and timestamp 2026-06-27 19:53:54 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/tags/nhl_schedules)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:7B916:1679C34:4A70549:6A402A53 and timestamp 2026-06-27 19:53:55 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/tags/nhl_schedules)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:2EBDAC:140F4FD:16D1C6F:6A402A55 and timestamp 2026-06-27 19:53:57 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0805:DECA7:C0F73C:DCEB56:6A402A56 and timestamp 2026-06-27 19:53:58 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080E:2ECA83:C54E0C:DF219D:6A402A58 and timestamp 2026-06-27 19:54:00 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080F:29A99D:152FD02:17F2B80:6A402A5B and timestamp 2026-06-27 19:54:03 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0809:70619:BD37FB:D8B3DC:6A402A5D and timestamp 2026-06-27 19:54:05 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:71274:B250E7:CDCCF6:6A402A67 and timestamp 2026-06-27 19:54:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0809:19F504:1BDB60A:1FC208A:6A402A7E and timestamp 2026-06-27 19:54:38 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:10F51B0:14AD8CC:6A402A98 and timestamp 2026-06-27 19:55:05 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:10F73A7:14B0223:6A402ACC and timestamp 2026-06-27 19:55:56 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B35C6A:1F1CFD2:6A402AD3 and timestamp 2026-06-27 19:56:03 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:71274:B2DCE0:CE6D61:6A402AFC and timestamp 2026-06-27 19:56:44 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:15EFF6:C6D267:E2DE20:6A402AFF and timestamp 2026-06-27 19:56:47 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:2EBDAC:141FD28:16E4038:6A402B1F and timestamp 2026-06-27 19:57:19 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:2EBDAC:1420E1A:16E52EE:6A402B2B and timestamp 2026-06-27 19:57:31 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:1AD17F:C09EBD:DCB3CD:6A402B39 and timestamp 2026-06-27 19:57:45 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:9403D:1F6CFC5:2351EC7:6A402B58 and timestamp 2026-06-27 19:58:16 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:1103CA4:14BE32E:6A402B79 and timestamp 2026-06-27 19:58:49 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+Error: Request failed after 20 attempts.
+Retrying in 60 seconds.
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B462E1:1F2F5FC:6A402BB6 and timestamp 2026-06-27 19:59:50 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0807:2B0C5:1AE9DE4:1ED3C2F:6A402BB7 and timestamp 2026-06-27 19:59:51 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080E:19F504:1BEFD9A:1FD93F3:6A402BB8 and timestamp 2026-06-27 19:59:52 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0811:19F504:1BEFF16:1FD95A3:6A402BBA and timestamp 2026-06-27 19:59:54 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0816:3AB9DE:1B1D8A7:1F071F4:6A402BBB and timestamp 2026-06-27 19:59:55 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:110800F:14C2FFD:6A402BBD and timestamp 2026-06-27 19:59:57 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:3FD3B4:1BEFB41:1FD8AA8:6A402BBE and timestamp 2026-06-27 19:59:58 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B46E44:1F302B6:6A402BC0 and timestamp 2026-06-27 20:00:00 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B47DA1:1F313ED:6A402BCD and timestamp 2026-06-27 20:00:13 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:32E343:1F3AD21:2320FA4:6A402BDC and timestamp 2026-06-27 20:00:28 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:322783:226CFB8:2653E0A:6A402C03 and timestamp 2026-06-27 20:01:07 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:3FD3B4:1BF8395:1FE239D:6A402C36 and timestamp 2026-06-27 20:01:58 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:BB122:EB75B9:12633CB:6A402C6A and timestamp 2026-06-27 20:02:50 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B5350F:1F3E217:6A402C70 and timestamp 2026-06-27 20:02:56 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:BB122:EBC92D:1268F80:6A402CA4 and timestamp 2026-06-27 20:03:48 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0806:3C667F:1BCA4AD:1FB6000:6A402CCB and timestamp 2026-06-27 20:04:27 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:1AD17F:C2E646:DF3A65:6A402D04 and timestamp 2026-06-27 20:05:25 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:71274:B55921:D134E5:6A402D1F and timestamp 2026-06-27 20:05:51 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:322783:2293041:267CDA9:6A402D54 and timestamp 2026-06-27 20:06:44 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:3B2E86:1F14C6C:22FE32A:6A402D6D and timestamp 2026-06-27 20:07:09 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+Error: Request failed after 20 attempts.
+Retrying in 60 seconds.
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:9403D:1FA4A76:238EBFD:6A402DA9 and timestamp 2026-06-27 20:08:09 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080A:33C33B:21C8176:25B25C9:6A402DAA and timestamp 2026-06-27 20:08:11 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080C:39FDD4:20A1B81:248C4EC:6A402DAC and timestamp 2026-06-27 20:08:12 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0811:9403D:1FA505F:238F275:6A402DAD and timestamp 2026-06-27 20:08:13 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 07C1:3E7717:21E19DC:25CB9A8:6A402DAF and timestamp 2026-06-27 20:08:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:9403D:1FA546E:238F6E2:6A402DB0 and timestamp 2026-06-27 20:08:16 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080E:B116:186901E:1B68AD3:6A402DB1 and timestamp 2026-06-27 20:08:18 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0812:35338F:212FB25:2519FC1:6A402DB3 and timestamp 2026-06-27 20:08:19 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0805:21A6C1:2117A48:25018A0:6A402DBD and timestamp 2026-06-27 20:08:30 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080A:1F2E70:1B48A54:1F362AA:6A402DD2 and timestamp 2026-06-27 20:08:51 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:384178:C9D674:E64E5C:6A402DFE and timestamp 2026-06-27 20:09:34 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:71274:B686B0:D28513:6A402E19 and timestamp 2026-06-27 20:10:01 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:BB122:ED60D1:1285FE7:6A402E3A and timestamp 2026-06-27 20:10:34 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0805:C4E24:11321D0:14F2D69:6A402E4E and timestamp 2026-06-27 20:10:54 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:2EBDAC:1468CF8:17346D8:6A402E7D and timestamp 2026-06-27 20:11:41 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:1AD17F:C4E9C5:E17603:6A402E9A and timestamp 2026-06-27 20:12:11 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:9403D:1FBAA02:23A6DA6:6A402E9E and timestamp 2026-06-27 20:12:14 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:3B2E86:1F35D89:232262C:6A402ED2 and timestamp 2026-06-27 20:13:07 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:1AD17F:C56209:E1FCD0:6A402F02 and timestamp 2026-06-27 20:13:54 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:384178:CB3A78:E7D80E:6A402F0D and timestamp 2026-06-27 20:14:05 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+Error: Request failed after 20 attempts.
+Retrying in 60 seconds.
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B81FED:1F732F5:6A402F49 and timestamp 2026-06-27 20:15:05 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:3FD3B4:1C30908:202173F:6A402F4B and timestamp 2026-06-27 20:15:07 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080E:19F504:1C27C66:20192B1:6A402F4C and timestamp 2026-06-27 20:15:08 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080F:C5C94:F96DF2:134E61C:6A402F4D and timestamp 2026-06-27 20:15:09 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0816:3AB9DE:1B57CF5:1F4962C:6A402F4F and timestamp 2026-06-27 20:15:11 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:37F201:1CAF0BE:209FC1A:6A402F50 and timestamp 2026-06-27 20:15:12 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0806:3C667F:1BF81D6:1FE978E:6A402F52 and timestamp 2026-06-27 20:15:14 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080C:1AF73E:1B917AF:1F83019:6A402F53 and timestamp 2026-06-27 20:15:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:114264F:150578E:6A402F5A and timestamp 2026-06-27 20:15:22 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:1143C55:15070D3:6A402F71 and timestamp 2026-06-27 20:15:45 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:37F201:1CB3169:20A45C1:6A402F90 and timestamp 2026-06-27 20:16:16 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:283443:1B708FE:1F62163:6A402F96 and timestamp 2026-06-27 20:16:22 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B89D21:1F7BFDE:6A402FB9 and timestamp 2026-06-27 20:16:57 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:9403D:1FD2613:23C16A0:6A402FDF and timestamp 2026-06-27 20:17:35 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:114DE06:15127C5:6A403008 and timestamp 2026-06-27 20:18:16 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:37F201:1CBD0CF:20AF963:6A403021 and timestamp 2026-06-27 20:18:41 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:BB122:EFB07C:12AF6A4:6A403034 and timestamp 2026-06-27 20:19:00 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:3E6C3F:1B91937:1F85006:6A403047 and timestamp 2026-06-27 20:19:19 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:3B2E86:1F5B2FA:234B6E4:6A403079 and timestamp 2026-06-27 20:20:10 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:3B2E86:1F5CCFF:234D484:6A403093 and timestamp 2026-06-27 20:20:35 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+Error: Request failed after 20 attempts.
+Retrying in 60 seconds.
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:322783:22EBE8E:26DD8AA:6A4030D0 and timestamp 2026-06-27 20:21:36 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0805:21A6C1:215FB95:2550804:6A4030D1 and timestamp 2026-06-27 20:21:37 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080C:39FDD4:20E9878:24DB2BD:6A4030D2 and timestamp 2026-06-27 20:21:38 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0811:9403D:1FE4EE0:23D61D0:6A4030D4 and timestamp 2026-06-27 20:21:40 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0814:B566:16E73E7:19E77CA:6A4030D5 and timestamp 2026-06-27 20:21:41 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:9403D:1FE531D:23D6665:6A4030D7 and timestamp 2026-06-27 20:21:43 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:32E343:1FACAAE:239DF6F:6A4030D8 and timestamp 2026-06-27 20:21:44 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080A:33C33B:221CE57:260E515:6A4030DB and timestamp 2026-06-27 20:21:47 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:3B2E86:1F630F2:235433F:6A4030E0 and timestamp 2026-06-27 20:21:52 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:9403D:1FE742B:23D8AA5:6A4030EC and timestamp 2026-06-27 20:22:04 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080A:1F2E70:1B77A67:1F6C798:6A403112 and timestamp 2026-06-27 20:22:42 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:9403D:1FED822:23DF96E:6A40313B and timestamp 2026-06-27 20:23:23 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0806:33C33B:2226C61:26190DC:6A40313E and timestamp 2026-06-27 20:23:26 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0800:384178:CE3FDC:EB302C:6A40315D and timestamp 2026-06-27 20:23:57 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:116639C:152E582:6A403197 and timestamp 2026-06-27 20:24:55 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:1166DAD:152F10D:6A4031A1 and timestamp 2026-06-27 20:25:05 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:9403D:1FF927E:23EC840:6A4031CD and timestamp 2026-06-27 20:25:49 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:322783:230836A:26FC634:6A4031F4 and timestamp 2026-06-27 20:26:28 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0803:37F201:1CDB69C:20D25B9:6A403215 and timestamp 2026-06-27 20:27:01 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:116DAA6:1536F4A:6A40321D and timestamp 2026-06-27 20:27:09 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+Error: Request failed after 20 attempts.
+Retrying in 60 seconds.
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:1AD17F:C8CE51:E5E097:6A403259 and timestamp 2026-06-27 20:28:10 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0808:15EFF6:CFFCBC:ED0DF9:6A40325B and timestamp 2026-06-27 20:28:11 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080C:29A99D:15CA83A:189F305:6A40325C and timestamp 2026-06-27 20:28:12 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080F:29A99D:15CA998:189F492:6A40325E and timestamp 2026-06-27 20:28:14 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.json)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 07C0:275021:C8031E:E517B4:6A40325F and timestamp 2026-06-27 20:28:15 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:E2A54:942B:C50B:6A403260 and timestamp 2026-06-27 20:28:16 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0807:1B2E55:CB84D0:E8964C:6A403262 and timestamp 2026-06-27 20:28:18 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 080B:15EFF6:D008C0:ED1B69:6A403265 and timestamp 2026-06-27 20:28:21 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:2EBDAC:14B0960:1784FEA:6A40326B and timestamp 2026-06-27 20:28:27 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.rds)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0809:70619:C77830:E4127B:6A40326F and timestamp 2026-06-27 20:28:31 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.parquet)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0801:322783:2315D66:270B487:6A403285 and timestamp 2026-06-27 20:28:53 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0804:9403D:2007665:23FC762:6A40328F and timestamp 2026-06-27 20:29:03 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=nhl_games_in_data_repo.csv)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repoHTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID 0802:C4E24:1176F36:1541983:6A4032B7 and timestamp 2026-06-27 20:29:43 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://uploads.github.com/repos/sportsdataverse/sportsdataverse-data/releases/306105397/assets?label=&name=timestamp.txt)
+→ Uploading 3 files!
+ℹ Building master schedule + nhl_games_in_data_repoℹ Start upload of 7 files to
+<https://github.com/sportsdataverse/sportsdataverse-data/releases> @
+nhl_schedules
+ℹ Building master schedule + nhl_games_in_data_repo✔ Upload successfully completed.
+ℹ Building master schedule + nhl_games_in_data_repo→ Uploaded 7 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-06-27 20:30:29.89445
+ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-213-1700"
 ✔ 22002 total schedule rows, 21897 with PBP
 ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
 ℹ Building master schedule + nhl_games_in_data_repo
 ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
 ℹ Building master schedule + nhl_games_in_data_repoFrom https://github.com/sportsdataverse/fastRhockey-nhl-data
-   3a106ad..10d630e  main       -> origin/main
+   6a71e93..779768c  main       -> origin/main
+ * [new branch]      chore/python-reshaper-cutover -> origin/chore/python-reshaper-cutover
+ * [new branch]      fix/python-shootout-extraction -> origin/fix/python-shootout-extraction
 On branch main
 Your branch is up to date with 'origin/main'.
 
