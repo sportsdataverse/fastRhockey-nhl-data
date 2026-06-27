@@ -26,8 +26,11 @@ def _season_start(game_id: int) -> int:
 
 def read_final_dir(final_dir: str | Path, season_end_year: int | None = None) -> list[dict]:
     """Load every ``final/{gid}.json`` in ``final_dir`` (optionally filtered to one season)."""
+    d = Path(final_dir)
+    if not d.is_dir():  # fail fast on a bad --final-dir rather than silently compiling 0 games
+        raise FileNotFoundError(f"final dir not found: {final_dir}")
     out = []
-    for p in sorted(Path(final_dir).glob("*.json")):
+    for p in sorted(d.glob("*.json")):
         try:
             gid = int(p.stem)
         except ValueError:

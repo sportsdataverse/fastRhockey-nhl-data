@@ -37,3 +37,4 @@ def test_st_feature_recipe() -> None:
     feats = [c for c in fst.columns if c not in ("game_id", "goal")]
     assert len(feats) == 38, f"expected 38 st features, got {len(feats)}"
     assert {"total_skaters_on", "event_team_advantage"} <= set(feats)
+    assert fst.height > 0, "ST fixture exercised no rows — recipe regressions would be invisible"

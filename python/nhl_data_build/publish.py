@@ -28,6 +28,7 @@ def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
     subprocess.run(
         ["gh", "release", "upload", release_tag, str(path), "--repo", repo, "--clobber"],
         check=True,
+        timeout=600,  # fail fast instead of hanging the daily workflow on a stuck upload/auth prompt
     )
 
 

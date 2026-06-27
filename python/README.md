@@ -33,7 +33,7 @@ uv run python -c "import polars as pl; from nhl_data_build.xg_train import train
 scratches, linescore, shifts (flat) + scoring, penalties, three_stars, shots_by_period
 (nested → `flatten_struct_cols`). pbp shape verified (850 full / 349 lite); its event
 columns are validated upstream in `fastRhockey-nhl-raw`. xG training live-validated on the
-2025 season (36/38 feats matching the canonical boosters). **20 tests, ruff clean.**
+2025 season (36/38 feats matching the canonical boosters). **22 tests, ruff clean.**
 
 CI: `.github/workflows/daily_nhl_python.yml` (workflow_dispatch + repository_dispatch;
 add the cron and retire `daily_nhl.yml` to cut over).

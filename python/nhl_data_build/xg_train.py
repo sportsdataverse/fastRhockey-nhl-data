@@ -125,6 +125,8 @@ def prepare_training_frame(pbp: pl.DataFrame, *, variant: str) -> pl.DataFrame:
     variant ``"5v5"`` = all non-shootout/non-PS unblocked shots; ``"st"`` = special-teams
     strengths only (+ total_skaters_on / event_team_advantage).
     """
+    if variant not in ("5v5", "st"):
+        raise ValueError(f"variant must be '5v5' or 'st', got {variant!r}")
     df = _harmonize(pbp).with_columns(secondary_type=_norm_secondary())
     df = df.filter(
         (pl.col("period_type") != "SHOOTOUT")
@@ -150,8 +152,8 @@ def prepare_training_frame(pbp: pl.DataFrame, *, variant: str) -> pl.DataFrame:
         )
     )
     df = df.filter(pl.col("event_type").is_in(_FENWICK) & pl.col("last_event_type").is_in(_VALID_LAST))
-    if df.height == 0:
-        return df
+    # No early return on empty: the expressions below run on a 0-row frame so the output keeps
+    # the full feature schema callers/tests expect.
 
     season = pl.col("season").cast(pl.Utf8)
     eta, home = pl.col("event_team"), pl.col("home_team")
@@ -176,8 +178,14 @@ def prepare_training_frame(pbp: pl.DataFrame, *, variant: str) -> pl.DataFrame:
         empty_net=pl.col("empty_net").cast(pl.Boolean).fill_null(False).cast(pl.Int64),
         goal=(pl.col("event_type") == "GOAL").cast(pl.Int64),
     )
-    onehots = {col: (pl.col("secondary_type") == canon).cast(pl.Int64) for canon, col in _SHOT_TYPE_COL.items()}
-    onehots |= {col: (pl.col("last_event_type") == raw).cast(pl.Int64) for raw, col in _LAST_EVENT_COL.items()}
+    # null secondary_type/last_event -> 0 (not null), so the drop_nulls() below keeps these
+    # shots with all-zero one-hots (R's pivot_wider(values_fill=0)) instead of discarding them.
+    onehots = {
+        col: (pl.col("secondary_type") == canon).cast(pl.Int64).fill_null(0) for canon, col in _SHOT_TYPE_COL.items()
+    }
+    onehots |= {
+        col: (pl.col("last_event_type") == raw).cast(pl.Int64).fill_null(0) for raw, col in _LAST_EVENT_COL.items()
+    }
 
     base = [
         "shot_distance",
@@ -233,6 +241,17 @@ def _rank_auc(pred: np.ndarray, actual: np.ndarray) -> float:
 def _logloss(y: np.ndarray, p: np.ndarray) -> float:
     p = np.clip(p, 1e-15, 1 - 1e-15)
     return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))
+
+
+def _json_safe(obj: object) -> object:
+    """Recursively replace NaN/inf floats with None so the meta is standards-compliant JSON."""
+    if isinstance(obj, float):
+        return obj if (obj == obj and obj not in (float("inf"), float("-inf"))) else None
+    if isinstance(obj, dict):
+        return {k: _json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_json_safe(v) for v in obj]
+    return obj
 
 
 def _train_variant(pbp: pl.DataFrame, variant: str, rng: np.random.Generator, *, quick: bool) -> tuple:
@@ -320,7 +339,8 @@ def train_xg_models(
         booster.save_model(str(out / f"xg_model_{variant}.json"))
         meta[f"xg_feature_names_{variant}"] = feats
         meta[f"info_{variant}"] = info
-    (out / "xg_model_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    # NaN/inf (e.g. a holdout AUC with no goals) -> null so the meta stays valid JSON.
+    (out / "xg_model_meta.json").write_text(json.dumps(_json_safe(meta), indent=2), encoding="utf-8")
 
     if report:
         from nhl_data_build.xg_report import write_xg_report

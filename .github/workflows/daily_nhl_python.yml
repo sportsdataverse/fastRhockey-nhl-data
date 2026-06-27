@@ -40,6 +40,8 @@ jobs:
     steps:
       - name: Checkout nhl-data
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false  # the commit-back step authenticates the push explicitly
 
       # The per-game final JSONs live in fastRhockey-nhl-raw. Sparse-checkout the final/
       # tree (the reshaper reads it via --final-dir).
@@ -64,13 +66,19 @@ jobs:
 
       - name: Resolve season range
         id: years
+        env:  # bind user inputs to env vars — never expand them into the shell source directly
+          IN_START: ${{ github.event.inputs.start_year }}
+          IN_END: ${{ github.event.inputs.end_year }}
         run: |
-          START="${{ github.event.inputs.start_year }}"
+          START="$IN_START"
           if [ -z "$START" ]; then
             Y=$(date +%Y); M=$(date +%m)
             START=$([ "$M" -ge 8 ] && echo $((Y + 1)) || echo "$Y")   # NHL season end-year
           fi
-          END="${{ github.event.inputs.end_year }}"; [ -z "$END" ] && END="$START"
+          END="${IN_END:-$START}"
+          # validate integers before any reuse (reject crafted values)
+          case "$START" in ''|*[!0-9]*) echo "invalid start_year: $START" >&2; exit 1;; esac
+          case "$END" in ''|*[!0-9]*) echo "invalid end_year: $END" >&2; exit 1;; esac
           echo "start=$START" >> "$GITHUB_OUTPUT"; echo "end=$END" >> "$GITHUB_OUTPUT"
 
       - name: Compile season datasets
@@ -90,9 +98,14 @@ jobs:
 
       - name: Commit compiled parquets
         working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add nhl
           git commit -m "ci(data): compile NHL datasets (Python) ${{ steps.years.outputs.start }}-${{ steps.years.outputs.end }}" || echo "no changes"
-          git push || echo "nothing to push"
+          # persist-credentials:false on checkout — authenticate the push explicitly so the
+          # write token isn't left in the runner's git config for later steps to reuse.
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:${GITHUB_REF_NAME}" || echo "nothing to push"

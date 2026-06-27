@@ -95,8 +95,11 @@ def extract_all(game_json: dict | None) -> dict[str, list[dict]]:
     for key, field, _, _ in DATASETS:
         val = game_json.get(field)
         if key in STANDARD_KEYS:
-            if isinstance(val, list) and val:
-                out[key] = _attach_ids(val, gi)
+            # A standard block is normally a list of rows, but a singleton dict (R's
+            # data.frame-vs-list duality) becomes a one-row dataset rather than being dropped.
+            rows = val if isinstance(val, list) else ([val] if isinstance(val, dict) else None)
+            if rows:
+                out[key] = _attach_ids(rows, gi)
         elif key in ("scoring", "penalties"):
             rows = _extract_scoring_like(val, "goals" if key == "scoring" else "penalties", gid)
             if rows:
