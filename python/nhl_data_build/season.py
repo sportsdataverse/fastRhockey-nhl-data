@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Iterator
 from pathlib import Path
 
 import polars as pl
@@ -24,12 +25,14 @@ def _season_start(game_id: int) -> int:
     return int(str(game_id)[:4])
 
 
-def read_final_dir(final_dir: str | Path, season_end_year: int | None = None) -> list[dict]:
-    """Load every ``final/{gid}.json`` in ``final_dir`` (optionally filtered to one season)."""
+def iter_final_dir(final_dir: str | Path, season_end_year: int | None = None) -> Iterator[dict]:
+    """Yield each ``final/{gid}.json`` in ``final_dir`` one at a time (optionally one season).
+
+    A generator (not a list) so a full season can be compiled without holding every game's
+    parsed JSON in memory at once — the key to fitting a standard CI runner."""
     d = Path(final_dir)
     if not d.is_dir():  # fail fast on a bad --final-dir rather than silently compiling 0 games
         raise FileNotFoundError(f"final dir not found: {final_dir}")
-    out = []
     for p in sorted(d.glob("*.json")):
         try:
             gid = int(p.stem)
@@ -38,15 +41,19 @@ def read_final_dir(final_dir: str | Path, season_end_year: int | None = None) ->
         if season_end_year is not None and _season_start(gid) != season_end_year - 1:
             continue
         try:
-            out.append(json.loads(p.read_text(encoding="utf-8")))
+            yield json.loads(p.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             continue
-    return out
+
+
+def read_final_dir(final_dir: str | Path, season_end_year: int | None = None) -> list[dict]:
+    """Eager list of every ``final/{gid}.json`` (thin wrapper over :func:`iter_final_dir`)."""
+    return list(iter_final_dir(final_dir, season_end_year))
 
 
 def build_season_from_dir(final_dir: str | Path, season_end_year: int | None = None) -> dict[str, pl.DataFrame]:
-    """Read final JSONs from a local dir and compile the season datasets."""
-    return build_season(read_final_dir(final_dir, season_end_year))
+    """Stream final JSONs from a local dir and compile the season datasets (memory-bounded)."""
+    return build_season(iter_final_dir(final_dir, season_end_year))
 
 
 def write_datasets(season: dict[str, pl.DataFrame], out_dir: str | Path, season_year: int) -> dict[str, int]:
