@@ -1,0 +1,19 @@
+[project]
+name = "nhl-data-build"
+version = "0.0.1"
+description = "Python port of the fastRhockey-nhl-data reshaper (final.json -> season datasets)"
+requires-python = ">=3.10"
+dependencies = [
+    "polars>=1.0,<2.0",
+    "pyarrow>=14.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
