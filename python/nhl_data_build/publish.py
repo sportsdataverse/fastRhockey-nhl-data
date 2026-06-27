@@ -5,6 +5,7 @@ wrapper (Python's equivalent of ``sportsdataversedata::sportsdataverse_save``). 
 dataset's ``{prefix}_{season}.parquet`` is uploaded (``--clobber``) to its release tag;
 the release must already exist on ``sportsdataverse-data`` (created once, like the R side).
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -30,7 +31,9 @@ def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
     )
 
 
-def publish_season(out_dir: str | Path, season_year: int, *, repo: str = _REPO, dry_run: bool = False) -> list[tuple[str, str]]:
+def publish_season(
+    out_dir: str | Path, season_year: int, *, repo: str = _REPO, dry_run: bool = False
+) -> list[tuple[str, str]]:
     """Upload every present ``{prefix}_{season_year}.parquet`` to its ``nhl_*`` release."""
     out = Path(out_dir)
     done: list[tuple[str, str]] = []
