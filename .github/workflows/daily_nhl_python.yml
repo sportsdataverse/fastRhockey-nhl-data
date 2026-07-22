@@ -75,16 +75,37 @@ jobs:
         env:  # bind user inputs to env vars — never expand them into the shell source directly
           IN_START: ${{ github.event.inputs.start_year }}
           IN_END: ${{ github.event.inputs.end_year }}
+          PAYLOAD_MSG: ${{ github.event.client_payload.commit_message }}
         run: |
-          START="$IN_START"
+          START="$IN_START"; END="$IN_END"
+
+          # A repository_dispatch from nhl-raw carries the upstream commit subject, whose
+          # first and last integers are the season range ("NHL Raw Updated (Start: 2026
+          # End: 2026)"). Same parse the R workflow used — without it a dispatch silently
+          # falls through to the date guess below, so a raw-side backfill of an older
+          # season would compile the current one instead.
+          if [ -z "$START" ] && [ -n "$PAYLOAD_MSG" ]; then
+            START=$(printf '%s' "$PAYLOAD_MSG" | grep -o -E '[0-9]+' | head -1)
+            END=$(printf '%s' "$PAYLOAD_MSG" | grep -o -E '[0-9]+' | tail -1)
+          fi
+
           if [ -z "$START" ]; then
             Y=$(date +%Y); M=$(date +%m)
             START=$([ "$M" -ge 8 ] && echo $((Y + 1)) || echo "$Y")   # NHL season end-year
           fi
-          END="${IN_END:-$START}"
+          END="${END:-$START}"
+
           # validate integers before any reuse (reject crafted values)
           case "$START" in ''|*[!0-9]*) echo "invalid start_year: $START" >&2; exit 1;; esac
           case "$END" in ''|*[!0-9]*) echo "invalid end_year: $END" >&2; exit 1;; esac
+          # the grep above takes whatever integers the subject happens to contain, so
+          # reject anything that isn't a plausible season end-year rather than compiling it
+          for Y in "$START" "$END"; do
+            if [ "$Y" -lt 2011 ] || [ "$Y" -gt 2100 ]; then
+              echo "implausible season year: $Y (from '$PAYLOAD_MSG')" >&2; exit 1
+            fi
+          done
+          [ "$START" -le "$END" ] || { echo "start $START after end $END" >&2; exit 1; }
           echo "start=$START" >> "$GITHUB_OUTPUT"; echo "end=$END" >> "$GITHUB_OUTPUT"
 
       - name: Compile season datasets

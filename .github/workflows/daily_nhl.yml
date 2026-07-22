@@ -1,15 +1,22 @@
 name: Update NHL Data (R — retired)
 
-# RETIRED: superseded by daily_nhl_python.yml (the Python reshaper). The schedule is removed
-# so this no longer runs on cron; repository_dispatch + workflow_dispatch are kept as a manual
-# fallback during the transition. Delete this workflow once the Python pipeline is proven.
+# RETIRED: scheduled NHL runs are owned by sdv-orch on the droplet (cut over 2026-07-21),
+# which disabled the GH scrape/build/trigger workflows. This is kept dispatchable as a
+# manual fallback only. Delete it once the Python pipeline is proven.
 on:
   # schedule:  # de-scheduled at cutover — see daily_nhl_python.yml
   #   - cron: '0 9 * 10-12 *'
   #   - cron: '0 9 * 1-4 *'
   #   - cron: '0 9 * 5-6 *'
-  repository_dispatch:
-    types: [daily_nhl_data]
+  #
+  # repository_dispatch removed 2026-07-22. It was listed here AND in
+  # daily_nhl_python.yml, so one daily_nhl_data dispatch started both compilers on the
+  # same seasons. They then raced on the release: `gh release upload --clobber` deletes
+  # an asset before re-uploading it, so on 2026-07-22T01:08 the two runs deleted each
+  # other's asset mid-flight and the Python run died with
+  #   HTTP 404 ... /releases/306105436/assets?name=play_by_play_2026.parquet
+  # Exactly one workflow may receive this event. The trigger in fastRhockey-nhl-raw is
+  # currently disabled, so nothing dispatches today -- this keeps re-enabling it safe.
   workflow_dispatch:
     inputs:
       start_year:
