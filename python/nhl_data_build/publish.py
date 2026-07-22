@@ -35,16 +35,21 @@ def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
 def publish_season(
     out_dir: str | Path, season_year: int, *, repo: str = _REPO, dry_run: bool = False
 ) -> list[tuple[str, str]]:
-    """Upload every present ``{prefix}_{season_year}.parquet`` to its ``nhl_*`` release."""
+    """Upload every present ``{prefix}_{season_year}.{parquet,rds,csv}`` to its ``nhl_*`` release.
+
+    All three released formats ship to the tag — the release is the distribution
+    channel (rds/csv are build artifacts, not committed to this repo).
+    """
     out = Path(out_dir)
     done: list[tuple[str, str]] = []
     for prefix, tag, key in _PUBLISH:
-        path = out / key / "parquet" / f"{prefix}_{season_year}.parquet"
-        if not path.exists():
-            continue
-        if dry_run:
-            print(f"[dry-run] {path.name} -> {repo}@{tag}")
-        else:
-            publish_file(path, tag, repo=repo)
-        done.append((tag, path.name))
+        for sub, ext in (("parquet", "parquet"), ("rds", "rds"), ("csv", "csv")):
+            path = out / key / sub / f"{prefix}_{season_year}.{ext}"
+            if not path.exists():
+                continue
+            if dry_run:
+                print(f"[dry-run] {path.name} -> {repo}@{tag}")
+            else:
+                publish_file(path, tag, repo=repo)
+            done.append((tag, path.name))
     return done

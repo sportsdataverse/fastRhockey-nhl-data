@@ -7,7 +7,15 @@ dependencies = [
     "polars>=1.0,<2.0",
     "pyarrow>=14.0",
     "numpy>=1.26",
+    # native .rds writing (write_rds) so the python producer emits every released
+    # format, not just parquet — matches R's .save_dataset (saveRDS + parquet).
+    "sportsdataverse>=0.0.72",
 ]
+
+[tool.uv.sources]
+# write_rds(cls=) landed in sportsdataverse-py #274 (0.0.72), which is not on PyPI
+# (latest published is 0.0.71) — track git main like the other -data producers.
+sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
 
 [dependency-groups]
 dev = ["pytest>=8.0"]
