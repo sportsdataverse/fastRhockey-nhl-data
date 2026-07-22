@@ -41,11 +41,22 @@ REPOS_ROOT="${SDV_REPOS:-/mnt/sdv_repos}"
 FINAL_DIR="${NHL_RAW_FINAL_DIR:-${REPOS_ROOT}/fastRhockey-nhl-raw/nhl/json/final}"
 OUT_DIR="${REPO_DIR}/nhl"
 
+# Call the project venv's interpreter by absolute path rather than going through
+# `uv run`. sdv-orch invokes this from a systemd unit, whose PATH is the systemd
+# default and does NOT include /root/.local/bin where uv lives -- `uv` exits 127
+# there while working fine in an interactive shell.
+PYBIN="${NHL_PYBIN:-${REPO_DIR}/python/.venv/bin/python}"
+
 # Fail before touching git if the upstream checkout isn't where we expect. A
 # missing final dir would otherwise compile zero games and "succeed", quietly
 # publishing nothing.
 if [ ! -d "${FINAL_DIR}" ]; then
     echo "::error ::raw finals not found at ${FINAL_DIR}"
+    exit 1
+fi
+
+if [ ! -x "${PYBIN}" ]; then
+    echo "::error ::python venv not found at ${PYBIN} -- run 'uv sync' in ${REPO_DIR}/python"
     exit 1
 fi
 
@@ -65,24 +76,18 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
         git config --local user.email "action@github.com"
         git config --local user.name "Github Action"
 
-        # uv resolves the project in python/, and nhl_data_build only imports
-        # with that as cwd, so run it in a subshell and pass absolute paths.
-        (
-            cd python && \
-            uv run python -m nhl_data_build.season \
-                -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}"
-        )
+        # nhl_data_build is not installed into the venv, so it only imports with
+        # python/ as cwd -- hence the subshell. Paths are absolute for that reason.
+        ( cd python && "${PYBIN}" -m nhl_data_build.season \
+                -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}" )
         echo "COMPILE_RC=$?" > "/tmp/_nhl_compile_rc_${i}"
 
         # Publish only what compiled. Uploading is idempotent (--clobber), so a
         # partial season still ships the datasets that built.
-        (
-            cd python && \
-            uv run python -c "
+        ( cd python && "${PYBIN}" -c "
 from nhl_data_build.publish import publish_season
 print(len(publish_season('${OUT_DIR}', ${i})), 'assets uploaded')
-"
-        )
+" )
 
         git pull >> /dev/null
         git add nhl >> /dev/null
