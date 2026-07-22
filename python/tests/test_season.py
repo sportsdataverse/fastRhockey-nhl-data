@@ -62,3 +62,41 @@ def test_build_season_batch_invariant() -> None:
         assert sorted(one[k].columns) == sorted(big[k].columns), k
     # the boundary actually combined two games (more pbp rows than a single game alone)
     assert one["pbp"].height > build_season([g1])["pbp"].height
+
+
+def test_rds_carries_the_make_fastRhockey_data_stamp(tmp_path: Path) -> None:
+    """R's rbindlist_with_attrs reads these attrs off the file — NULL prints a blank header.
+
+    Asserted against the raw RDS stream (names are stored as ASCII) rather than via
+    readRDS, so the check needs no R toolchain in CI.
+    """
+    import gzip
+
+    season = build_season_from_dir(_stage_final_dir(tmp_path))
+    out = tmp_path / "out"
+    write_datasets(season, out, 2025)
+
+    blob = gzip.decompress((out / "pbp" / "rds" / "play_by_play_2025.rds").read_bytes())
+    for token in (
+        b"fastRhockey_data",  # the class chain load_nhl_*() expects
+        b"tbl_df",
+        b"data.table",
+        b"data.frame",
+        b"fastRhockey_timestamp",
+        b"fastRhockey_type",
+        b"NHL play-by-play data (full)",  # the key's registry description
+    ):
+        assert token in blob, f"{token!r} missing from the rds stamp"
+
+
+def test_derived_datasets_get_their_own_type_label(tmp_path: Path) -> None:
+    """pbp_lite/player_box have no tribble row — without an explicit label they'd
+    stamp their bare key as the printed header."""
+    import gzip
+
+    season = build_season_from_dir(_stage_final_dir(tmp_path))
+    out = tmp_path / "out"
+    write_datasets(season, out, 2025)
+
+    lite = out / "pbp_lite" / "rds" / "play_by_play_lite_2025.rds"
+    assert b"NHL play-by-play data (lite)" in gzip.decompress(lite.read_bytes())

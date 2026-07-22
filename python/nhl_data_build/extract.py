@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from nhl_data_build.config import DATASETS, STANDARD_KEYS
 
-_FIELD = {key: field for key, field, _, _ in DATASETS}
+_FIELD = {key: field for key, field, _, _, _ in DATASETS}
 
 
 def _game_info(game_json: dict) -> dict:
@@ -111,7 +111,7 @@ def extract_all(game_json: dict | None) -> dict[str, list[dict]]:
     gid, season, gdate = gi.get("game_id"), gi.get("season"), gi.get("game_date")
     out: dict[str, list[dict]] = {}
 
-    for key, field, _, _ in DATASETS:
+    for key, field, _, _, _ in DATASETS:
         val = game_json.get(field)
         if key in STANDARD_KEYS:
             # A standard block is normally a list of rows, but a singleton dict (R's

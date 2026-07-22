@@ -12,7 +12,7 @@ from nhl_data_build.publish import _PUBLISH, publish_season
 
 def test_publish_covers_all_datasets() -> None:
     keys = {key for _prefix, _tag, key in _PUBLISH}
-    assert {k for k, _f, _p, _t in DATASETS} <= keys  # every registry dataset
+    assert {k for k, _f, _p, _t, _d in DATASETS} <= keys  # every registry dataset
     assert {"pbp_lite", "player_box"} <= keys  # + the derived ones
     assert all(tag.startswith("nhl_") for _p, tag, _k in _PUBLISH)
 

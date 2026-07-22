@@ -16,7 +16,7 @@ from nhl_data_build.config import DATASETS
 _REPO = "sportsdataverse/sportsdataverse-data"
 
 # (file_prefix, release_tag, dataset_key) for every published dataset incl. the derived ones.
-_PUBLISH: list[tuple[str, str, str]] = [(prefix, tag, key) for key, _field, prefix, tag in DATASETS]
+_PUBLISH: list[tuple[str, str, str]] = [(prefix, tag, key) for key, _field, prefix, tag, _desc in DATASETS]
 _PUBLISH += [
     ("play_by_play_lite", "nhl_pbp_lite", "pbp_lite"),
     ("player_box", "nhl_player_boxscores", "player_box"),
