@@ -7,20 +7,16 @@
 #
 #   bash scripts/daily_nhl_python_processor.sh -s 2026 -e 2026
 #
-# ⚠ NOT WIRED INTO sdv-orch YET -- pending a dependency bump. A full 2026 compile
-# was OOM-killed on the droplet on 2026-07-22 at 13.7GB RSS:
-#   Out of memory: Killed process (python3) total-vm:31471552kB anon-rss:13774772kB
+# Memory note: a full season compile was OOM-killed here on 2026-07-22 at 13.7GB
+# RSS, which blocked this script until sportsdataverse-py #296. The compile itself
+# was never the problem -- build_season batches 250 games and the reader streams,
+# putting it at a 5.46GB peak. The kill was inside write_rds, which buffered the
+# entire serialized frame (one small bytes object per value) and then joined that
+# into a second contiguous copy: ~6.8GB for the 1.1M x 94 pbp frame. #296 streams
+# it instead, and the same compile now finishes at a 2.60GB write-phase peak.
 #
-# The compile is not the problem -- profiling puts build_season (which already
-# batches 250 games and streams the reader) at a 5.46GB peak. The kill was inside
-# sportsdataverse write_rds: it buffered the entire serialized frame as one small
-# bytes object per value, then joined that into a second contiguous copy, costing
-# ~6.8GB for the 1.1M x 94 pbp frame. Streaming fix in sdv-py PR #296 brings it to
-# -0.03GB with a 2.60GB write-phase peak.
-#
-# To finish the cutover: merge #296, re-pin sportsdataverse in python/pyproject.toml
-# + uv.lock, verify a full-season run, then point sdv-orch's data.build stage here.
-# Until then the R processor remains the scheduled path.
+# Keep an eye on it if NHL datasets grow substantially: peak now tracks the
+# largest single dataset held as a frame, not the serialized stream.
 #
 # Reads the raw finals from the sibling fastRhockey-nhl-raw checkout (the
 # `raw.scrape` stage runs first and self-commits there), writes parquet into
