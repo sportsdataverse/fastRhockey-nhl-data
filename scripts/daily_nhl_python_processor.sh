@@ -1,0 +1,117 @@
+#!/bin/bash
+# Compile NHL datasets with the Python reshaper (python/nhl_data_build).
+#
+# Drop-in replacement for daily_nhl_R_processor.sh: same -s/-e contract, same
+# per-season commit subject, same exit-code propagation, so sdv-orch's
+# `data.build` stage can call either one.
+#
+#   bash scripts/daily_nhl_python_processor.sh -s 2026 -e 2026
+#
+# ⚠ NOT WIRED INTO sdv-orch YET -- MEMORY. A full 2026 compile was OOM-killed on
+# the droplet on 2026-07-22 at 13.7GB RSS (15GiB box):
+#   Out of memory: Killed process (python3) total-vm:31471552kB anon-rss:13774772kB
+# nhl_data_build.build_season accumulates every dataset's rows for the whole
+# season before framing them, which does not fit a full NHL season. It is also
+# marginal on a 16GB GH runner. Make the writes per-dataset streaming before
+# moving sdv-orch's data.build stage onto this script. Until then the R
+# processor remains the scheduled path.
+#
+# Reads the raw finals from the sibling fastRhockey-nhl-raw checkout (the
+# `raw.scrape` stage runs first and self-commits there), writes parquet into
+# nhl/, and uploads parquet + rds + csv to the nhl_* releases. rds/csv are
+# gitignored -- the releases are their distribution channel.
+
+set -uo pipefail
+
+while getopts s:e: flag; do
+    case "${flag}" in
+        s) START_YEAR=${OPTARG};;
+        e) END_YEAR=${OPTARG};;
+        *) echo "Usage: $0 -s <start_year> -e <end_year>"; exit 1;;
+    esac
+done
+
+if [ -z "${START_YEAR:-}" ] || [ -z "${END_YEAR:-}" ]; then
+    echo "Usage: $0 -s <start_year> -e <end_year>"
+    exit 1
+fi
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPOS_ROOT="${SDV_REPOS:-/mnt/sdv_repos}"
+FINAL_DIR="${NHL_RAW_FINAL_DIR:-${REPOS_ROOT}/fastRhockey-nhl-raw/nhl/json/final}"
+OUT_DIR="${REPO_DIR}/nhl"
+
+# Fail before touching git if the upstream checkout isn't where we expect. A
+# missing final dir would otherwise compile zero games and "succeed", quietly
+# publishing nothing.
+if [ ! -d "${FINAL_DIR}" ]; then
+    echo "::error ::raw finals not found at ${FINAL_DIR}"
+    exit 1
+fi
+
+cd "${REPO_DIR}" || exit 1
+mkdir -p logs
+
+ANY_FAILED=0
+for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
+    LOGFILE="logs/fastRhockey_nhl_data_logfile_${i}.log"
+    TMPLOG=$(mktemp "/tmp/fastRhockey_nhl_data_logfile_${i}.XXXXXX.log")
+    echo "=== Processing NHL data for season $i (Python) ==="
+
+    # Tee inside the block writes to /tmp (untracked) so the `git pull` calls
+    # don't trip over their own log output being written to a tracked file.
+    {
+        git pull >> /dev/null
+        git config --local user.email "action@github.com"
+        git config --local user.name "Github Action"
+
+        # uv resolves the project in python/, and nhl_data_build only imports
+        # with that as cwd, so run it in a subshell and pass absolute paths.
+        (
+            cd python && \
+            uv run python -m nhl_data_build.season \
+                -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}"
+        )
+        echo "COMPILE_RC=$?" > "/tmp/_nhl_compile_rc_${i}"
+
+        # Publish only what compiled. Uploading is idempotent (--clobber), so a
+        # partial season still ships the datasets that built.
+        (
+            cd python && \
+            uv run python -c "
+from nhl_data_build.publish import publish_season
+print(len(publish_season('${OUT_DIR}', ${i})), 'assets uploaded')
+"
+        )
+
+        git pull >> /dev/null
+        git add nhl >> /dev/null
+        git commit -m "NHL Data Updated (Start: $i End: $i)" || echo "No changes to commit"
+        git pull >> /dev/null
+        git push >> /dev/null
+    } 2>&1 | tee "$TMPLOG"
+
+    COMPILE_RC=$(sed 's/COMPILE_RC=//' "/tmp/_nhl_compile_rc_${i}" 2>/dev/null)
+    rm -f "/tmp/_nhl_compile_rc_${i}"
+
+    cp "$TMPLOG" "$LOGFILE"
+    git stash -u --quiet 2>/dev/null || true
+    git pull --rebase >> /dev/null || true
+    git stash pop --quiet 2>/dev/null || true
+    git add "$LOGFILE"
+    git commit -m "NHL Data log update (Start: $i End: $i)" >> /dev/null || echo "No log changes to commit"
+    git push >> /dev/null
+    rm -f "$TMPLOG"
+
+    # Surface a failed compile rather than masking it with a successful push;
+    # finish the remaining seasons first.
+    if [ "${COMPILE_RC:-0}" != "0" ]; then
+        echo "::error ::nhl_data_build.season for season $i exited with code ${COMPILE_RC}"
+        ANY_FAILED=1
+    fi
+done
+
+if [ "${ANY_FAILED}" != "0" ]; then
+    echo "::error ::At least one season's compile exited non-zero. See per-season logs."
+    exit 1
+fi
