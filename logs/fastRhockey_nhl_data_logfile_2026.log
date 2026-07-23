@@ -1,381 +1,54 @@
-error: Pulling is not possible because you have unmerged files.
-hint: Fix them up in the work tree, and then use 'git add/rm <file>'
-hint: as appropriate to mark resolution and make a commit.
-fatal: Exiting because of an unresolved conflict.
-ℹ === NHL Data Creation started ===
-ℹ Processing seasons: 2026
-
-── Processing 2025-26 season ───────────────────────────────────────────────────
-ℹ Downloading 2025-26 schedule from nhl-raw
-ℹ 1394 games with final JSON in raw repo
-ℹ Downloading 2025-26 schedule from nhl-raw✔ Downloaded 2025-26 schedule [370ms]
-
-ℹ Reading 1394 game JSONs and extracting datasets
-ℹ pbp: 1100073 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_pbp_full on 2026-07-21 21:50:12.801173
-ℹ Reading 1394 game JSONs and extracting datasetsℹ skater_box: 50183 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_skater_boxscores on 2026-07-21 21:50:26.819913
-ℹ Reading 1394 game JSONs and extracting datasetsℹ goalie_box: 5575 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_goalie_boxscores on 2026-07-21 21:50:34.756646
-ℹ Reading 1394 game JSONs and extracting datasetsℹ team_box: 2788 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_team_boxscores on 2026-07-21 21:50:41.659208
-ℹ Reading 1394 game JSONs and extracting datasetsℹ game_info: 1394 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_game_info on 2026-07-21 21:50:48.525046
-ℹ Reading 1394 game JSONs and extracting datasetsℹ game_rosters: 55758 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_game_rosters on 2026-07-21 21:50:58.880283
-ℹ Reading 1394 game JSONs and extracting datasetsℹ shifts: 656504 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_shifts on 2026-07-21 21:53:24.825034
-ℹ Reading 1394 game JSONs and extracting datasetsℹ scoring: 8691 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_scoring on 2026-07-21 21:54:07.583394
-ℹ Reading 1394 game JSONs and extracting datasetsℹ penalties: 10445 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_penalties on 2026-07-21 21:54:16.168151
-ℹ Reading 1394 game JSONs and extracting datasetsℹ scratches: 9435 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_scratches on 2026-07-21 21:54:23.288465
-ℹ Reading 1394 game JSONs and extracting datasetsℹ linescore: 1394 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_linescore on 2026-07-21 21:54:30.052887
-ℹ Reading 1394 game JSONs and extracting datasetsℹ three_stars: 4182 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_three_stars on 2026-07-21 21:54:37.222623
-ℹ Reading 1394 game JSONs and extracting datasetsℹ officials: 5574 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_officials on 2026-07-21 21:54:43.543258
-ℹ Reading 1394 game JSONs and extracting datasetsℹ shots_by_period: 4653 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_shots_by_period on 2026-07-21 21:54:50.111098
-ℹ Reading 1394 game JSONs and extracting datasetsℹ shootout: 930 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_shootout on 2026-07-21 21:54:56.308956
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_pbp_lite on 2026-07-21 21:59:12.655337
-ℹ Reading 1394 game JSONs and extracting datasetsℹ pbp_lite: 443569 rows
-ℹ Reading 1394 game JSONs and extracting datasets→ Uploading 3 files!
-ℹ Reading 1394 game JSONs and extracting datasets
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_player_boxscores on 2026-07-21 21:59:27.815449
-ℹ Reading 1394 game JSONs and extracting datasetsℹ player_box: 55758 rows
-ℹ Reading 1394 game JSONs and extracting datasets✔ Extracted per-game datasets [22m 44s]
-
-ℹ Compiling 2025-26 season rosters
-→ Uploading 3 files!
-ℹ Compiling 2025-26 season rosters
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_rosters on 2026-07-21 21:59:39.253663
-ℹ Compiling 2025-26 season rostersℹ rosters: 55758 unique entries
-ℹ Compiling 2025-26 season rosters✔ Compiled 2025-26 season rosters [11.5s]
-
-ℹ Updating 2025-26 schedule flags
-→ Uploading 3 files!
-ℹ Updating 2025-26 schedule flags
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-07-21 21:59:46.125757
-ℹ Updating 2025-26 schedule flags✔ Done with 2025-26
-ℹ Updating 2025-26 schedule flags✔ Updated 2025-26 schedule flags [8.2s]
-
-There were 50 or more warnings (use warnings() to see the first 50)
-ℹ Building master schedule + nhl_games_in_data_repo
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo
-
-
-Error: This `rate` object has already be run more than `max_times` allows.
-ℹ Do you need to reset it with `rate_reset()`?
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-07-21 22:07:49.468807
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-1818014-1318"
-Warning messages:
-1: In for (v in vnames) { :
-  closing unused connection 10 (/tmp/RtmptLmqpJ/nhl_schedule_master.csv)
-2: In for (v in vnames) { :
-  closing unused connection 3 (/tmp/RtmptLmqpJ/nhl_schedule_master.rds)
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo
-
-
-Error: This `rate` object has already be run more than `max_times` allows.
-ℹ Do you need to reset it with `rate_reset()`?
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repoError: Request failed after 10 attempts.
-Retrying in 60 seconds.
-→ Uploading 3 files!
-ℹ Building master schedule + nhl_games_in_data_repo
-
-
-
-
-
-
-→ Uploaded 3 to sportsdataverse/sportsdataverse-data @ nhl_schedules on 2026-07-21 22:15:54.127833
-ℹ Building master schedule + nhl_games_in_data_repo[1] "cli-1818014-2289"
-Warning messages:
-1: In for (n in rev(nms)) { :
-  closing unused connection 18 (/tmp/RtmptLmqpJ/nhl_games_in_data_repo.csv)
-2: In for (n in rev(nms)) { :
-  closing unused connection 17 (/tmp/RtmptLmqpJ/nhl_games_in_data_repo.rds)
-3: In for (n in rev(nms)) { :
-  closing unused connection 16 (/tmp/RtmptLmqpJ/package_function.json)
-4: In for (n in rev(nms)) { :
-  closing unused connection 15 (/tmp/RtmptLmqpJ/package_function.txt)
-5: In for (n in rev(nms)) { :
-  closing unused connection 14 (/tmp/RtmptLmqpJ/timestamp.json)
-6: In for (n in rev(nms)) { :
-  closing unused connection 13 (/tmp/RtmptLmqpJ/timestamp.txt)
-7: In for (n in rev(nms)) { :
-  closing unused connection 12 (/tmp/RtmptLmqpJ/nhl_schedule_master.parquet)
-8: In for (n in rev(nms)) { :
-  closing unused connection 10 (/tmp/RtmptLmqpJ/nhl_schedule_master.csv)
-9: In for (n in rev(nms)) { :
-  closing unused connection 3 (/tmp/RtmptLmqpJ/nhl_schedule_master.rds)
-✔ 22002 total schedule rows, 21897 with PBP
-ℹ Building master schedule + nhl_games_in_data_repoℹ === NHL Data Creation complete ===
-ℹ Building master schedule + nhl_games_in_data_repo
-ℹ Building master schedule + nhl_games_in_data_repo── All done! ───────────────────────────────────────────────────────────────────
-ℹ Building master schedule + nhl_games_in_data_repoerror: Pulling is not possible because you have unmerged files.
-hint: Fix them up in the work tree, and then use 'git add/rm <file>'
-hint: as appropriate to mark resolution and make a commit.
-fatal: Exiting because of an unresolved conflict.
-error: You have not concluded your merge (MERGE_HEAD exists).
-hint: Please, commit your changes before merging.
-fatal: Exiting because of unfinished merge.
-[main b8a3300] NHL Data Updated (Start: 2026 End: 2026)
+season 2026: 2416905 rows across 17 datasets -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl
+51 assets uploaded
+[main ab5b75c] NHL Data Updated (Start: 2026 End: 2026)
+ 51 files changed, 0 insertions(+), 0 deletions(-)
+ rewrite nhl/game_info/parquet/game_info_2026.parquet (97%)
+ rewrite nhl/game_rosters/parquet/game_rosters_2026.parquet (94%)
+ rewrite nhl/goalie_box/parquet/goalie_box_2026.parquet (98%)
+ rewrite nhl/linescore/parquet/linescore_2026.parquet (97%)
+ rewrite nhl/officials/parquet/officials_2026.parquet (98%)
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2010.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2011.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2012.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2013.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2014.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2015.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2016.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2017.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2018.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2019.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2020.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2021.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2022.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2023.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2024.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2025.rds
+ create mode 100644 nhl/pbp/full/rds/play_by_play_2026.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2010_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2011_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2012_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2013_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2014_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2015_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2016_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2017_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2018_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2019_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2020_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2021_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2022_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2023_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2024_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2025_lite.rds
+ create mode 100644 nhl/pbp/lite/rds/play_by_play_2026_lite.rds
+ rewrite nhl/penalties/parquet/penalties_2026.parquet (97%)
+ rewrite nhl/player_box/parquet/player_box_2026.parquet (93%)
+ rewrite nhl/scoring/parquet/scoring_2026.parquet (88%)
+ rewrite nhl/scratches/parquet/scratches_2026.parquet (99%)
+ rewrite nhl/shootout/parquet/shootout_summary_2026.parquet (96%)
+ rewrite nhl/shots_by_period/parquet/shots_by_period_2026.parquet (99%)
+ rewrite nhl/skater_box/parquet/skater_box_2026.parquet (94%)
+ rewrite nhl/team_box/parquet/team_box_2026.parquet (96%)
+ rewrite nhl/three_stars/parquet/three_stars_2026.parquet (98%)
 To https://github.com/sportsdataverse/fastRhockey-nhl-data.git
-   32087fd..b8a3300  main -> main
+   cb92af7..ab5b75c  main -> main
