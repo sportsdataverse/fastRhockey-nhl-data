@@ -66,6 +66,58 @@ flowchart TB;
 | [`nhl_rosters`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_rosters) | NHL rosters |
 | [`nhl_schedules`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_schedules) | NHL schedules |
 
+## Model retrain
+
+Two xG model families live in this repo. The fastRhockey xG model
+(`models/`) is fit by `R/build_xg_model.R` and is documented in full
+under "fastRhockey Expected Goals Model" below. The vendored
+[hockeyR](https://github.com/danmorse314/hockeyR) package (`hockeyR/`)
+carries its own xG models, retrained here in modern xgboost format by
+`hockeyR/retrain_xg_models.R` (the 2026-03 salvage: the upstream
+`sysdata.rda` boosters were serialized in a legacy format that current
+xgboost can no longer load).
+
+`hockeyR/retrain_xg_models.R` retrains the vendored hockeyR 5v5 and
+special-teams xgboost boosters on 14 seasons of hockeyR PBP data
+(2010-11 through 2023-24), re-saves them as portable JSON, and rebuilds
+`hockeyR/R/sysdata.rda` (boosters + feature-name vectors + penalty-shot
+constant + `team_abbr_yearly` lookup).
+
+Inputs:
+
+- `../hockeyR-data/pbp_data/*.rds` — season PBP files from a checkout
+  of [hockeyR-data](https://github.com/danmorse314/hockeyR-data) placed
+  as a sibling of the `hockeyR/` directory (`_lite` files and
+  2024-25 / 2025-26 seasons are excluded).
+- `hockeyR/R/team_abbr_yearly.rds` — required; produced by
+  `hockeyR/extract_team_abbr.R` (kept in the repo for that reason).
+- `hockeyR/R/xg_model_ps.rds` — optional; falls back to the hardcoded
+  constant extracted from the original `sysdata.rda`.
+
+Outputs:
+
+- `hockeyR/inst/extdata/xg_model_5v5.json`
+- `hockeyR/inst/extdata/xg_model_st.json`
+- `hockeyR/R/sysdata.rda`
+
+Run (needs dplyr, purrr, tidyr, janitor, xgboost; edit or remove the
+machine-specific `.libPaths(...)` line at the top first — paths are
+relative to `hockeyR/`):
+
+```sh
+cd hockeyR
+Rscript retrain_xg_models.R
+```
+
+### Model registry
+
+| Model | Artifact file(s) | Fitting script | Last retrain | Cadence |
+|-------|------------------|----------------|--------------|---------|
+| hockeyR xG 5v5 | `hockeyR/inst/extdata/xg_model_5v5.json` (+ `hockeyR/R/sysdata.rda`) | `hockeyR/retrain_xg_models.R` | 2026-03 | as-needed / manual |
+| hockeyR xG special teams | `hockeyR/inst/extdata/xg_model_st.json` (+ `hockeyR/R/sysdata.rda`) | `hockeyR/retrain_xg_models.R` | 2026-03 | as-needed / manual |
+| hockeyR penalty-shot constant | `hockeyR/R/xg_model_ps.rds` (bundled into `hockeyR/R/sysdata.rda`) | `hockeyR/retrain_xg_models.R` (restore step) | 2026-03 | as-needed / manual |
+| fastRhockey xG (5v5 + ST + meta) | `models/xg_model_5v5.json`, `models/xg_model_st.json`, `models/xg_model_meta.rds` | `R/build_xg_model.R` | 2026-04 | as-needed / manual |
+
 ## Related repositories
 
 [fastRhockey-nhl-raw data repository (source: NHL API)](https://github.com/sportsdataverse/fastRhockey-nhl-raw)
