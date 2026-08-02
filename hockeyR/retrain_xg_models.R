@@ -6,7 +6,12 @@
 ## Reads historical PBP data from ../hockeyR-data/pbp_data/
 ## Outputs new R/sysdata.rda with xgboost models saved in modern format.
 
-.libPaths("C:/Users/1143552/AppData/Local/R/win-library/4.5")
+## Library path: honor an explicit override, else use the session default.
+## This line previously hardcoded a Windows library path belonging to ANOTHER
+## machine, so the script could not run anywhere else -- the retrain recipe for
+## a shipped model family was effectively unrunnable.
+lib_override <- Sys.getenv("HOCKEYR_LIB_PATH", "")
+if (nzchar(lib_override)) .libPaths(lib_override)
 
 library(dplyr)
 library(purrr)
@@ -20,7 +25,16 @@ cat("xgboost version:", as.character(packageVersion("xgboost")), "\n\n")
 # --------------------------------------------------------------------------
 # 1. Load historical PBP data (2010-11 through 2023-24 as training data)
 # --------------------------------------------------------------------------
-pbp_dir <- "../hockeyR-data/pbp_data"
+## Input: the hockeyR-data sibling checkout (a separate repo -- this is why the
+## retrain is a documented LOCAL runbook, not a CI workflow). Override with
+## HOCKEYR_PBP_DIR if the checkout lives elsewhere.
+pbp_dir <- Sys.getenv("HOCKEYR_PBP_DIR", "../hockeyR-data/pbp_data")
+if (!dir.exists(pbp_dir)) {
+  stop(sprintf(
+    "pbp_dir not found: %s
+  Clone sportsdataverse/hockeyR-data next to this repo, or set HOCKEYR_PBP_DIR.",
+    pbp_dir))
+}
 rds_files <- list.files(pbp_dir, pattern = "\\.rds$", full.names = TRUE)
 # Exclude lite files and exclude 2024-25 / 2025-26 (future seasons)
 rds_files <- rds_files[!grepl("_lite\\.rds$", rds_files)]

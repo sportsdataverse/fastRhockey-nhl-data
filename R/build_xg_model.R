@@ -56,7 +56,7 @@ for (d in c("models", "data", "figures")) {
 
 message(glue("{Sys.time()}: Loading PBP data..."))
 
-rds_dir <- "nhl/pbp/full/rds"
+rds_dir <- Sys.getenv("NHL_PBP_RDS_DIR", "nhl/pbp/full/rds")
 if (!dir.exists(rds_dir)) {
     stop("PBP data directory not found: ", rds_dir, call. = FALSE)
 }
