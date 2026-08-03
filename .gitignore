@@ -55,3 +55,6 @@ nhl/*/csv/
 # Python bytecode
 __pycache__/
 *.py[cod]
+
+# uv-managed project virtualenv (now at the repo root).
+.venv/
