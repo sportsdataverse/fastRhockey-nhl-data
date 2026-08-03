@@ -55,6 +55,19 @@ flowchart TB;
 
 ```
 
+## Daily processors
+
+- `scripts/daily_nhl_R_processor.sh` — the R reshape path (see the diagram above).
+- `scripts/daily_nhl_python_processor.sh` — the Python port
+  (`python/nhl_data_build`), and the **local** equivalent of what
+  `.github/workflows/daily_nhl_python.yml` runs.
+
+  Note the duplication: that workflow does **not** call this script — it inlines
+  `uv run python -m nhl_data_build.season` and `nhl_data_build.publish` directly.
+  So local and CI execute the same stages by two separate definitions, and a
+  change to one does not reach the other. Prefer editing both together until the
+  workflow is pointed at the script.
+
 ## sportsdataverse-data releases
 
 | Release tag | Content |
