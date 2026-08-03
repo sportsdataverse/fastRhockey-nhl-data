@@ -51,3 +51,7 @@ rsconnect/
 # Built rds/csv ship to the sportsdataverse-data releases, not to git.
 nhl/*/rds/
 nhl/*/csv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]

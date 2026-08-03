@@ -2,7 +2,18 @@
 
 ## Repo Overview
 
-`fastRhockey.nhl.data` (package name on `DESCRIPTION`) is the R-side
+> **Production is Python.** `python/nhl_data_build` compiles and publishes
+> the NHL datasets as of the 2026-07-21 cutover; it runs from
+> `.github/workflows/daily_nhl_python.yml` (CI) and
+> `scripts/daily_nhl_python_processor.sh` (sdv-orch droplet). The R stack
+> described below — `R/nhl_data_creation.R`,
+> `scripts/daily_nhl_R_processor.sh`, `.github/workflows/daily_nhl.yml` — is
+> **retired**: de-scheduled, dispatch-only, kept as a manual fallback. The
+> outputs, release tags and end-year season convention are identical across
+> both, so everything below still describes the data contract accurately;
+> only the *entry points* changed. Default to the Python side.
+
+`fastRhockey.nhl.data` (package name on `DESCRIPTION`) is the
 parser/compiler that turns per-game NHL JSON from
 [fastRhockey-nhl-raw](https://github.com/sportsdataverse/fastRhockey-nhl-raw)
 into season-level compiled datasets and uploads them as GitHub Releases on
@@ -39,17 +50,27 @@ uploads `.rds` + `.parquet` files to the release tags below using
 
 ## Build & Development Commands
 
-The repo is driven by `scripts/daily_nhl_R_processor.sh`, which calls
-`R/nhl_data_creation.R` for each season in a range:
+Production flow — `python/nhl_data_build`, driven by
+`scripts/daily_nhl_python_processor.sh` (droplet) or
+`.github/workflows/daily_nhl_python.yml` (CI). Both run the same two
+stages, `nhl_data_build.season` then `publish.publish_season`; a change to
+that sequence must land in both call sites (their git/env plumbing differs
+on purpose — see the workflow header).
 
 ```sh
-# Daily flow for a single end-year season (the CI entry point)
+# Daily flow for a single end-year season (droplet entry point)
+bash scripts/daily_nhl_python_processor.sh -s 2026 -e 2026
+bash scripts/daily_nhl_python_processor.sh -s 2024 -e 2026   # range
+
+# Call the compiler directly when iterating (from python/)
+uv run python -m nhl_data_build.season -s 2026 -e 2026 \
+  --final-dir ../../fastRhockey-nhl-raw/nhl/json/final --out-dir ../nhl
+```
+
+Retired R fallback (dispatch-only; same outputs, same season convention):
+
+```sh
 bash scripts/daily_nhl_R_processor.sh -s 2026 -e 2026
-
-# Range of seasons
-bash scripts/daily_nhl_R_processor.sh -s 2024 -e 2026
-
-# Call the R script directly when iterating
 Rscript R/nhl_data_creation.R -s 2026           # single season: 2025-26
 Rscript R/nhl_data_creation.R -s 2024 -e 2026   # range: 2023-24 .. 2025-26
 ```

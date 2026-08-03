@@ -10,6 +10,12 @@ name: Update NHL Data (Python)
 #
 # Credential scoping: the cross-repo publish PAT (SDV_GH_TOKEN) is set only on the publish
 # step; the external nhl-raw checkout sets persist-credentials:false.
+#
+# SECOND CALL SITE: scripts/daily_nhl_python_processor.sh runs the same two stages
+# (nhl_data_build.season -> publish.publish_season) on the sdv-orch droplet. The stage
+# sequence is duplicated on purpose -- the git/env plumbing genuinely differs (that script
+# uses an absolute venv path because systemd's PATH has no `uv`, and commits per season).
+# Change the stages in BOTH, or CI and the droplet will drift apart.
 on:
   schedule:
     # Mirrors the retired daily_nhl.yml cadence — 09:00 UTC, NHL season Oct-Apr + playoffs Apr-Jun.

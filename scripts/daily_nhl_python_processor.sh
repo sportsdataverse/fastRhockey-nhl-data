@@ -7,6 +7,13 @@
 #
 #   bash scripts/daily_nhl_python_processor.sh -s 2026 -e 2026
 #
+# SECOND CALL SITE: .github/workflows/daily_nhl_python.yml runs the same two
+# stages (nhl_data_build.season -> publish.publish_season) on the GH runner.
+# The stage sequence is duplicated on purpose -- the git/env plumbing genuinely
+# differs (that workflow sparse-checks-out nhl-raw and pushes with an explicit
+# token; this script uses an absolute venv path because systemd's PATH has no
+# `uv`). Change the stages in BOTH, or CI and the droplet will drift apart.
+#
 # Memory note: a full season compile was OOM-killed here on 2026-07-22 at 13.7GB
 # RSS, which blocked this script until sportsdataverse-py #296. The compile itself
 # was never the problem -- build_season batches 250 games and the reader streams,
