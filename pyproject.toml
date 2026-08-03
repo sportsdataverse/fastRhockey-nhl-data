@@ -18,7 +18,10 @@ dependencies = [
 sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
 
 [dependency-groups]
-dev = ["pytest>=8.0"]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
 # xG model training (xg_train): xgboost + pandas (xgb.cv returns a pandas frame).
 train = ["xgboost>=2.0", "pandas>=2.0"]
 # optional feature-importance PNGs (xg_report.write_importance_figures).
@@ -30,3 +33,9 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+# Pinned rule set: relying on ruff defaults makes the gate version-sensitive.
+select = ["E4", "E7", "E9", "F", "I"]
+# Explicit polars bool masks (pl.col(...) == True) are the project convention.
+ignore = ["E712"]

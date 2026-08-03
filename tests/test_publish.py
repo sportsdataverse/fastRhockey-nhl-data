@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import polars as pl
-
 from nhl_data_build.config import DATASETS
 from nhl_data_build.publish import _PUBLISH, publish_season
 

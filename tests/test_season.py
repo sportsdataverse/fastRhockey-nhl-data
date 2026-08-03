@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import polars as pl
-
 from nhl_data_build.season import build_season_from_dir, read_final_dir, write_datasets
 
 FIX = Path(__file__).parent / "fixtures"

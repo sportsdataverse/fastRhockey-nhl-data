@@ -12,7 +12,6 @@ from pathlib import Path
 
 import polars as pl
 import pytest
-
 from nhl_data_build.build import build_season
 
 FIX = Path(__file__).parent / "fixtures"

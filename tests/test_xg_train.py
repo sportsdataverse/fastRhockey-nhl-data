@@ -12,7 +12,6 @@ import json
 from pathlib import Path
 
 import polars as pl
-
 from nhl_data_build.xg_train import prepare_training_frame
 
 FIX = Path(__file__).parent / "fixtures"
