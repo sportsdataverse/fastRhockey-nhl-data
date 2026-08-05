@@ -14,10 +14,22 @@ Downstream, `fastRhockey::load_nhl_*()` and
 `fastRhockey::update_nhl_db()` read those releases.
 
 **The Python reshaper (`python/nhl_data_build`) is production** as of the
-2026-07-21 cutover. The R stack (`R/nhl_data_creation.R`,
-`scripts/daily_nhl_R_processor.sh`, `.github/workflows/daily_nhl.yml`) is
-**retired** — de-scheduled, kept dispatch-only as a manual fallback. Work
-on the Python side unless a task explicitly targets the R fallback.
+2026-07-21 cutover, and is where the work happens. The R stack
+(`R/nhl_data_creation.R`, `scripts/daily_nhl_R_processor.sh`,
+`.github/workflows/daily_nhl.yml`) is **de-scheduled but actively
+maintained** — dispatch-only, no cron.
+
+**It is NOT retired.** Standing policy (2026-08-03): this repo carries both
+pipelines. Python is primary; the R chain is kept as the methodological /
+language equivalent; **both move together when either changes.** Adding,
+renaming or removing a dataset on one side alone is a defect, and
+`tests/test_r_python_parity.py` fails the build for it — it compares the
+`DATASETS` registry in `python/nhl_data_build/config.py` against the
+`DATASETS` tribble in `R/nhl_data_creation.R`, field by field.
+
+Neither side is automatically authoritative. If the two disagree, that is a
+review item: decide which pipeline is methodologically right, then update the
+other. Do not "fix" the parity test by editing one registry to match.
 
 Pipeline:
 `NHL API -> fastRhockey-nhl-raw -> fastRhockey-nhl-data [HERE] -> sportsdataverse-data -> fastRhockey`.
@@ -59,7 +71,7 @@ Rscript R/build_xg_model.R          # fastRhockey-side models -> models/
 Rscript hockeyR/retrain_xg_models.R # vendored hockeyR 5v5 + special-teams
 ```
 
-Retired R fallback (dispatch-only; do not use for routine work):
+Maintained R equivalent (dispatch-only, no cron -- kept in parity with Python):
 
 ```sh
 bash scripts/daily_nhl_R_processor.sh -s 2026 -e 2026
@@ -91,8 +103,8 @@ Output paths under `nhl/`:
 ## Release Tags (load-bearing)
 
 Each row of the `DATASETS` registry in `python/nhl_data_build/config.py`
-(a port of the R `DATASETS` tribble, which the retired fallback still
-reads) pins a release tag on `sportsdataverse-data`. The tags below are
+(kept in lockstep with the R `DATASETS` tribble the maintained R
+equivalent reads -- `tests/test_r_python_parity.py` enforces it) pins a release tag on `sportsdataverse-data`. The tags below are
 consumed by `fastRhockey::load_nhl_*()` and cannot be renamed without a
 coordinated breaking change:
 
@@ -114,7 +126,7 @@ Python (`python/nhl_data_build/` — the production surface):
 - Season args are always CLI (`-s`/`-e`), never hardcoded; end-year
   convention throughout.
 
-R (retired fallback + the xG retraining sandbox):
+R (maintained equivalent + the xG retraining sandbox):
 
 - Follow tidyverse style: `snake_case`, 2-space indent.
 - Use `cli::cli_alert_*` for status, never bare `message()` / `print()`.
@@ -152,7 +164,7 @@ R (retired fallback + the xG retraining sandbox):
   <start>-<end>"`. Keep the year integers in both — downstream
   automation parses them.
 
-`.github/workflows/daily_nhl.yml` is the retired R workflow: no cron, no
+`.github/workflows/daily_nhl.yml` is the de-scheduled R workflow: no cron, no
 `repository_dispatch`, `workflow_dispatch` only.
 
 ## Cross-Repo References
