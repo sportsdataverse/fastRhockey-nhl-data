@@ -20,11 +20,16 @@ jobs:
       - uses: actions/checkout@v5
         with:
           # Sparse: these repos carry large committed data trees and a full
-          # checkout is slow to useless here -- no test reads them (verified).
+          # checkout is slow to useless here -- no test reads the DATA trees.
+          # R/ is 96K of source, not data: test_r_python_parity reads
+          # R/nhl_data_creation.R to check the Python DATASETS registry against
+          # the R tribble it ports, and leaving it out is why that suite failed
+          # with FileNotFoundError on a file committed the whole time.
           sparse-checkout: |
             python
             tests
             scripts
+            R
             pyproject.toml
             uv.lock
           sparse-checkout-cone-mode: false
