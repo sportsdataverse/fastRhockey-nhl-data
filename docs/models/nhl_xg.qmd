@@ -1,0 +1,426 @@
+---
+title: "NHL Expected Goals (fastRhockey xG suite)"
+format:
+  gfm:
+    fig-dpi: 120
+execute:
+  echo: false
+  warning: false
+jupyter: python3
+---
+
+```{python}
+#| output: false
+import glob
+import sys
+import numpy as np
+import polars as pl
+import xgboost as xgb
+from pathlib import Path
+from plotnine import (
+    ggplot, aes, geom_point, geom_line, geom_col, geom_abline, geom_jitter,
+    labs, theme_minimal, coord_flip, scale_color_manual,
+)
+from great_tables import GT
+from IPython.display import HTML, display
+
+ROOT = Path.cwd()
+while not (ROOT / "nhl" / "pbp" / "parquet").is_dir():
+    ROOT = ROOT.parent
+sys.path.insert(0, str(ROOT / "python"))
+from nhl_data_build import xg_train as xt
+
+files = sorted(glob.glob(str(ROOT / "nhl" / "pbp" / "parquet" / "play_by_play_*.parquet")))
+pbp = pl.concat([pl.read_parquet(f) for f in files], how="diagonal_relaxed")
+boosters = {}
+for v in ("5v5", "st"):
+    b = xgb.Booster()
+    b.load_model(str(ROOT / "models" / f"xg_model_{v}.json"))
+    boosters[v] = b
+
+def gt_show(g):
+    display(HTML(g.as_raw_html()))
+```
+
+The fastRhockey xG suite estimates the probability that an unblocked shot
+becomes a goal, in two strength regimes: **5v5** (all non-shootout,
+non-penalty-shot unblocked shots) and **special teams** (power play /
+short-handed). A third component, the **penalty-shot constant**, is the
+historical conversion rate computed at train time. The suite's output ships
+as the xG columns inside every published `nhl_pbp_full` season asset — the
+model never ships alone; it reaches consumers embedded in the play-by-play.
+
+The models are XGBoost binary classifiers (logloss objective), a faithful
+reproduction lineage of the hockeyR xG recipe (Morse 2022), re-fit on this
+repository's own committed corpus by `python/nhl_data_build/xg_train.py`
+(canonical R twin `R/build_xg_model.R`). The fitted boosters are **committed
+in this repo** (`models/xg_model_{5v5,st}.json`) — that is the promotion step
+— and every figure and number below is computed at render time from those
+committed artifacts plus the committed play-by-play.
+
+## Training data
+
+```{python}
+seasons_tbl = (
+    pbp.filter(pl.col("event_type").is_in(xt._FENWICK))
+    .group_by("season").agg(
+        pl.col("game_id").n_unique().alias("games"),
+        pl.len().alias("fenwick_events"),
+        (pl.col("event_type") == "GOAL").mean().alias("goal_share"),
+    ).sort("season")
+)
+gt_show(
+    GT(seasons_tbl.to_pandas())
+    .tab_header(title="Committed NHL play-by-play corpus, by season",
+                subtitle="unblocked shot events (SHOT / MISSED_SHOT / GOAL); computed at render time")
+    .fmt_number(columns=["fenwick_events"], sep_mark=",", decimals=0)
+    .fmt_percent(columns="goal_share", decimals=1)
+)
+```
+
+Training corpus: this repository's committed play-by-play
+(`nhl/pbp/parquet/`, seasons listed above, ~13.6M events). Seasons are
+grouped into **five era buckets** (2011–2013, 2014–2018, 2019–2021,
+2022–2024, 2025-on) that enter as one-hot features, so rule- and
+tracking-era shifts are modeled rather than silently biasing the fit. The
+5v5/ST split is a modeling decision, not a convenience: shooting talent and
+shot-quality distributions differ enough across strength states that a single
+pooled model miscalibrates the power play.
+
+## Exploratory data analysis
+
+```{python}
+#| output: false
+frames = {}
+rng = np.random.default_rng(37)
+splits = {}
+for v in ("5v5", "st"):
+    fr = xt.prepare_training_frame(pbp, variant=v)
+    frames[v] = fr
+    tr, te = xt._grouped_split(fr, rng)
+    _ = rng.permutation(tr["game_id"].unique().to_list())  # replay the fold draw
+    splits[v] = (tr, te)
+f5 = frames["5v5"]
+```
+
+```{python}
+#| fig-cap: "Goal rate by shot distance, 5v5 model frame — the dominant feature."
+d = (
+    f5.with_columns((pl.col("shot_distance") / 5).floor().alias("bin"))
+    .group_by("bin").agg(pl.col("goal").mean().alias("goal_rate"),
+                          pl.len().alias("n"), pl.col("shot_distance").mean().alias("dist"))
+    .filter((pl.col("n") >= 500) & (pl.col("dist") <= 90)).sort("dist")
+)
+(
+    ggplot(d.to_pandas(), aes("dist", "goal_rate"))
+    + geom_point(aes(size="n"), color="#2a6f97", alpha=0.8) + geom_line(color="#2a6f97")
+    + labs(x="shot distance (ft)", y="observed goal rate",
+           title="NHL goal rate by shot distance (5v5 frame)")
+    + theme_minimal()
+)
+```
+
+```{python}
+shot_mix = (
+    f5.select([c for c in xt._SHOT_TYPE_COL.values() if c in f5.columns] + ["goal"])
+    .unpivot(index="goal", variable_name="shot_type", value_name="is_type")
+    .filter(pl.col("is_type") == 1)
+    .group_by("shot_type").agg(pl.len().alias("shots"), pl.col("goal").mean().alias("goal_rate"))
+    .sort("shots", descending=True)
+)
+gt_show(
+    GT(shot_mix.to_pandas())
+    .tab_header(title="Shot-type mix and conversion (5v5 frame)")
+    .fmt_number(columns="shots", sep_mark=",", decimals=0)
+    .fmt_percent(columns="goal_rate", decimals=1)
+)
+```
+
+Distance dominates conversion — from ~25% at the crease to ~2% beyond 60 ft —
+and the shot-type table explains the one-hot block: tips and deflections
+convert well above wrist shots from similar range, and the model needs the
+type to separate them. The special-teams frame adds `total_skaters_on` and
+`event_team_advantage`, the two features that encode the man-advantage state.
+
+## Feature importance
+
+```{python}
+imp_rows = []
+for v, b in boosters.items():
+    for f, g in b.get_score(importance_type="gain").items():
+        imp_rows.append({"variant": v, "feature": f, "gain": float(g)})
+imp = pl.DataFrame(imp_rows)
+top5 = imp.filter(pl.col("variant") == "5v5").sort("gain", descending=True).head(12)
+topst = imp.filter(pl.col("variant") == "st").sort("gain", descending=True).head(12)
+gt_show(
+    GT(top5.rename({"gain": "gain_5v5"}).drop("variant").to_pandas())
+    .tab_header(title="Top 12 features by gain — 5v5 booster (committed artifact)")
+    .fmt_number(columns="gain_5v5", decimals=1)
+)
+```
+
+```{python}
+#| fig-cap: "Gain importance, both committed boosters (top 12 each)."
+both = pl.concat([top5, topst]).to_pandas()
+(
+    ggplot(both, aes("reorder(feature, gain)", "gain", fill="variant"))
+    + geom_col(position="dodge")
+    + coord_flip()
+    + labs(x="", y="gain", title="xG feature importance (gain)")
+    + theme_minimal()
+)
+```
+
+## SHAP
+
+TreeSHAP attributions come directly from the committed boosters
+(`pred_contribs=True` — exact for tree ensembles, no extra dependency). The
+distribution of per-shot attributions for the top features shows how each
+one moves individual shots on the log-odds scale:
+
+```{python}
+#| fig-cap: "TreeSHAP per-shot attributions, 5v5 booster, top 8 features by mean |SHAP|; 4,000-shot sample."
+b5 = boosters["5v5"]
+feats5 = b5.feature_names
+rs = np.random.default_rng(11)
+samp_idx = rs.choice(f5.height, size=min(4000, f5.height), replace=False)
+Xs = f5.select(feats5).to_numpy().astype(float)[samp_idx]
+contribs = b5.predict(xgb.DMatrix(Xs, feature_names=feats5), pred_contribs=True)[:, :-1]
+mean_abs = np.abs(contribs).mean(axis=0)
+order = np.argsort(mean_abs)[::-1][:8]
+rows = []
+for j in order:
+    for i in range(Xs.shape[0]):
+        rows.append({"feature": feats5[j], "shap": float(contribs[i, j])})
+shap_df = pl.DataFrame(rows).to_pandas()
+(
+    ggplot(shap_df, aes("feature", "shap"))
+    + geom_jitter(width=0.25, alpha=0.05, size=0.4, color="#2a6f97")
+    + coord_flip()
+    + labs(x="", y="SHAP (log-odds)", title="TreeSHAP attributions per shot — 5v5")
+    + theme_minimal()
+)
+```
+
+```{python}
+shap_tbl = pl.DataFrame({
+    "feature": [feats5[j] for j in order],
+    "mean_abs_shap": [float(mean_abs[j]) for j in order],
+})
+gt_show(
+    GT(shap_tbl.to_pandas())
+    .tab_header(title="Mean |SHAP| — 5v5 booster, 4,000-shot sample")
+    .fmt_number(columns="mean_abs_shap", decimals=4)
+)
+```
+
+## Evaluation
+
+Two views, honestly labeled. First, the **frozen training-time gates**: the
+grouped 5-fold CV metrics observed at the 2026-04 fit, below which a retrain
+fails (`--quick` smoke runs tolerate misses; a real retrain does not):
+
+| variant | CV AUC (observed at fit) | CV log-loss | frozen floor |
+|---|---|---|---|
+| 5v5 | **0.8322** | 0.2053 | cv AUC ≥ 0.82 |
+| special teams | **0.8213** | 0.2567 | cv AUC ≥ 0.81 |
+
+Second, a **reproduced grouped split evaluated at render time**: the same
+seed-37, game-grouped 80/20 partition recipe the trainer uses, applied to
+*today's* committed corpus, scoring the committed boosters on the 20% side.
+Because the corpus has grown since the fit (new games, repairs), this is a
+*near*-holdout — some evaluation games were in the boosters' training data —
+so read it as a stability check on live data, not a pristine test score.
+
+```{python}
+rows = []
+for v in ("5v5", "st"):
+    tr, te = splits[v]
+    b = boosters[v]
+    X = te.select(b.feature_names).to_numpy().astype(float)
+    y = te["goal"].to_numpy().astype(float)
+    p = b.predict(xgb.DMatrix(X, feature_names=b.feature_names))
+    base = float(tr["goal"].mean())
+    rows.append({
+        "variant": v, "eval_shots": te.height, "goal_rate": float(y.mean()),
+        "logloss": xt._logloss(y, p),
+        "baseline_logloss": xt._logloss(y, np.full_like(p, base)),
+        "rank_AUC": xt._rank_auc(p, y),
+    })
+ev = pl.DataFrame(rows)
+gt_show(
+    GT(ev.to_pandas())
+    .tab_header(title="Reproduced grouped-split evaluation (render-time, current corpus)",
+                subtitle="seed-37 game-grouped 80/20 recipe; committed boosters scored on the 20% side")
+    .fmt_number(columns="eval_shots", sep_mark=",", decimals=0)
+    .fmt_percent(columns="goal_rate", decimals=1)
+    .fmt_number(columns=["logloss", "baseline_logloss", "rank_AUC"], decimals=4)
+)
+```
+
+```{python}
+#| fig-cap: "Calibration by xG decile, 5v5, reproduced-split evaluation shots."
+tr5, te5 = splits["5v5"]
+b5 = boosters["5v5"]
+p5 = b5.predict(xgb.DMatrix(te5.select(feats5).to_numpy().astype(float), feature_names=feats5))
+dec = (
+    pl.DataFrame({"xg": p5, "goal": te5["goal"].to_numpy().astype(float)})
+    .with_columns((pl.col("xg").rank("ordinal") * 10 / pl.len()).ceil().clip(1, 10).alias("decile"))
+    .group_by("decile").agg(pl.col("xg").mean(), pl.col("goal").mean(), pl.len().alias("n"))
+    .sort("decile")
+)
+(
+    ggplot(dec.to_pandas(), aes("xg", "goal"))
+    + geom_abline(slope=1, intercept=0, linetype="dashed", color="gray")
+    + geom_point(aes(size="n"), color="#2a6f97") + geom_line(color="#2a6f97")
+    + labs(x="mean predicted xG (decile)", y="observed goal rate",
+           title="5v5 calibration — reproduced split")
+    + theme_minimal()
+)
+```
+
+```{python}
+#| fig-cap: "Per-era discrimination: rank AUC of the committed 5v5 booster by era bucket (evaluation shots)."
+era_cols = [c for c in feats5 if c.startswith("era_")]
+te5e = te5.with_columns(pl.Series("xg", p5))
+era_rows = []
+for ec in era_cols:
+    sub = te5e.filter(pl.col(ec) == 1)
+    if sub.height < 5000:
+        continue
+    era_rows.append({"era": ec.removeprefix("era_"),
+                     "AUC": xt._rank_auc(sub["xg"].to_numpy(), sub["goal"].to_numpy().astype(float)),
+                     "n": sub.height})
+era_df = pl.DataFrame(era_rows).to_pandas()
+(
+    ggplot(era_df, aes("era", "AUC", group=1))
+    + geom_point(aes(size="n"), color="#2a6f97") + geom_line(color="#2a6f97")
+    + labs(x="era bucket", y="rank AUC", title="5v5 xG discrimination by era")
+    + theme_minimal()
+)
+```
+
+The penalty-shot constant computed from the current corpus:
+
+```{python}
+ps = xt.penalty_shot_xg(pbp)
+gt_show(
+    GT(pl.DataFrame({"component": ["penalty-shot / shootout constant"],
+                     "xG": [ps]}).to_pandas())
+    .tab_header(title="Penalty-shot xG constant (historical conversion rate)")
+    .fmt_number(columns="xG", decimals=4)
+)
+```
+
+## Results — players and teams
+
+```{python}
+latest = int(pbp["season"].cast(pl.Int64).max())
+cur = pbp.filter(pl.col("season").cast(pl.Int64) == latest)
+fr_cur = xt.prepare_training_frame(cur, variant="5v5")
+shooter = (
+    xt._harmonize(cur).with_columns(secondary_type=xt._norm_secondary())
+)
+# score the current season's 5v5 frame with the committed booster
+pcur = boosters["5v5"].predict(
+    xgb.DMatrix(fr_cur.select(feats5).to_numpy().astype(float), feature_names=feats5))
+# re-attach shooter identity by rebuilding the same filter chain (incl. the
+# null-drop set: every nullable feature in prepare_training_frame's keep list
+# derives from shot_distance / shot_angle / time_since_last / last_x / last_y)
+def frame_with_identity(pbp_in):
+    df = xt._harmonize(pbp_in).with_columns(secondary_type=xt._norm_secondary())
+    df = df.filter(
+        (pl.col("period_type") != "SHOOTOUT")
+        & ((pl.col("secondary_type") != "Penalty Shot") | pl.col("secondary_type").is_null())
+    )
+    grp = "game_id"
+    df = df.with_columns(
+        last_event_type=pl.col("event_type").shift(1).over(grp),
+        time_since_last=pl.col("game_seconds") - pl.col("game_seconds").shift(1).over(grp),
+        last_x=pl.col("x").shift(1).over(grp),
+        last_y=pl.col("y").shift(1).over(grp),
+    )
+    df = df.filter(pl.col("event_type").is_in(xt._FENWICK)
+                   & pl.col("last_event_type").is_in(xt._VALID_LAST))
+    return df.drop_nulls(subset=["shot_distance", "shot_angle", "time_since_last",
+                                 "last_x", "last_y"])
+ident = frame_with_identity(cur).select(
+    "event_player_1_name", "event_player_1_id", "event_team", "event_type")
+assert ident.height == fr_cur.height  # same filter chain, row-aligned
+scored = ident.with_columns(pl.Series("xg", pcur))
+players = (
+    scored.group_by("event_player_1_id")
+    .agg(pl.col("event_player_1_name").first().alias("player"),
+         pl.col("event_team").last().alias("team"),
+         pl.len().alias("shots"),
+         pl.col("xg").sum().alias("xG"),
+         (pl.col("event_type") == "GOAL").sum().alias("goals"))
+    .drop_nulls("event_player_1_id")
+    .with_columns((pl.col("goals") - pl.col("xG")).alias("GAX"))
+    .sort("xG", descending=True).head(15)
+    .with_columns(
+        ("<img src='https://assets.nhle.com/mugs/nhl/latest/"
+         + pl.col("event_player_1_id").cast(pl.Int64).cast(pl.Utf8)
+         + ".png' height='42'/>").alias("headshot"))
+)
+gt_show(
+    GT(players.select("headshot", "player", "team", "shots", "xG", "goals", "GAX").to_pandas())
+    .tab_header(title=f"Top 15 skaters by 5v5 expected goals — season {str(latest)[:4]}-{str(latest)[4:]}",
+                subtitle="unblocked 5v5 shots scored by the committed booster; GAX = goals above expected")
+    .fmt_markdown(columns="headshot")
+    .fmt_number(columns=["xG", "GAX"], decimals=2)
+    .cols_label(headshot="", player="Player", team="Team", shots="Shots",
+                xG="xG", goals="G", GAX="GAX")
+)
+```
+
+```{python}
+teams = (
+    scored.group_by(pl.col("event_team").alias("team"))
+    .agg(pl.len().alias("shots"), pl.col("xg").sum().alias("xG_for"),
+         (pl.col("event_type") == "GOAL").sum().alias("goals_for"))
+    .with_columns((pl.col("goals_for") - pl.col("xG_for")).alias("GAX"))
+    .sort("xG_for", descending=True)
+)
+gt_show(
+    GT(teams.to_pandas())
+    .tab_header(title=f"Team 5v5 shot generation — season {str(latest)[:4]}-{str(latest)[4:]}")
+    .fmt_number(columns=["xG_for", "GAX"], decimals=1)
+    .fmt_number(columns="shots", sep_mark=",", decimals=0)
+)
+```
+
+Positive GAX marks finishing above shot quality. At the team level, xG-for
+minus goals-for separates shot-generation strength from shooting luck — the
+spread between the two is exactly what the embedded xG columns in
+`nhl_pbp_full` exist to expose.
+
+## Provenance & reproducibility
+
+- **Trained on:** this repository's committed play-by-play
+  (`nhl/pbp/parquet/`, seasons in the corpus table above), 2026-04 fit;
+  grouped 80/20 split by `game_id`, grouped 5-fold CV for
+  `min_child_weight`, seed 37.
+- **Artifacts:** `models/xg_model_5v5.json`, `models/xg_model_st.json`
+  (committed — the promotion step); output ships inside `nhl_pbp_full`.
+- **Retrain:** `scripts/nhl_models.sh` (stages `nhl_model_01_xg_5v5` /
+  `nhl_model_02_xg_st`; fingerprint-skipped when unchanged; gates frozen in
+  `models/manifest.yaml`, registry row in `models/REGISTRY.md`).
+- **Rebuild this document:** `scripts/render_model_docs.sh` (Quarto → GFM;
+  uses this repo's `.venv` via `QUARTO_PYTHON`; `uv sync --group docs`).
+
+## Avenues for improvement & open issues
+
+- **Pre-shot context** — rush/rebound flags exist, but passing sequences and
+  screens do not; public-feed models plateau here, so the honest gain is
+  better rebound/rush definitions, not more trees.
+- **Commit the python meta sidecar** — `xg_model_meta.json` (feature lists +
+  per-retrain metrics) is regenerated per run but only the R-era `.rds` is
+  committed; committing the json would let this document quote the exact
+  training-time holdout metrics instead of the CV gates.
+- **Exact holdout reproduction** — the render-time evaluation is a
+  near-holdout because the corpus has grown since the fit; persisting the
+  training-time game-id partition alongside the meta would make the exact
+  test set reproducible forever.
+- **Known issue:** the ST sample is ~5× smaller than 5v5 — its gate floor is
+  lower for that reason, and per-season ST calibration drift is unmonitored.
