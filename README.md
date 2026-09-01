@@ -25,7 +25,8 @@ flowchart TB;
 
     subgraph B[fastRhockey-nhl-data];
         direction TB;
-        B1[scripts/daily_nhl_R_processor.sh]-->B2[R/nhl_data_creation.R];
+        B1[scripts/daily_nhl_python_processor.sh]-->B2[python -m nhl_data_build.season];
+        B3[scripts/daily_nhl_R_processor.sh]-.unscheduled twin.->B4[R/nhl_data_creation.R];
     end;
 
     subgraph C[sportsdataverse Releases];
@@ -1037,3 +1038,25 @@ Reproducible Method for Offensive Player Evaluation in Football.”
     chances than unblocked shots and don’t add value to analysis. Read
     more
     [here](https://www.pensionplanpuppets.com/2012/7/25/3184137/intro-to-advanced-hockey-statistics-fenwick).
+
+## Automation & status
+
+<!-- BEGIN GENERATED: status -->
+
+| workflow | schedule | last run |
+|---|---|---|
+| [![daily_nhl.yml](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/daily_nhl.yml/badge.svg)](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/daily_nhl.yml) | on dispatch | 2026-07-22 |
+| [![daily_nhl_python.yml](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/daily_nhl_python.yml/badge.svg)](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/daily_nhl_python.yml) | daily 09:00 UTC in Oct-Dec; daily 09:00 UTC in Jan-Apr; daily 09:00 UTC in May-Jun | 2026-07-22 |
+| [![orphan_scripts.yml](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/orphan_scripts.yml/badge.svg)](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/orphan_scripts.yml) | on push / PR / dispatch | 2026-08-27 |
+| [![tests.yml](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/tests.yml/badge.svg)](https://github.com/sportsdataverse/fastRhockey-nhl-data/actions/workflows/tests.yml) | on push / PR / dispatch | 2026-08-27 |
+
+| release tag | assets | size | last publish |
+|---|---:|---:|---|
+| [`nhl_pbp_full`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_pbp_full) | 55 | 8,990.2 MB | 2026-07-23 |
+| [`nhl_pbp_lite`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_pbp_lite) | 64 | 4,945.3 MB | 2026-07-23 |
+| [`nhl_team_boxscores`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_team_boxscores) | 55 | 4.3 MB | 2026-07-23 |
+| [`nhl_player_boxscores`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_player_boxscores) | 55 | 93.8 MB | 2026-07-23 |
+| [`nhl_rosters`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_rosters) | 55 | 14.7 MB | 2026-07-22 |
+| [`nhl_schedules`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_schedules) | 61 | 21.4 MB | 2026-07-22 |
+
+<!-- END GENERATED: status -->
