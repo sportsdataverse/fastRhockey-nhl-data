@@ -58,3 +58,6 @@ __pycache__/
 
 # uv-managed project virtualenv (now at the repo root).
 .venv/
+
+# per-stage fingerprint stores (local skip cache, never committed)
+.fingerprints.json

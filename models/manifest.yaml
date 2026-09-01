@@ -1,0 +1,42 @@
+# Model stage manifest — single home for the model/stage list (Track C step 2).
+# One model = one numbered pipeline (python/nhl_model_build/nhl_model_NN_*.py,
+# thin entries over nhl_data_build.xg_train); run subsets with
+# scripts/nhl_models.sh. tests/test_model_manifest.py keeps this file, the
+# stage scripts, and models/REGISTRY.md in lockstep.
+#
+# Step 6 (commit promoted artifacts): ALREADY the convention here — the xG
+# artifacts are committed under models/ and their output ships inside the
+# published nhl_pbp_full datasets. CI retrains upload run artifacts only;
+# promotion = committing the retrained files, a deliberate human step.
+#
+# Feature lists are era-derived at train time (no code constant), so there is
+# no features/ registry in this repo — models/xg_model_meta.json records the
+# per-retrain feature names instead.
+
+driver: scripts/nhl_models.sh
+
+suites:
+  xg:
+    module: nhl_data_build.xg_train
+    gate: "cv AUC floors frozen just below the 2026-04 observed values; never lowered. --quick smoke runs tolerate misses."
+    models:
+      xg_5v5:
+        stage: python/nhl_model_build/nhl_model_01_xg_5v5.py
+        artifact: models/xg_model_5v5.json
+        release_tag: null  # committed artifact; output ships in nhl_pbp_full
+        gate: "cv_auc >= 0.82 (observed 0.8322)"
+      xg_st:
+        stage: python/nhl_model_build/nhl_model_02_xg_st.py
+        artifact: models/xg_model_st.json
+        release_tag: null
+        gate: "cv_auc >= 0.81 (observed 0.8213)"
+    sidecars:
+      - models/xg_model_meta.json
+      - models/xg_model_report.md
+
+# hockeyR reproduction lineage — R-only, retrained via the local runbook
+# (needs the hockeyR-data sibling checkout); no CI trigger by design.
+vendored:
+  - hockeyR/inst/extdata/xg_model_5v5.json
+  - hockeyR/inst/extdata/xg_model_st.json
+  - hockeyR/R/xg_model_ps.rds

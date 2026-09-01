@@ -320,7 +320,13 @@ def _train_variant(pbp: pl.DataFrame, variant: str, rng: np.random.Generator, *,
 
 
 def train_xg_models(
-    pbp: pl.DataFrame, out_dir: str | Path, *, quick: bool = False, report: bool = True, figures: bool = False
+    pbp: pl.DataFrame,
+    out_dir: str | Path,
+    *,
+    quick: bool = False,
+    report: bool = True,
+    figures: bool = False,
+    variants: tuple[str, ...] = ("5v5", "st"),
 ) -> dict:
     """Train + save the 5v5 / ST boosters (JSON) + ``xg_model_meta.json`` + a training report.
 
@@ -333,14 +339,20 @@ def train_xg_models(
     rng = np.random.default_rng(_SEED)
     ps = penalty_shot_xg(pbp)
 
-    meta: dict = {"xg_model_ps": round(ps, 7)}
-    for variant in ("5v5", "st"):
+    # Single-variant runs merge into the existing meta (numbered per-model
+    # stages retrain one booster without clobbering the sibling's entries).
+    meta_path = out / "xg_model_meta.json"
+    meta: dict = {}
+    if set(variants) != {"5v5", "st"} and meta_path.is_file():
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    meta["xg_model_ps"] = round(ps, 7)
+    for variant in variants:
         booster, feats, info = _train_variant(pbp, variant, rng, quick=quick)
         booster.save_model(str(out / f"xg_model_{variant}.json"))
         meta[f"xg_feature_names_{variant}"] = feats
         meta[f"info_{variant}"] = info
     # NaN/inf (e.g. a holdout AUC with no goals) -> null so the meta stays valid JSON.
-    (out / "xg_model_meta.json").write_text(json.dumps(_json_safe(meta), indent=2), encoding="utf-8")
+    meta_path.write_text(json.dumps(_json_safe(meta), indent=2), encoding="utf-8")
 
     if report:
         from nhl_data_build.xg_report import write_xg_report
@@ -362,18 +374,20 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default="models", help="output dir for the .json models + meta + report")
     ap.add_argument("--quick", action="store_true", help="reduced grid/rounds (smoke run)")
     ap.add_argument("--figures", action="store_true", help="also write feature-importance PNGs (needs matplotlib)")
+    ap.add_argument("--variant", choices=["5v5", "st", "both"], default="both",
+                    help="train one booster (meta merges) or both")
     args = ap.parse_args(argv)
 
     files = sorted(glob.glob(args.pbp))
     if not files:
         ap.error(f"no pbp parquet matched {args.pbp!r}")
     pbp = pl.concat([pl.read_parquet(f) for f in files], how="diagonal_relaxed")
-    meta = train_xg_models(pbp, args.out, quick=args.quick, figures=args.figures)
-    print(
-        f"trained xG models -> {args.out} "
-        f"(5v5 {len(meta['xg_feature_names_5v5'])} feats, st {len(meta['xg_feature_names_st'])} feats); "
-        f"report: {args.out}/xg_model_report.md"
+    variants = ("5v5", "st") if args.variant == "both" else (args.variant,)
+    meta = train_xg_models(pbp, args.out, quick=args.quick, figures=args.figures, variants=variants)
+    feats_bits = ", ".join(
+        f"{v} {len(meta[f'xg_feature_names_{v}'])} feats" for v in variants
     )
+    print(f"trained xG models -> {args.out} ({feats_bits}); report: {args.out}/xg_model_report.md")
     return 0
 
 

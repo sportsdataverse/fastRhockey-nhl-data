@@ -1,0 +1,119 @@
+# NHL xG Model Pipeline — one CI job per numbered model stage.
+#
+# Wires the previously-unwired retrain (registry cadence read "as-needed /
+# manual" with no workflow behind it — the stranded-retrain failure). The
+# annual cron exercises both stages once a year; dispatch runs any subset.
+#
+# Artifacts are COMMITTED in this repo (models/*.json) — that is the promotion
+# step, and it stays human: this workflow uploads the retrained files + ledger
+# as a run artifact for comparison, it never pushes to main.
+
+name: NHL xG Model Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      stages:
+        description: 'Stage selectors, space-separated (01 02, or model names xg_5v5 xg_st); empty = all'
+        required: false
+        default: ''
+      quick:
+        description: 'Reduced grid/rounds smoke run (gates tolerated)'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # 06:00 UTC 15 July — deep offseason, after the season's pbp is settled.
+    - cron: '0 6 15 7 *'
+
+concurrency:
+  group: nhl-model-pipeline
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    name: ${{ matrix.stage }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        stage:
+          - nhl_model_01_xg_5v5
+          - nhl_model_02_xg_st
+
+    steps:
+      - name: Check stage selection
+        id: sel
+        env:
+          STAGES: ${{ inputs.stages }}
+          STAGE: ${{ matrix.stage }}
+        run: |
+          NUM="${STAGE:10:2}"
+          MODEL="${STAGE:13}"
+          SELECTED=true
+          if [ -n "${STAGES}" ]; then
+            SELECTED=false
+            for want in ${STAGES}; do
+              if [ "${want}" = "${NUM}" ] || [ "${want}" = "${MODEL}" ] || [ "${want}" = "${STAGE}" ]; then
+                SELECTED=true
+              fi
+            done
+          fi
+          echo "selected=${SELECTED}" >> "$GITHUB_OUTPUT"
+          echo "stage ${STAGE}: selected=${SELECTED}"
+
+      # Sparse checkout: code + the committed pbp parquet corpus the trainer
+      # reads (~530 MB, 16 files) — NOT the full rds/lite trees.
+      - name: Checkout (sparse, with pbp parquet)
+        if: steps.sel.outputs.selected == 'true'
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            python
+            tests
+            scripts
+            models
+            nhl/pbp/parquet
+            pyproject.toml
+            uv.lock
+
+      - name: Set up Python 3.12
+        if: steps.sel.outputs.selected == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        if: steps.sel.outputs.selected == 'true'
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Sync deps
+        if: steps.sel.outputs.selected == 'true'
+        run: uv sync --frozen
+
+      - name: Run stage
+        if: steps.sel.outputs.selected == 'true'
+        env:
+          STAGE: ${{ matrix.stage }}
+          QUICK: ${{ inputs.quick }}
+        run: |
+          EXTRA=""
+          if [ "${QUICK}" = "true" ]; then EXTRA="--quick"; fi
+          uv run --no-sync python -m "nhl_model_build.${STAGE}" ${EXTRA}
+
+      - name: Upload retrained artifacts (promotion stays a human commit)
+        if: steps.sel.outputs.selected == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: nhl-xg-${{ matrix.stage }}
+          path: |
+            models/xg_model_*.json
+            models/xg_model_report.md
+            models/ledger.jsonl
+          if-no-files-found: warn
+          retention-days: 30

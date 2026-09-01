@@ -33,3 +33,11 @@ design** (needs the `hockeyR-data` sibling checkout).
 | hockeyR xG 5v5 | `hockeyR/inst/extdata/xg_model_5v5.json` (+ `hockeyR/R/sysdata.rda`) | — (vendored package data) | hockeyR-data corpus | `hockeyR/retrain_xg_models.R` | reproduction of Morse 2022 recipe | 2026-03 | manual — local runbook |
 | hockeyR xG special teams | `hockeyR/inst/extdata/xg_model_st.json` (+ `hockeyR/R/sysdata.rda`) | — (vendored package data) | hockeyR-data corpus | `hockeyR/retrain_xg_models.R` | reproduction of Morse 2022 recipe | 2026-03 | manual — local runbook |
 | hockeyR penalty-shot constant | `hockeyR/R/xg_model_ps.rds` (bundled into `sysdata.rda`) | — (vendored package data) | hockeyR-data corpus | `hockeyR/retrain_xg_models.R` (restore step) | constant — no fit gate | 2026-03 | manual — local runbook |
+
+## Operability (Track C steps 2–6)
+
+- `models/manifest.yaml` — single home for the model/stage list (guarded by `tests/test_model_manifest.py`).
+- One model = one numbered pipeline: `python/nhl_model_build/nhl_model_01_xg_5v5.py` / `nhl_model_02_xg_st.py`; run subsets with `scripts/nhl_models.sh`; retrain CI = `nhl_model_pipeline.yml` (dispatch + annual July cron; previously the cadence had NO workflow behind it).
+- Gate floors frozen just below the 2026-04 observed values (5v5 cv AUC ≥ 0.82, ST ≥ 0.81); never lowered; `--quick` smoke runs tolerate misses.
+- Fingerprints: stages skip when `hash(code subtree, config)` is unchanged (`--force` to retrain); every trained model appends a `models/ledger.jsonl` line; each retrain rewrites the `xg_model_meta.json` + `xg_model_report.md` sidecars (single-variant runs merge, never clobber).
+- Promotion = committing the retrained `models/*.json` (this repo's step-6 convention); CI only uploads run artifacts, it never pushes.

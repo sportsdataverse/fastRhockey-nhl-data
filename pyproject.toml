@@ -20,6 +20,7 @@ sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "pyyaml>=6.0.3",
     "ruff>=0.6",
 ]
 # xG model training (xg_train): xgboost + pandas (xgb.cv returns a pandas frame).
