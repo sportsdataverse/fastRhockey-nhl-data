@@ -127,14 +127,12 @@ jobs:
 
       - name: Compile season datasets
         run: |
-          # One numbered creation stage per dataset family (parse + compile
-          # individually; generated from the config DATASETS registry).
-          for f in python/nhl_data_[0-9][0-9]_*_creation.py; do
-            mod=$(basename "$f" .py)
-            uv run python -m "$mod" \
-              -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }} \
-              --final-dir "$GITHUB_WORKSPACE/_raw/nhl/json/final" --out-dir "$GITHUB_WORKSPACE/nhl"
-          done
+          # Daily cron runs the shared SINGLE-PASS compile (all families, one
+          # parse of ~1,400 finals). The numbered per-family creation stages
+          # (nhl_data_02..18_*_creation) are the SAME code path (season.main
+          # + --families) and serve targeted rebuilds — running all 17 here
+          # would re-parse the finals 17x for no gain.
+          uv run python -m nhl_data_build.season             -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }}             --final-dir "$GITHUB_WORKSPACE/_raw/nhl/json/final" --out-dir "$GITHUB_WORKSPACE/nhl"
 
       - name: Publish to sportsdataverse-data releases
         if: ${{ github.event.inputs.publish != 'false' }}

@@ -125,13 +125,11 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
 
         # nhl_data_build is not installed into the venv, so it only imports with
         # python/ as cwd -- hence the subshell. Paths are absolute for that reason.
-        COMPILE_RC_I=0
-        for f in python/nhl_data_[0-9][0-9]_*_creation.py; do
-            mod=$(basename "$f" .py)
-            ( cd python && "${PYBIN}" -m "${mod}" \
-                -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}" ) || COMPILE_RC_I=$?
-        done
-        echo "COMPILE_RC=${COMPILE_RC_I}" > "/tmp/_nhl_compile_rc_${i}"
+        # Single-pass compile (all families, one parse); the numbered
+        # per-family stages share this exact code path (season.main
+        # --families) and exist for targeted rebuilds.
+        ( cd python && "${PYBIN}" -m nhl_data_build.season                 -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}" )
+        echo "COMPILE_RC=$?" > "/tmp/_nhl_compile_rc_${i}"
 
         # Publish only what compiled. Uploading is idempotent (--clobber), so a
         # partial season still ships the datasets that built.
@@ -153,7 +151,7 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     # Surface a failed compile rather than masking it with a successful push;
     # finish the remaining seasons first.
     if [ "${COMPILE_RC:-0}" != "0" ]; then
-        echo "::error ::nhl_data family creation stages for season $i exited with code ${COMPILE_RC}"
+        echo "::error ::nhl_data_build.season for season $i exited with code ${COMPILE_RC}"
         ANY_FAILED=1
     fi
 done
