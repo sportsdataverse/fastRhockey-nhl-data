@@ -12,7 +12,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "models" / "manifest.yaml"
 REGISTRY = ROOT / "models" / "REGISTRY.md"
-STAGES_DIR = ROOT / "python" / "nhl_model_build"
+STAGES_DIR = ROOT / "python"
 
 
 def _doc() -> dict:
@@ -39,7 +39,7 @@ def test_stages_and_manifest_agree_bidirectionally():
 
 def test_stage_modules_import_and_expose_main():
     for p in sorted(STAGES_DIR.glob("nhl_model_[0-9][0-9]_*.py")):
-        mod = import_module(f"nhl_model_build.{p.stem}")
+        mod = import_module(p.stem)
         assert callable(getattr(mod, "main", None)), f"{p.stem} has no main()"
 
 

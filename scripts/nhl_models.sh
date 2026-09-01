@@ -8,7 +8,7 @@
 #   scripts/nhl_models.sh --force 06       # pass --force through to the stages
 #   NHL_MODELS_ARGS="--nrounds 5" scripts/nhl_models.sh 06   # extra stage args
 #
-# Stage list = python/nhl_model_build/nhl_model_NN_<model>.py (single home:
+# Stage list = python/nhl_model_NN_<model>.py (single home:
 # models/manifest.yaml; tests/test_model_manifest.py keeps them in lockstep).
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -27,7 +27,7 @@ fi
 FORCE=""
 if [ "${1:-}" = "--force" ]; then FORCE="--force"; shift; fi
 
-mapfile -t ALL < <(ls python/nhl_model_build/nhl_model_[0-9][0-9]_*.py | sort)
+mapfile -t ALL < <(ls python/nhl_model_[0-9][0-9]_*.py | sort)
 
 SELECTED=()
 if [ "$#" -eq 0 ]; then
@@ -57,7 +57,7 @@ for f in "${SELECTED[@]}"; do
   mod="$(basename "${f}" .py)"
   echo "== ${mod}"
   # shellcheck disable=SC2086
-  PYTHONPATH=python "${PY}" -m "nhl_model_build.${mod}" ${FORCE} ${NHL_MODELS_ARGS:-} || {
+  PYTHONPATH=python "${PY}" -m "${mod}" ${FORCE} ${NHL_MODELS_ARGS:-} || {
     rc=$?
     echo "== ${mod} FAILED (rc=${rc})"
     break

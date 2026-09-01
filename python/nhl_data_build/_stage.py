@@ -1,9 +1,9 @@
-"""Shared runner for the numbered per-model stage scripts (``nhl_model_NN_*``).
+"""Shared runner for the numbered per-model stage scripts (``nhl_model_NN_*``, flat in python/).
 
 Each stage is a thin, individually-runnable pipeline for ONE model:
 fingerprint (skip unless ``--force``) -> train via ``nhl_data_build.xg_train``
 -> record fingerprint -> append ``models/ledger.jsonl`` -> fail on a hard gate
-miss. Run via ``python -m nhl_model_build.nhl_model_NN_...`` or ``scripts/nhl_models.sh``.
+miss. Run via ``python -m nhl_model_NN_...`` or ``scripts/nhl_models.sh``.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Optional
 
-from nhl_model_build import fingerprint as fp
+from nhl_data_build import fingerprint as fp
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LEDGER = REPO_ROOT / "models" / "ledger.jsonl"

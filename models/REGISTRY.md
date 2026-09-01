@@ -37,7 +37,7 @@ design** (needs the `hockeyR-data` sibling checkout).
 ## Operability (Track C steps 2–6)
 
 - `models/manifest.yaml` — single home for the model/stage list (guarded by `tests/test_model_manifest.py`).
-- One model = one numbered pipeline: `python/nhl_model_build/nhl_model_01_xg_5v5.py` / `nhl_model_02_xg_st.py`; run subsets with `scripts/nhl_models.sh`; retrain CI = `nhl_model_pipeline.yml` (dispatch + annual July cron; previously the cadence had NO workflow behind it).
+- One model = one numbered pipeline: `python/nhl_model_01_xg_5v5.py` / `nhl_model_02_xg_st.py`; run subsets with `scripts/nhl_models.sh`; retrain CI = `nhl_model_pipeline.yml` (dispatch + annual July cron; previously the cadence had NO workflow behind it).
 - Gate floors frozen just below the 2026-04 observed values (5v5 cv AUC ≥ 0.82, ST ≥ 0.81); never lowered; `--quick` smoke runs tolerate misses.
 - Fingerprints: stages skip when `hash(code subtree, config)` is unchanged (`--force` to retrain); every trained model appends a `models/ledger.jsonl` line; each retrain rewrites the `xg_model_meta.json` + `xg_model_report.md` sidecars (single-variant runs merge, never clobber).
 - Promotion = committing the retrained `models/*.json` (this repo's step-6 convention); CI only uploads run artifacts, it never pushes.

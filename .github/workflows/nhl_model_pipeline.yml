@@ -104,7 +104,7 @@ jobs:
         run: |
           EXTRA=""
           if [ "${QUICK}" = "true" ]; then EXTRA="--quick"; fi
-          uv run --no-sync python -m "nhl_model_build.${STAGE}" ${EXTRA}
+          uv run --no-sync python -m "${STAGE}" ${EXTRA}
 
       - name: Upload retrained artifacts (promotion stays a human commit)
         if: steps.sel.outputs.selected == 'true'
