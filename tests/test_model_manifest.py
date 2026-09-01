@@ -53,3 +53,22 @@ def test_registry_names_every_manifest_artifact_and_vendored_row():
             assert Path(sc).name in registry, f"sidecar {sc} not in REGISTRY.md"
     for v in doc["vendored"]:
         assert Path(v).name in registry, f"vendored {v} not in REGISTRY.md"
+
+
+def _data_pipelines() -> dict:
+    return yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))["data_pipelines"]
+
+
+def test_data_stages_and_manifest_agree_bidirectionally():
+    files = {p.stem for p in STAGES_DIR.glob("nhl_data_[0-9][0-9]_*.py")}
+    manifest = {Path(m["stage"]).stem for m in _data_pipelines().values()}
+    assert files == manifest, f"files-only={files - manifest}, manifest-only={manifest - files}"
+    for name, m in _data_pipelines().items():
+        assert (ROOT / m["stage"]).is_file(), f"{name} stage missing"
+        assert (ROOT / ".github" / "workflows" / m["workflow"]).is_file(), f"{name} workflow missing"
+
+
+def test_data_stage_modules_import_and_expose_main():
+    for p in sorted(STAGES_DIR.glob("nhl_data_[0-9][0-9]_*.py")):
+        mod = import_module(p.stem)
+        assert callable(getattr(mod, "main", None)), f"{p.stem} has no main()"

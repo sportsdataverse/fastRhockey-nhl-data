@@ -125,16 +125,13 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
 
         # nhl_data_build is not installed into the venv, so it only imports with
         # python/ as cwd -- hence the subshell. Paths are absolute for that reason.
-        ( cd python && "${PYBIN}" -m nhl_data_build.season \
+        ( cd python && "${PYBIN}" -m nhl_data_02_season \
                 -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}" )
         echo "COMPILE_RC=$?" > "/tmp/_nhl_compile_rc_${i}"
 
         # Publish only what compiled. Uploading is idempotent (--clobber), so a
         # partial season still ships the datasets that built.
-        ( cd python && "${PYBIN}" -c "
-from nhl_data_build.publish import publish_season
-print(len(publish_season('${OUT_DIR}', ${i})), 'assets uploaded')
-" )
+        ( cd python && "${PYBIN}" -m nhl_data_03_publish -s "${i}" --out-dir "${OUT_DIR}" )
 
         sdv_commit_push "NHL Data Updated (Start: $i End: $i)" nhl || PUSH_RC=1
     } 2>&1 | tee "$TMPLOG"
@@ -152,7 +149,7 @@ print(len(publish_season('${OUT_DIR}', ${i})), 'assets uploaded')
     # Surface a failed compile rather than masking it with a successful push;
     # finish the remaining seasons first.
     if [ "${COMPILE_RC:-0}" != "0" ]; then
-        echo "::error ::nhl_data_build.season for season $i exited with code ${COMPILE_RC}"
+        echo "::error ::nhl_data_02_season for season $i exited with code ${COMPILE_RC}"
         ANY_FAILED=1
     fi
 done

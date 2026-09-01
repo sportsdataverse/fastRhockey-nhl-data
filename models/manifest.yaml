@@ -40,3 +40,21 @@ vendored:
   - hockeyR/inst/extdata/xg_model_5v5.json
   - hockeyR/inst/extdata/xg_model_st.json
   - hockeyR/R/xg_model_ps.rds
+
+# Data pipelines (Option A: numbered domain packages, flat in python/). Same
+# discipline as the model stages: thin entries over nhl_data_build; run
+# subsets with scripts/nhl_data.sh. Data stages do NOT fingerprint-skip —
+# they are refresh jobs whose inputs change upstream without a code change.
+data_pipelines:
+  fetch:
+    stage: python/nhl_data_01_fetch.py
+    wraps: nhl_data_build.fetch
+    workflow: daily_nhl_python.yml
+  season:
+    stage: python/nhl_data_02_season.py
+    wraps: nhl_data_build.season
+    workflow: daily_nhl_python.yml
+  publish:
+    stage: python/nhl_data_03_publish.py
+    wraps: nhl_data_build.publish.publish_season
+    workflow: daily_nhl_python.yml

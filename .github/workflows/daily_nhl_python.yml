@@ -74,7 +74,7 @@ jobs:
       # checkout on purpose — its plumbing differs by design.
       - name: Fetch nhl-raw finals over HTTP
         run: |
-          uv run python -m nhl_data_build.fetch \
+          uv run python -m nhl_data_01_fetch \
             -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }} \
             --dest "$GITHUB_WORKSPACE/_raw/nhl/json/final"
 
@@ -127,7 +127,7 @@ jobs:
 
       - name: Compile season datasets
         run: |
-          uv run python -m nhl_data_build.season \
+          uv run python -m nhl_data_02_season \
             -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }} \
             --final-dir "$GITHUB_WORKSPACE/_raw/nhl/json/final" --out-dir "$GITHUB_WORKSPACE/nhl"
 
@@ -136,9 +136,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
         run: |
-          for y in $(seq ${{ steps.years.outputs.start }} ${{ steps.years.outputs.end }}); do
-            uv run python -c "from nhl_data_build.publish import publish_season; print(publish_season('$GITHUB_WORKSPACE/nhl', $y))"
-          done
+          uv run python -m nhl_data_03_publish \
+            -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }} \
+            --out-dir "$GITHUB_WORKSPACE/nhl"
 
       - name: Commit compiled parquets
         working-directory: .
