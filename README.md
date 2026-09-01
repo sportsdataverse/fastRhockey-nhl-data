@@ -1043,7 +1043,8 @@ Reproducible Method for Offensive Player Evaluation in Football.”
 
 | Report | What it is | Last updated |
 |---|---|---|
-| [Model registry](models/REGISTRY.md) | model | artifact | gates | retrain, one row per published model | uncommitted |
+| [Model registry](models/REGISTRY.md) | model | artifact | gates | retrain, one row per published model | 2026-09-01 |
+| [Model reports & cards](docs/models/) | 1 files, one per item | uncommitted |
 
 <!-- END GENERATED: reports -->
 
