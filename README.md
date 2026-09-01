@@ -63,11 +63,12 @@ flowchart TB;
   (`python/nhl_data_build`), and the **local** equivalent of what
   `.github/workflows/daily_nhl_python.yml` runs.
 
-  Note the duplication: that workflow does **not** call this script — it inlines
-  `uv run python -m nhl_data_build.season` and `nhl_data_build.publish` directly.
-  So local and CI execute the same stages by two separate definitions, and a
-  change to one does not reach the other. Prefer editing both together until the
-  workflow is pointed at the script.
+  Note the duplication: that workflow does **not** call this script. Both now
+  run the shared single-pass compile (`python -m nhl_data_build.season`, all
+  families in one parse) and publish via the numbered `nhl_data_19_publish`
+  stage; the per-family `nhl_data_02..18_*_creation` stages are the
+  targeted-rebuild surface over the same code path (`--families`). Local and CI
+  are still two separate definitions — prefer editing both together.
 
 ## sportsdataverse-data releases
 
