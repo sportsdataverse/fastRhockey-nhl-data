@@ -122,3 +122,7 @@ data_pipelines:
     stage: python/nhl_data_19_publish.py
     wraps: nhl_data_build.publish.publish_season
     workflow: daily_nhl_python.yml
+# Efficiency note (2026-09-01): the daily cron + droplet processor run the
+# shared SINGLE-PASS compile (nhl_data_build.season, all families, one parse
+# of ~1,400 finals). The numbered per-family creation stages are the SAME
+# code path (--families) and are the targeted-rebuild surface — no drift.
