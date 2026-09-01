@@ -1039,6 +1039,16 @@ Reproducible Method for Offensive Player Evaluation in Football.”
     more
     [here](https://www.pensionplanpuppets.com/2012/7/25/3184137/intro-to-advanced-hockey-statistics-fenwick).
 
+## Reports & explainers
+
+<!-- BEGIN GENERATED: reports -->
+
+| Report | What it is | Last updated |
+|---|---|---|
+| _none yet_ | — | — |
+
+<!-- END GENERATED: reports -->
+
 ## Automation & status
 
 <!-- BEGIN GENERATED: status -->
