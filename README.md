@@ -56,6 +56,84 @@ flowchart TB;
 
 ```
 
+## Repository layout
+
+<!-- BEGIN GENERATED: layout -->
+
+```
+fastRhockey-nhl-data/
+├── R/   # R pipeline stages and publish toolchain
+│   ├── 0000_create_fastRhockey_releases_init.R
+│   ├── 0001_push_existing_release_data.R
+│   ├── build_xg_model.R
+│   ├── compress_pbp_data.R
+│   ├── nhl_data_creation.R
+│   └── run_summary.R
+├── README_files/
+│   └── figure-gfm/
+├── data/   # committed datasets
+├── docs/   # explainers, model reports and dataset docs
+│   └── models/
+├── figures/   # generated figures
+├── hockeyR/
+│   ├── R/
+│   ├── data/
+│   ├── inst/
+│   ├── man/
+│   ├── pkgdown/
+│   └── vignettes/
+├── logs/   # per-run logs (gitignored where large)
+├── models/   # model artifacts, cards and the registry
+├── nhl/
+│   ├── game_info/
+│   ├── game_rosters/
+│   ├── goalie_box/
+│   ├── linescore/
+│   ├── officials/
+│   ├── pbp/
+│   ├── pbp_lite/
+│   ├── penalties/
+│   └── … 11 more
+├── python/   # Python pipeline stages, numbered in build order
+│   ├── nhl_data_build/
+│   ├── nhl_data_01_fetch.py
+│   ├── nhl_data_02_pbp_creation.py
+│   ├── nhl_data_03_skater_box_creation.py
+│   ├── nhl_data_04_goalie_box_creation.py
+│   ├── nhl_data_05_team_box_creation.py
+│   ├── nhl_data_06_game_info_creation.py
+│   ├── nhl_data_07_game_rosters_creation.py
+│   ├── nhl_data_08_shifts_creation.py
+│   ├── nhl_data_09_scoring_creation.py
+│   ├── nhl_data_10_penalties_creation.py
+│   ├── nhl_data_11_scratches_creation.py
+│   ├── nhl_data_12_linescore_creation.py
+│   ├── nhl_data_13_three_stars_creation.py
+│   ├── nhl_data_14_officials_creation.py
+│   ├── nhl_data_15_shots_by_period_creation.py
+│   └── … 6 more
+├── scripts/   # bash drivers (the daily/weekly entry points)
+│   ├── daily_nhl_R_processor.sh
+│   ├── daily_nhl_python_processor.sh
+│   ├── nhl_data.sh
+│   ├── nhl_models.sh
+│   └── render_model_docs.sh
+└── tests/   # test suite
+    ├── fixtures/
+    ├── test_extract_parity.py
+    ├── test_fetch.py
+    ├── test_model_manifest.py
+    ├── test_model_registry.py
+    ├── test_publish.py
+    ├── test_r_python_parity.py
+    ├── test_season.py
+    ├── test_xg_report.py
+    ├── test_xg_train.py
+    └── test_xg_variant_merge.py
+```
+
+<!-- END GENERATED: layout -->
+
 ## Daily processors
 
 - `scripts/daily_nhl_R_processor.sh` — the R reshape path (see the diagram above).
