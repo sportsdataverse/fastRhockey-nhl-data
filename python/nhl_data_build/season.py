@@ -133,9 +133,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("-e", "--end", type=int, help="end season end-year (default: --start)")
     ap.add_argument("--final-dir", required=True, help="dir of final/{gid}.json (fastRhockey-nhl-raw nhl/json/final)")
     ap.add_argument("--out-dir", default="nhl")
+    ap.add_argument("--families", nargs="+", default=None, metavar="KEY",
+                    help="restrict to these dataset families (default: all)")
     args = ap.parse_args(argv)
+    if args.families:
+        from nhl_data_build.config import TYPES
+
+        unknown = sorted(set(args.families) - set(TYPES))
+        if unknown:
+            ap.error(f"unknown families: {unknown} (known: {sorted(TYPES)})")
     for year in range(args.start, (args.end or args.start) + 1):
         season = build_season_from_dir(args.final_dir, season_end_year=year)
+        if args.families:
+            season = {k: v for k, v in season.items() if k in args.families}
         written = write_datasets(season, args.out_dir, year)
         print(f"season {year}: {sum(written.values())} rows across {len(written)} datasets -> {args.out_dir}")
     return 0
