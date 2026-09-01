@@ -1069,3 +1069,36 @@ Reproducible Method for Offensive Player Evaluation in Football.”
 | [`nhl_schedules`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_schedules) | 61 | 21.4 MB | 2026-07-22 |
 
 <!-- END GENERATED: status -->
+
+## Consumers
+
+The packages that read what this repo produces:
+
+- **R:** [fastRhockey](https://fastRhockey.sportsdataverse.org) — docs at <https://fastRhockey.sportsdataverse.org>
+- **Python:** [`sportsdataverse.nhl`](https://github.com/sportsdataverse/sportsdataverse-py) — docs at <https://py.sportsdataverse.org>
+
+## Stage inventory
+
+Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `scripts/*.sh` drivers by number or name):
+
+- `python/nhl_data_01_fetch.py`
+- `python/nhl_data_02_pbp_creation.py`
+- `python/nhl_data_03_skater_box_creation.py`
+- `python/nhl_data_04_goalie_box_creation.py`
+- `python/nhl_data_05_team_box_creation.py`
+- `python/nhl_data_06_game_info_creation.py`
+- `python/nhl_data_07_game_rosters_creation.py`
+- `python/nhl_data_08_shifts_creation.py`
+- `python/nhl_data_09_scoring_creation.py`
+- `python/nhl_data_10_penalties_creation.py`
+- `python/nhl_data_11_scratches_creation.py`
+- `python/nhl_data_12_linescore_creation.py`
+- `python/nhl_data_13_three_stars_creation.py`
+- `python/nhl_data_14_officials_creation.py`
+- `python/nhl_data_15_shots_by_period_creation.py`
+- `python/nhl_data_16_shootout_creation.py`
+- `python/nhl_data_17_pbp_lite_creation.py`
+- `python/nhl_data_18_player_box_creation.py`
+- `python/nhl_data_19_publish.py`
+- `python/nhl_model_01_xg_5v5.py`
+- `python/nhl_model_02_xg_st.py`
