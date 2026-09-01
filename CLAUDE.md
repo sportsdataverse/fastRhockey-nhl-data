@@ -152,7 +152,7 @@ Add a new compiled dataset by appending one row to `DATASETS` and creating
 the matching `nhl/<key>/` subdirectory; the rest of the compile loop is
 data-driven. The corresponding loader on the `fastRhockey` package side
 (`load_nhl_<key>()`) also needs a new catalog row in
-`R/nhl_loaders.R`.
+the fastRhockey package's `R/nhl_loaders.R`.
 
 A "lite" play-by-play (`nhl_pbp_lite`) is generated from the full PBP by
 dropping a configurable set of columns; it shares the same compile path as
