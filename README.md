@@ -138,12 +138,9 @@ HOCKEYR_PBP_DIR=/path/to/hockeyR-data/pbp_data Rscript retrain_xg_models.R
 
 ### Model registry
 
-| Model | Artifact file(s) | Fitting script | Last retrain | Cadence |
-|-------|------------------|----------------|--------------|---------|
-| hockeyR xG 5v5 | `hockeyR/inst/extdata/xg_model_5v5.json` (+ `hockeyR/R/sysdata.rda`) | `hockeyR/retrain_xg_models.R` | 2026-03 | manual — local runbook (needs the `hockeyR-data` sibling checkout; no CI trigger by design) |
-| hockeyR xG special teams | `hockeyR/inst/extdata/xg_model_st.json` (+ `hockeyR/R/sysdata.rda`) | `hockeyR/retrain_xg_models.R` | 2026-03 | manual — local runbook (needs the `hockeyR-data` sibling checkout; no CI trigger by design) |
-| hockeyR penalty-shot constant | `hockeyR/R/xg_model_ps.rds` (bundled into `hockeyR/R/sysdata.rda`) | `hockeyR/retrain_xg_models.R` (restore step) | 2026-03 | manual — local runbook (needs the `hockeyR-data` sibling checkout; no CI trigger by design) |
-| fastRhockey xG (5v5 + ST + meta) | `models/xg_model_5v5.json`, `models/xg_model_st.json`, `models/xg_model_meta.rds` | `R/build_xg_model.R` | 2026-04 | as-needed / manual |
+Moved to [`models/REGISTRY.md`](models/REGISTRY.md) (Track C — the registry is
+repository data a test parses; `tests/test_model_registry.py` keeps it in
+lockstep with the artifacts on disk).
 
 ## Related repositories
 
@@ -1045,7 +1042,7 @@ Reproducible Method for Offensive Player Evaluation in Football.”
 
 | Report | What it is | Last updated |
 |---|---|---|
-| _none yet_ | — | — |
+| [Model registry](models/REGISTRY.md) | model | artifact | gates | retrain, one row per published model | uncommitted |
 
 <!-- END GENERATED: reports -->
 
