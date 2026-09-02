@@ -27,11 +27,31 @@ _PUBLISH += [
 
 #: Release sidecar metadata. Every published tag carries package_function.txt/.json
 #: naming the loader a consumer reads it through -- the half of R's
-#: sportsdataverse_save() this module's port dropped. fastRhockey names every one
-#: of these loaders after its tag, and the derivation was checked against the
-#: package_function.json already published to all 17 tags, so re-stamping from
-#: Python does not change what a consumer sees.
-PKG_FUNCTION: dict[str, str] = {tag: f"fastRhockey::load_{tag}()" for _p, tag, _k in _PUBLISH}
+#: sportsdataverse_save() this module's port dropped. Each value is the exact
+#: string the R producer already published to that tag (read back off the
+#: release assets), so re-stamping from Python does not change what a consumer
+#: sees. Spelled out rather than derived from the tag: these are consumer-facing
+#: strings, and a future tag whose loader breaks the naming pattern would
+#: otherwise ship a name that does not resolve.
+PKG_FUNCTION: dict[str, str] = {
+    "nhl_game_info": "fastRhockey::load_nhl_game_info()",
+    "nhl_game_rosters": "fastRhockey::load_nhl_game_rosters()",
+    "nhl_goalie_boxscores": "fastRhockey::load_nhl_goalie_boxscores()",
+    "nhl_linescore": "fastRhockey::load_nhl_linescore()",
+    "nhl_officials": "fastRhockey::load_nhl_officials()",
+    "nhl_pbp_full": "fastRhockey::load_nhl_pbp_full()",
+    "nhl_pbp_lite": "fastRhockey::load_nhl_pbp_lite()",
+    "nhl_penalties": "fastRhockey::load_nhl_penalties()",
+    "nhl_player_boxscores": "fastRhockey::load_nhl_player_boxscores()",
+    "nhl_scoring": "fastRhockey::load_nhl_scoring()",
+    "nhl_scratches": "fastRhockey::load_nhl_scratches()",
+    "nhl_shifts": "fastRhockey::load_nhl_shifts()",
+    "nhl_shootout": "fastRhockey::load_nhl_shootout()",
+    "nhl_shots_by_period": "fastRhockey::load_nhl_shots_by_period()",
+    "nhl_skater_boxscores": "fastRhockey::load_nhl_skater_boxscores()",
+    "nhl_team_boxscores": "fastRhockey::load_nhl_team_boxscores()",
+    "nhl_three_stars": "fastRhockey::load_nhl_three_stars()",
+}
 
 
 def _gh(args: list[str]) -> None:

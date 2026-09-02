@@ -9,6 +9,7 @@ confident wrong answer.
 import json
 from pathlib import Path
 
+import pytest
 from nhl_data_build import publish
 
 SIDECAR_NAMES = [
@@ -22,8 +23,7 @@ SIDECAR_NAMES = [
 def test_every_published_tag_names_a_loader():
     missing = sorted({tag for _p, tag, _k in publish._PUBLISH} - set(publish.PKG_FUNCTION))
     assert missing == [], f"tags with no PKG_FUNCTION entry: {missing}"
-    # fastRhockey's loaders are named after the tag -- this is what the R
-    # producer published to every one of these tags
+    # every value is the string the R producer published to that tag
     assert publish.PKG_FUNCTION["nhl_pbp_full"] == "fastRhockey::load_nhl_pbp_full()"
 
 
@@ -74,3 +74,26 @@ def test_stamped_sidecars_carry_the_loader_and_a_timestamp(tmp_path, monkeypatch
     assert seen["package_function.txt"].strip() == publish.PKG_FUNCTION[tag]
     assert json.loads(seen["package_function.json"])["package_function"] == publish.PKG_FUNCTION[tag]
     assert json.loads(seen["timestamp.json"])["last_updated"].strip()
+
+
+@pytest.mark.parametrize(("tag", "expected"), sorted(publish.PKG_FUNCTION.items()))
+def test_every_mapping_reaches_the_sidecar_verbatim(tmp_path, monkeypatch, tag, expected):
+    """Pin every tag's loader name, not just the one the happy path uses.
+
+    These strings ship to consumers as the canonical way to read the tag, so
+    each one is asserted on the bytes that actually land.
+    """
+    seen: dict[str, str] = {}
+
+    def _capture(argv: list[str]) -> None:
+        path = Path(argv[3])
+        if path.name.startswith(("timestamp.", "package_function.")):
+            seen[path.name] = path.read_text()
+
+    monkeypatch.setattr(publish, "_gh", _capture)
+    publish.upload_release_sidecars(
+        tag, runner=publish._gh, pkg_function=publish.PKG_FUNCTION[tag], repo="r/r"
+    )
+
+    assert seen["package_function.txt"].strip() == expected
+    assert json.loads(seen["package_function.json"])["package_function"] == expected
