@@ -1,7 +1,8 @@
-"""Single-variant retrains merge into the existing meta (numbered stages).
+"""Single-variant retrains merge into the existing sidecars (numbered stages).
 
-The per-model stages train ONE booster; xg_model_meta.json must keep the
-sibling variant's entries rather than clobbering them.
+The per-model stages train ONE booster; xg_model_meta.json AND
+xg_model_split.json must keep the sibling variant's entries rather than
+clobbering them.
 """
 
 import json
@@ -21,7 +22,12 @@ def test_single_variant_merges_meta(tmp_path, monkeypatch):
 
     def fake_variant(pbp, variant, rng, quick=False):
         calls.append(variant)
-        return _FakeBooster(), [f"feat_{variant}"], {"cv_auc": 0.9}
+        split = (
+            {"train_game_ids": [1, 2], "test_game_ids": [3]}
+            if variant == "5v5"
+            else {"train_game_ids": [4], "test_game_ids": [5]}
+        )
+        return _FakeBooster(), [f"feat_{variant}"], {"cv_auc": 0.9}, split
 
     monkeypatch.setattr(xt, "_train_variant", fake_variant)
     monkeypatch.setattr(xt, "penalty_shot_xg", lambda pbp: 0.3)
@@ -37,14 +43,24 @@ def test_single_variant_merges_meta(tmp_path, monkeypatch):
     assert meta2["xg_feature_names_5v5"] == ["feat_5v5"]  # preserved, not clobbered
     assert meta2["xg_feature_names_st"] == ["feat_st"]
     assert meta2["xg_model_ps"] == 0.3
+    assert meta2["split_file"] == "xg_model_split.json" and meta2["seed"] == 37
     assert calls == ["5v5", "st"]
+    split = json.loads((tmp_path / "xg_model_split.json").read_text(encoding="utf-8"))
+    assert split["5v5"] == {"train_game_ids": [1, 2], "test_game_ids": [3]}  # preserved, not clobbered
+    assert split["st"] == {"train_game_ids": [4], "test_game_ids": [5]}
+    assert split["seed"] == 37
 
 
 def test_both_variants_fresh_meta(tmp_path, monkeypatch):
     monkeypatch.setattr(
         xt,
         "_train_variant",
-        lambda pbp, v, rng, quick=False: (_FakeBooster(), [f"feat_{v}"], {}),
+        lambda pbp, v, rng, quick=False: (
+            _FakeBooster(),
+            [f"feat_{v}"],
+            {},
+            {"train_game_ids": [], "test_game_ids": []},
+        ),
     )
     monkeypatch.setattr(xt, "penalty_shot_xg", lambda pbp: 0.25)
     xt.train_xg_models(pl.DataFrame({"a": [1]}), tmp_path, report=False)

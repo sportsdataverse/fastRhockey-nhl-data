@@ -6,7 +6,9 @@ shot_type + last_event_type) is the SAME recipe the inference path uses
 (``nhl_raw.xg.prepare_xg_data``); this module keeps the ``goal`` target + all one-hot
 columns and adds the XGBoost training loop (grouped 80/20 split + 5-fold grouped CV +
 min_child_weight grid + final fit), then saves ``xg_model_5v5.json`` / ``xg_model_st.json``
-/ ``xg_model_meta.json``.
+/ ``xg_model_meta.json`` (feature lists + per-retrain holdout metrics, incl. the per-season
+calibration table the ST drift gate reads) / ``xg_model_split.json`` (the training-time
+train/test ``game_id`` partition, so the exact holdout stays reproducible as the corpus grows).
 
 The "5v5" model is trained on ALL non-shootout, non-penalty-shot unblocked shots (no
 strength filter, per the R script); the "st" model is trained only on the special-teams
@@ -18,6 +20,7 @@ from __future__ import annotations
 import argparse
 import glob
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -38,6 +41,8 @@ _VALID_LAST = [
 ]
 _ST_STRENGTHS = ["5v4", "5v3", "6v5", "6v4", "4v4", "4v3", "3v3", "4v5", "3v5", "5v6", "4v6", "3v4"]
 _SEED = 37
+_META_FILE = "xg_model_meta.json"
+_SPLIT_FILE = "xg_model_split.json"
 
 _SHOT_TYPE_NORM = {
     "wrist": "Wrist Shot",
@@ -243,6 +248,71 @@ def _logloss(y: np.ndarray, p: np.ndarray) -> float:
     return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))
 
 
+def season_of_game(game_id: pl.Expr | None = None) -> pl.Expr:
+    """NHL ``game_id`` = SSSSTTNNNN -> season START year (SSSS).
+
+    Verified on the committed corpus: equals ``season // 10000`` for every game, so the
+    model frame (which carries ``game_id`` but not ``season``) can be bucketed by season
+    without threading a non-feature column through the feature matrix.
+    """
+    return (pl.col("game_id") if game_id is None else game_id).cast(pl.Int64) // 1_000_000
+
+
+def per_season_calibration(game_ids: np.ndarray, y: np.ndarray, p: np.ndarray) -> list[dict]:
+    """Goals-vs-xG calibration of one scored frame, one row per season.
+
+    ``z = (goals - sum xG) / sqrt(sum xG (1 - xG))`` is the binomial calibration z-score: a
+    season the model prices correctly has ``|z|`` ~ N(0, 1) regardless of its shot count, which
+    is what makes ``max |z|`` usable as a drift gate across seasons of unequal size. ``ratio``
+    (goals / xG) is the human-readable companion; ``auc`` is the per-season rank AUC.
+    """
+    df = pl.DataFrame(
+        {"game_id": np.asarray(game_ids, dtype=np.int64), "goal": np.asarray(y, dtype=float), "xg": np.asarray(p, dtype=float)}
+    ).with_columns(season=season_of_game())
+    tab = (
+        df.group_by("season")
+        .agg(
+            n=pl.len(),
+            goals=pl.col("goal").sum(),
+            xg_sum=pl.col("xg").sum(),
+            var=(pl.col("xg") * (1 - pl.col("xg"))).sum(),
+        )
+        .sort("season")
+    )
+    rows = []
+    for r in tab.iter_rows(named=True):
+        sub = df.filter(pl.col("season") == r["season"])
+        z = (r["goals"] - r["xg_sum"]) / np.sqrt(r["var"]) if r["var"] > 0 else float("nan")
+        rows.append(
+            {
+                "season": int(r["season"]),
+                "n": int(r["n"]),
+                "goals": int(r["goals"]),
+                "xg_sum": round(float(r["xg_sum"]), 2),
+                "goal_rate": round(float(r["goals"]) / r["n"], 4),
+                "mean_xg": round(float(r["xg_sum"]) / r["n"], 4),
+                "ratio": round(float(r["goals"]) / r["xg_sum"], 4) if r["xg_sum"] > 0 else None,
+                "se_ratio": round(float(np.sqrt(r["var"])) / r["xg_sum"], 4) if r["xg_sum"] > 0 else None,
+                # NOT rounded: max_abs_season_z gates on this, and a true |z| of 3.0004
+                # rounded to 3.0 would slip under a <= 3.0 ceiling. Rounding is presentation
+                # (docs/models/nhl_xg.qmd formats the column), never storage.
+                "z": float(z),
+                "auc": round(_rank_auc(sub["xg"].to_numpy(), sub["goal"].to_numpy()), 4),
+            }
+        )
+    return rows
+
+
+def max_abs_season_z(rows: list[dict]) -> float | None:
+    """The drift statistic a stage gates on: the worst per-season |z| (None if no season has one).
+
+    Full precision on purpose -- this value is compared against the drift ceiling, and a
+    rounded 3.0004 -> 3.0 would pass a ``<= 3.0`` gate it should fail. Round at render time.
+    """
+    zs = [abs(r["z"]) for r in rows if r.get("z") is not None and r["z"] == r["z"]]
+    return max(zs) if zs else None
+
+
 def _json_safe(obj: object) -> object:
     """Recursively replace NaN/inf floats with None so the meta is standards-compliant JSON."""
     if isinstance(obj, float):
@@ -304,19 +374,33 @@ def _train_variant(pbp: pl.DataFrame, variant: str, rng: np.random.Generator, *,
     preds = booster.predict(xgb.DMatrix(Xte, feature_names=feats))
     gain = booster.get_score(importance_type="gain")
     top_imp = sorted(gain.items(), key=lambda kv: kv[1], reverse=True)[:15]
+    base_rate = float(train["goal"].mean())
+    calibration = per_season_calibration(test["game_id"].to_numpy(), yte, preds)
     info = {
+        "trained_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "min_child_weight": mcw,
         "nrounds": rounds,
         "n_train": train.height,
         "n_test": test.height,
+        "n_games_train": train["game_id"].n_unique(),
+        "n_games_test": test["game_id"].n_unique(),
         "goal_rate": round(float(frame["goal"].mean()), 4),
         "cv_logloss": round(float(cv_log["test-logloss-mean"].min()), 4),
         "cv_auc": round(float(cv_log["test-auc-mean"].iloc[rounds - 1]), 4) if "test-auc-mean" in cv_log else None,
         "test_logloss": round(_logloss(yte, preds), 4),
+        "baseline_logloss": round(_logloss(yte, np.full(len(yte), base_rate)), 4),
         "test_auc": round(_rank_auc(preds, yte), 4),
+        "per_season_calibration": calibration,
+        "max_abs_season_z": max_abs_season_z(calibration),
         "importance": [{"feature": f, "gain": round(g, 2)} for f, g in top_imp],
     }
-    return booster, feats, info
+    # The exact partition, persisted: today's corpus filtered to test_game_ids IS the
+    # training-time holdout, however many games land later (those are out-of-time).
+    split = {
+        "train_game_ids": sorted(int(g) for g in train["game_id"].unique().to_list()),
+        "test_game_ids": sorted(int(g) for g in test["game_id"].unique().to_list()),
+    }
+    return booster, feats, info, split
 
 
 def train_xg_models(
@@ -328,31 +412,46 @@ def train_xg_models(
     figures: bool = False,
     variants: tuple[str, ...] = ("5v5", "st"),
 ) -> dict:
-    """Train + save the 5v5 / ST boosters (JSON) + ``xg_model_meta.json`` + a training report.
+    """Train + save the 5v5 / ST boosters (JSON) + the two sidecars + a training report.
 
-    With ``report`` (default), writes ``xg_model_report.md`` (per-model CV/test logloss + AUC,
-    PS constant, era groupings, top feature importance). With ``figures``, also writes
-    feature-importance PNGs (best-effort; needs matplotlib).
+    Sidecars: ``xg_model_meta.json`` (feature lists, per-retrain CV + exact-holdout metrics,
+    per-season calibration, PS constant) and ``xg_model_split.json`` (the train/test
+    ``game_id`` partition per variant). With ``report`` (default), writes
+    ``xg_model_report.md`` (per-model CV/test logloss + AUC, PS constant, era groupings, top
+    feature importance). With ``figures``, also writes feature-importance PNGs (best-effort;
+    needs matplotlib).
     """
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(_SEED)
     ps = penalty_shot_xg(pbp)
 
-    # Single-variant runs merge into the existing meta (numbered per-model
+    # Single-variant runs merge into the existing sidecars (numbered per-model
     # stages retrain one booster without clobbering the sibling's entries).
-    meta_path = out / "xg_model_meta.json"
+    meta_path, split_path = out / _META_FILE, out / _SPLIT_FILE
     meta: dict = {}
-    if set(variants) != {"5v5", "st"} and meta_path.is_file():
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    split_doc: dict = {}
+    if set(variants) != {"5v5", "st"}:
+        if meta_path.is_file():
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        if split_path.is_file():
+            split_doc = json.loads(split_path.read_text(encoding="utf-8"))
     meta["xg_model_ps"] = round(ps, 7)
+    meta["seed"] = _SEED
+    meta["xgboost_version"] = _xgboost_version()
+    meta["split_file"] = _SPLIT_FILE
+    if "season" in pbp.columns:
+        meta["corpus_seasons"] = sorted(str(s) for s in pbp["season"].unique().to_list())
+    split_doc["seed"] = _SEED
     for variant in variants:
-        booster, feats, info = _train_variant(pbp, variant, rng, quick=quick)
+        booster, feats, info, split = _train_variant(pbp, variant, rng, quick=quick)
         booster.save_model(str(out / f"xg_model_{variant}.json"))
         meta[f"xg_feature_names_{variant}"] = feats
         meta[f"info_{variant}"] = info
+        split_doc[variant] = split
     # NaN/inf (e.g. a holdout AUC with no goals) -> null so the meta stays valid JSON.
     meta_path.write_text(json.dumps(_json_safe(meta), indent=2), encoding="utf-8")
+    split_path.write_text(_dump_split(split_doc), encoding="utf-8")
 
     if report:
         from nhl_data_build.xg_report import write_xg_report
@@ -363,6 +462,26 @@ def train_xg_models(
 
         write_importance_figures(meta, out / "figures")
     return meta
+
+
+def _xgboost_version() -> str | None:
+    try:
+        import xgboost
+    except ImportError:  # the trainer needs it; a monkeypatched test run may not
+        return None
+    return str(xgboost.__version__)
+
+
+def _dump_split(doc: dict) -> str:
+    """Valid JSON, one id list per line (a retrain rewrites whole lists, so per-id lines buy nothing)."""
+    parts = []
+    for key, val in doc.items():
+        if isinstance(val, dict):
+            inner = ",\n".join(f'    "{k}": {json.dumps(v, separators=(",", ":"))}' for k, v in val.items())
+            parts.append(f'  "{key}": {{\n{inner}\n  }}')
+        else:
+            parts.append(f'  "{key}": {json.dumps(val)}')
+    return "{\n" + ",\n".join(parts) + "\n}\n"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -387,7 +506,10 @@ def main(argv: list[str] | None = None) -> int:
     feats_bits = ", ".join(
         f"{v} {len(meta[f'xg_feature_names_{v}'])} feats" for v in variants
     )
-    print(f"trained xG models -> {args.out} ({feats_bits}); report: {args.out}/xg_model_report.md")
+    print(
+        f"trained xG models -> {args.out} ({feats_bits}); sidecars: {_META_FILE}, {_SPLIT_FILE}; "
+        f"report: {args.out}/xg_model_report.md"
+    )
     return 0
 
 
