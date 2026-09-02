@@ -60,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--force", action="store_true", help="retrain even when the fingerprint is unchanged")
     args = ap.parse_args(argv)
 
-    def train():
+    def train(out_dir: Path):
         import polars as pl
         from nhl_data_build.xg_train import train_xg_models
 
@@ -68,7 +68,7 @@ def main(argv: list[str] | None = None) -> int:
         if not files:
             raise SystemExit(f"no pbp parquet matched {args.pbp!r}")
         pbp = pl.concat([pl.read_parquet(f) for f in files], how="diagonal_relaxed")
-        meta = train_xg_models(pbp, args.out, quick=args.quick, variants=("st",))
+        meta = train_xg_models(pbp, out_dir, quick=args.quick, variants=("st",))
         return st_gates(meta["info_st"])
 
     return run_stage(
@@ -76,8 +76,10 @@ def main(argv: list[str] | None = None) -> int:
         suite="nhl_data_build",
         force=args.force,
         config={"model": "xg_st", "pbp": args.pbp, "quick": args.quick},
-        # Both sidecars are stage artifacts too: train_xg_models writes them, and the
-        # fingerprint skip must not declare the stage done when one has been removed.
+        # CHAMPION paths -- run_stage trains into a candidate dir and copies these
+        # names across only when the gate passes. Both sidecars are stage artifacts
+        # too: train_xg_models writes them, and the fingerprint skip must not declare
+        # the stage done when one has been removed.
         artifacts=[
             Path(args.out) / "xg_model_st.json",
             Path(args.out) / "xg_model_meta.json",

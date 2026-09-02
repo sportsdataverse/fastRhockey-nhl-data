@@ -11,6 +11,7 @@ Usage::
     python -m nhl_model_01_xg_5v5 [--force] [--quick]
     scripts/nhl_models.sh 01
 """
+
 from __future__ import annotations
 
 import argparse
@@ -28,7 +29,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--force", action="store_true", help="retrain even when the fingerprint is unchanged")
     args = ap.parse_args(argv)
 
-    def train():
+    def train(out_dir: Path):
         import polars as pl
         from nhl_data_build.xg_train import train_xg_models
 
@@ -36,7 +37,7 @@ def main(argv: list[str] | None = None) -> int:
         if not files:
             raise SystemExit(f"no pbp parquet matched {args.pbp!r}")
         pbp = pl.concat([pl.read_parquet(f) for f in files], how="diagonal_relaxed")
-        meta = train_xg_models(pbp, args.out, quick=args.quick, variants=("5v5",))
+        meta = train_xg_models(pbp, out_dir, quick=args.quick, variants=("5v5",))
         info = meta["info_5v5"]
         auc = info.get("cv_auc")
         return {
@@ -47,16 +48,21 @@ def main(argv: list[str] | None = None) -> int:
         }
 
     return run_stage(
-        name="xg_5v5", suite="nhl_data_build", force=args.force,
+        name="xg_5v5",
+        suite="nhl_data_build",
+        force=args.force,
         config={"model": "xg_5v5", "pbp": args.pbp, "quick": args.quick},
-        # Both sidecars are stage artifacts too: train_xg_models writes them, and the
-        # fingerprint skip must not declare the stage done when one has been removed.
+        # CHAMPION paths -- run_stage trains into a candidate dir and copies these
+        # names across only when the gate passes. Both sidecars are stage artifacts
+        # too: train_xg_models writes them, and the fingerprint skip must not declare
+        # the stage done when one has been removed.
         artifacts=[
             Path(args.out) / "xg_model_5v5.json",
             Path(args.out) / "xg_model_meta.json",
             Path(args.out) / "xg_model_split.json",
         ],
-        train=train, smoke=args.quick,
+        train=train,
+        smoke=args.quick,
     )
 
 
