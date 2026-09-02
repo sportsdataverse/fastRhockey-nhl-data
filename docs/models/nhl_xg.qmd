@@ -45,7 +45,10 @@ for v in ("5v5", "st"):
 # evaluation replays the trainer's seed-37 game-grouped split (a NEAR-holdout) and says so.
 _meta_path = ROOT / "models" / "xg_model_meta.json"
 META = json.loads(_meta_path.read_text(encoding="utf-8")) if _meta_path.is_file() else None
-SPLIT = json.loads((ROOT / "models" / META["split_file"]).read_text(encoding="utf-8")) if META else None
+# A meta written before split_file existed has no such key, and a meta committed without its
+# sidecar has no such file -- both degrade to the seed-37 replay path below, never a render abort.
+_split_path = ROOT / "models" / META["split_file"] if META and META.get("split_file") else None
+SPLIT = json.loads(_split_path.read_text(encoding="utf-8")) if _split_path and _split_path.is_file() else None
 if META and not all(f"info_{v}" in META and v in (SPLIT or {}) for v in ("5v5", "st")):
     META = SPLIT = None  # a half-populated sidecar (one variant retrained) is not a fit to quote
 from nhl_model_02_xg_st import _ST_DRIFT_MAX_ABS_Z, st_gates
@@ -437,11 +440,14 @@ gt_show(
 if META:
     verdict, src = st_gates(META["info_st"]), "committed xg_model_meta.json"
 else:  # no python meta: evaluate the drift statistic on the render-time held-out ST shots
-    verdict, src = st_gates({"cv_auc": None, "max_abs_season_z": round(st_max_z, 3)}), f"render-time {EVAL_LABEL}"
+    # Unrounded: the gate must see the same precision the trainer's gate does.
+    verdict, src = st_gates({"cv_auc": None, "max_abs_season_z": float(st_max_z)}), f"render-time {EVAL_LABEL}"
 gate_tbl = pl.DataFrame({
     "check": ["cv AUC ≥ 0.81", "ST drift: max |z| over held-out seasons ≤ ceiling", "stage verdict"],
+    # The gate saw full precision (above); rounding here is presentation only.
     "observed": [str(verdict["cv_auc"]) if verdict["cv_auc"] is not None else "n/a (no python meta)",
-                 str(verdict["st_max_abs_season_z"]), ""],
+                 str(round(verdict["st_max_abs_season_z"], 3))
+                 if verdict["st_max_abs_season_z"] is not None else "n/a", ""],
     "threshold": ["0.81", str(verdict["st_drift_ceiling"]), ""],
     "pass": [str(verdict["cv_auc"] >= 0.81) if verdict["cv_auc"] is not None else "n/a",
              str(verdict["st_drift_pass"]), str(verdict["gate_pass"]) if META else "n/a"],
