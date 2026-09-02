@@ -11,6 +11,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from sportsdataverse.release import upload_release_sidecars
+
 from nhl_data_build.config import DATASETS
 
 _REPO = "sportsdataverse/sportsdataverse-data"
@@ -23,13 +25,47 @@ _PUBLISH += [
 ]
 
 
-def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
-    """Upload one file to a release tag (``gh release upload --clobber``)."""
+#: Release sidecar metadata. Every published tag carries package_function.txt/.json
+#: naming the loader a consumer reads it through -- the half of R's
+#: sportsdataverse_save() this module's port dropped. Each value is the exact
+#: string the R producer already published to that tag (read back off the
+#: release assets), so re-stamping from Python does not change what a consumer
+#: sees. Spelled out rather than derived from the tag: these are consumer-facing
+#: strings, and a future tag whose loader breaks the naming pattern would
+#: otherwise ship a name that does not resolve.
+PKG_FUNCTION: dict[str, str] = {
+    "nhl_game_info": "fastRhockey::load_nhl_game_info()",
+    "nhl_game_rosters": "fastRhockey::load_nhl_game_rosters()",
+    "nhl_goalie_boxscores": "fastRhockey::load_nhl_goalie_boxscores()",
+    "nhl_linescore": "fastRhockey::load_nhl_linescore()",
+    "nhl_officials": "fastRhockey::load_nhl_officials()",
+    "nhl_pbp_full": "fastRhockey::load_nhl_pbp_full()",
+    "nhl_pbp_lite": "fastRhockey::load_nhl_pbp_lite()",
+    "nhl_penalties": "fastRhockey::load_nhl_penalties()",
+    "nhl_player_boxscores": "fastRhockey::load_nhl_player_boxscores()",
+    "nhl_scoring": "fastRhockey::load_nhl_scoring()",
+    "nhl_scratches": "fastRhockey::load_nhl_scratches()",
+    "nhl_shifts": "fastRhockey::load_nhl_shifts()",
+    "nhl_shootout": "fastRhockey::load_nhl_shootout()",
+    "nhl_shots_by_period": "fastRhockey::load_nhl_shots_by_period()",
+    "nhl_skater_boxscores": "fastRhockey::load_nhl_skater_boxscores()",
+    "nhl_team_boxscores": "fastRhockey::load_nhl_team_boxscores()",
+    "nhl_three_stars": "fastRhockey::load_nhl_three_stars()",
+}
+
+
+def _gh(args: list[str]) -> None:
+    """Single ``gh`` chokepoint -- tests monkeypatch this to stay offline."""
     subprocess.run(
-        ["gh", "release", "upload", release_tag, str(path), "--repo", repo, "--clobber"],
+        ["gh", *args],
         check=True,
         timeout=600,  # fail fast instead of hanging the daily workflow on a stuck upload/auth prompt
     )
+
+
+def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
+    """Upload one file to a release tag (``gh release upload --clobber``)."""
+    _gh(["release", "upload", release_tag, str(path), "--repo", repo, "--clobber"])
 
 
 def publish_season(
@@ -43,6 +79,7 @@ def publish_season(
     out = Path(out_dir)
     done: list[tuple[str, str]] = []
     for prefix, tag, key in _PUBLISH:
+        uploaded = 0
         for sub, ext in (("parquet", "parquet"), ("rds", "rds"), ("csv", "csv")):
             path = out / key / sub / f"{prefix}_{season_year}.{ext}"
             if not path.exists():
@@ -51,5 +88,11 @@ def publish_season(
                 print(f"[dry-run] {path.name} -> {repo}@{tag}")
             else:
                 publish_file(path, tag, repo=repo)
+                uploaded += 1
             done.append((tag, path.name))
+        # stamp LAST so the timestamp describes a finished upload, and only when
+        # something actually uploaded -- a stamp on a no-op run would claim data
+        # moved when it did not
+        if uploaded:
+            upload_release_sidecars(tag, runner=_gh, pkg_function=PKG_FUNCTION.get(tag), repo=repo)
     return done
