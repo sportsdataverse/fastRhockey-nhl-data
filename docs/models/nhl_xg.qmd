@@ -12,6 +12,7 @@ jupyter: python3
 ```{python}
 #| output: false
 import glob
+import json
 import sys
 import numpy as np
 import polars as pl
@@ -19,6 +20,7 @@ import xgboost as xgb
 from pathlib import Path
 from plotnine import (
     ggplot, aes, geom_point, geom_line, geom_col, geom_abline, geom_jitter,
+    geom_errorbar, geom_hline, facet_wrap,
     labs, theme_minimal, coord_flip, scale_color_manual,
 )
 from great_tables import GT
@@ -38,6 +40,19 @@ for v in ("5v5", "st"):
     b.load_model(str(ROOT / "models" / f"xg_model_{v}.json"))
     boosters[v] = b
 
+# The two sidecars the python trainer writes beside the boosters. They are committed with the
+# first python retrain that passes the frozen gates; until then META/SPLIT are None and the
+# evaluation replays the trainer's seed-37 game-grouped split (a NEAR-holdout) and says so.
+_meta_path = ROOT / "models" / "xg_model_meta.json"
+META = json.loads(_meta_path.read_text(encoding="utf-8")) if _meta_path.is_file() else None
+SPLIT = json.loads((ROOT / "models" / META["split_file"]).read_text(encoding="utf-8")) if META else None
+if META and not all(f"info_{v}" in META and v in (SPLIT or {}) for v in ("5v5", "st")):
+    META = SPLIT = None  # a half-populated sidecar (one variant retrained) is not a fit to quote
+from nhl_model_02_xg_st import _ST_DRIFT_MAX_ABS_Z, st_gates
+# Frozen gates as observed at the 2026-04 R fit (the README table); the meta supersedes them when committed.
+FROZEN = {"5v5": {"cv_auc": 0.8322, "cv_logloss": 0.2053, "floor": 0.82},
+          "st": {"cv_auc": 0.8213, "cv_logloss": 0.2567, "floor": 0.81}}
+
 def gt_show(g):
     display(HTML(g.as_raw_html()))
 ```
@@ -56,7 +71,13 @@ repository's own committed corpus by `python/nhl_data_build/xg_train.py`
 (canonical R twin `R/build_xg_model.R`). The fitted boosters are **committed
 in this repo** (`models/xg_model_{5v5,st}.json`) — that is the promotion step
 — and every figure and number below is computed at render time from those
-committed artifacts plus the committed play-by-play.
+committed artifacts plus the committed play-by-play. The python trainer also
+writes two sidecars beside the boosters, `xg_model_meta.json` (feature lists,
+training-time CV and holdout metrics, per-season calibration) and
+`xg_model_split.json` (the train/test `game_id` partition); when they are
+committed the evaluation below scores the *exact* held-out games, otherwise it
+replays the trainer's split recipe on today's corpus and labels the result a
+near-holdout.
 
 ## Training data
 
@@ -91,15 +112,21 @@ pooled model miscalibrates the power play.
 
 ```{python}
 #| output: false
-frames = {}
-rng = np.random.default_rng(37)
-splits = {}
+frames, holdout, oot = {}, {}, {}
+rng = np.random.default_rng(xt._SEED)
 for v in ("5v5", "st"):
     fr = xt.prepare_training_frame(pbp, variant=v)
     frames[v] = fr
-    tr, te = xt._grouped_split(fr, rng)
-    _ = rng.permutation(tr["game_id"].unique().to_list())  # replay the fold draw
-    splits[v] = (tr, te)
+    if SPLIT:
+        test_ids = SPLIT[v]["test_game_ids"]
+        seen_ids = test_ids + SPLIT[v]["train_game_ids"]
+        holdout[v] = fr.filter(pl.col("game_id").is_in(test_ids))
+        oot[v] = fr.filter(pl.col("game_id").is_in(seen_ids).not_())  # games that landed after the fit
+    else:  # replay the trainer's seed-37 game-grouped 80/20 recipe on today's corpus: a NEAR-holdout
+        tr, te = xt._grouped_split(fr, rng)
+        _ = rng.permutation(tr["game_id"].unique().to_list())  # replay the fold draw
+        holdout[v], oot[v] = te, fr.head(0)
+EVAL_LABEL = "exact holdout" if SPLIT else "near-holdout (seed-37 replay)"
 f5 = frames["5v5"]
 ```
 
@@ -216,51 +243,104 @@ gt_show(
 
 ## Evaluation
 
-Two views, honestly labeled. First, the **frozen training-time gates**: the
-grouped 5-fold CV metrics observed at the 2026-04 fit, below which a retrain
-fails (`--quick` smoke runs tolerate misses; a real retrain does not):
+Two views, honestly labeled. First, the **training-time metrics**: grouped
+5-fold CV on the 80% side (the gated number) and the game-grouped 20% holdout
+the fit never saw. They come from `models/xg_model_meta.json` when a python
+sidecar is committed, otherwise from the 2026-04 R fit's console output as
+frozen in the README (CV only — that run persisted no holdout metrics and no
+partition, which is exactly what the sidecars fix). The gate floors are frozen
+just below the 2026-04 values (5v5 cv AUC ≥ 0.82, ST ≥ 0.81) and are never
+lowered; a real retrain below them fails (`--quick` smoke runs tolerate misses).
 
-| variant | CV AUC (observed at fit) | CV log-loss | frozen floor |
-|---|---|---|---|
-| 5v5 | **0.8322** | 0.2053 | cv AUC ≥ 0.82 |
-| special teams | **0.8213** | 0.2567 | cv AUC ≥ 0.81 |
-
-Second, a **reproduced grouped split evaluated at render time**: the same
-seed-37, game-grouped 80/20 partition recipe the trainer uses, applied to
-*today's* committed corpus, scoring the committed boosters on the 20% side.
-Because the corpus has grown since the fit (new games, repairs), this is a
-*near*-holdout — some evaluation games were in the boosters' training data —
-so read it as a stability check on live data, not a pristine test score.
+```{python}
+#| output: asis
+if META:
+    print("**Sidecar state:** `xg_model_meta.json` + `xg_model_split.json` are committed — the holdout below is the exact "
+          f"training-time partition (fit {max(META[f'info_{v}']['trained_at'] for v in ('5v5', 'st'))[:10]}).")
+else:
+    print("**Sidecar state:** no python sidecar is committed yet — the committed boosters are the 2026-04 R fit. The python "
+          "trainer writes both sidecars on every run, but its 2026-09-02 retrain on this repository's parquet frame fell "
+          "below the frozen floors (special teams cv AUC **0.7569** vs ≥ 0.81) and was not promoted (`models/ledger.jsonl`). "
+          "Gates are never lowered, so the sidecars land with the first passing retrain; until then the evaluation below "
+          "replays the trainer's seed-37 game-grouped split on today's corpus and is a *near*-holdout — some evaluation "
+          "games were in the boosters' training data.")
+```
 
 ```{python}
 rows = []
 for v in ("5v5", "st"):
-    tr, te = splits[v]
-    b = boosters[v]
-    X = te.select(b.feature_names).to_numpy().astype(float)
-    y = te["goal"].to_numpy().astype(float)
-    p = b.predict(xgb.DMatrix(X, feature_names=b.feature_names))
-    base = float(tr["goal"].mean())
-    rows.append({
-        "variant": v, "eval_shots": te.height, "goal_rate": float(y.mean()),
-        "logloss": xt._logloss(y, p),
-        "baseline_logloss": xt._logloss(y, np.full_like(p, base)),
-        "rank_AUC": xt._rank_auc(p, y),
-    })
-ev = pl.DataFrame(rows)
+    fz = FROZEN[v]
+    if META:
+        i = META[f"info_{v}"]
+        rows.append({
+            "variant": v, "source": f"xg_model_meta.json (fit {i['trained_at'][:10]})",
+            "train shots": i["n_train"], "holdout shots": i["n_test"], "holdout games": i["n_games_test"],
+            "CV AUC": i["cv_auc"], "CV log-loss": i["cv_logloss"],
+            "holdout AUC": i["test_auc"], "holdout log-loss": i["test_logloss"],
+            "baseline log-loss": i.get("baseline_logloss"),
+            "gate": f"cv AUC ≥ {fz['floor']}", "passes": bool((i["cv_auc"] or 0) >= fz["floor"]),
+        })
+    else:
+        rows.append({
+            "variant": v, "source": "2026-04 R fit (README; CV only)",
+            "train shots": None, "holdout shots": None, "holdout games": None,
+            "CV AUC": fz["cv_auc"], "CV log-loss": fz["cv_logloss"],
+            "holdout AUC": None, "holdout log-loss": None, "baseline log-loss": None,
+            "gate": f"cv AUC ≥ {fz['floor']}", "passes": fz["cv_auc"] >= fz["floor"],
+        })
+gt_show(
+    GT(pl.DataFrame(rows).to_pandas())
+    .tab_header(title="Training-time metrics",
+                subtitle="grouped 5-fold CV on the 80% side; game-grouped 20% holdout; floors frozen, never lowered")
+    .fmt_number(columns=["train shots", "holdout shots", "holdout games"], sep_mark=",", decimals=0)
+    .fmt_number(columns=["CV AUC", "CV log-loss", "holdout AUC", "holdout log-loss", "baseline log-loss"], decimals=4)
+    .sub_missing(missing_text="—")
+)
+```
+
+Second, the **held-out games re-scored at render time** by the committed
+boosters. With a committed split file this is today's corpus filtered to the
+persisted `test_game_ids`; games that landed after the fit are in neither list
+and are reported separately as **out-of-time** shots — an honest forward test
+that grows as seasons land — and `Δ vs meta` (render-time holdout AUC minus
+the meta's) is exactly 0 unless the committed play-by-play was repaired after
+the fit. Without a split file the set is the seed-37 replay described above.
+
+```{python}
+def eval_rows(label, frames_by_v):
+    out = []
+    for v in ("5v5", "st"):
+        te, b, i = frames_by_v[v], boosters[v], (META[f"info_{v}"] if META else None)
+        row = {"variant": v, "set": label, "shots": te.height, "games": te["game_id"].n_unique()}
+        if te.height:
+            X = te.select(b.feature_names).to_numpy().astype(float)
+            y = te["goal"].to_numpy().astype(float)
+            p = b.predict(xgb.DMatrix(X, feature_names=b.feature_names))
+            auc = xt._rank_auc(p, y)
+            base = i["goal_rate"] if i else float(frames[v]["goal"].mean())
+            row |= {"goal_rate": float(y.mean()), "logloss": xt._logloss(y, p),
+                    "baseline_logloss": xt._logloss(y, np.full_like(p, base)),
+                    "rank_AUC": auc,
+                    "Δ vs meta": (auc - i["test_auc"]) if (i and label == EVAL_LABEL and i.get("test_auc") is not None) else None}
+        out.append(row)
+    return out
+ev = pl.DataFrame(eval_rows(EVAL_LABEL, holdout) + eval_rows("out-of-time (post-fit games)", oot))
+n_oot = int(ev.filter(pl.col("set").str.starts_with("out-of-time"))["games"].sum())
 gt_show(
     GT(ev.to_pandas())
-    .tab_header(title="Reproduced grouped-split evaluation (render-time, current corpus)",
-                subtitle="seed-37 game-grouped 80/20 recipe; committed boosters scored on the 20% side")
-    .fmt_number(columns="eval_shots", sep_mark=",", decimals=0)
+    .tab_header(title=f"Held-out evaluation — {EVAL_LABEL} (render-time, current corpus)",
+                subtitle=("test_game_ids from models/xg_model_split.json" if SPLIT else "seed-37 game-grouped 80/20 replay; committed boosters scored on the 20% side")
+                         + f"; {n_oot} post-fit games in the out-of-time set")
+    .fmt_number(columns=["shots", "games"], sep_mark=",", decimals=0)
     .fmt_percent(columns="goal_rate", decimals=1)
-    .fmt_number(columns=["logloss", "baseline_logloss", "rank_AUC"], decimals=4)
+    .fmt_number(columns=["logloss", "baseline_logloss", "rank_AUC", "Δ vs meta"], decimals=4)
+    .sub_missing(missing_text="—")
 )
 ```
 
 ```{python}
-#| fig-cap: "Calibration by xG decile, 5v5, reproduced-split evaluation shots."
-tr5, te5 = splits["5v5"]
+#| fig-cap: "Calibration by xG decile, 5v5, held-out shots."
+te5 = holdout["5v5"]
 b5 = boosters["5v5"]
 p5 = b5.predict(xgb.DMatrix(te5.select(feats5).to_numpy().astype(float), feature_names=feats5))
 dec = (
@@ -274,13 +354,13 @@ dec = (
     + geom_abline(slope=1, intercept=0, linetype="dashed", color="gray")
     + geom_point(aes(size="n"), color="#2a6f97") + geom_line(color="#2a6f97")
     + labs(x="mean predicted xG (decile)", y="observed goal rate",
-           title="5v5 calibration — reproduced split")
+           title=f"5v5 calibration — {EVAL_LABEL}")
     + theme_minimal()
 )
 ```
 
 ```{python}
-#| fig-cap: "Per-era discrimination: rank AUC of the committed 5v5 booster by era bucket (evaluation shots)."
+#| fig-cap: "Per-era discrimination: rank AUC of the committed 5v5 booster by era bucket (held-out shots)."
 era_cols = [c for c in feats5 if c.startswith("era_")]
 te5e = te5.with_columns(pl.Series("xg", p5))
 era_rows = []
@@ -311,6 +391,91 @@ gt_show(
     .fmt_number(columns="xG", decimals=4)
 )
 ```
+
+## Per-season calibration drift
+
+The special-teams sample is ~5× smaller than 5v5, so its AUC floor alone
+cannot see a season whose *level* drifts — a rule or tracking change that
+shifts conversion without reordering shots. The monitor is the binomial
+calibration z-score per season, `z = (goals − ΣxG) / sqrt(ΣxG · (1 − xG))`: a
+season the model prices correctly has |z| ~ N(0, 1) whatever its shot count,
+which is what makes `max |z|` comparable across seasons of unequal size. The
+trainer records this table in `info_st.per_season_calibration` at every
+retrain (`xg_train.per_season_calibration`), and stage `nhl_model_02_xg_st`
+gates on `max |z| ≤ _ST_DRIFT_MAX_ABS_Z` — a ceiling derived from the value
+observed on the exact holdout of the trusted retrain and never raised (see
+`models/REGISTRY.md`). The same statistic is recomputed here at render time on
+the held-out shots, with post-fit seasons appended as out-of-time rows.
+
+```{python}
+def season_rows(v, frames_by_v, label):
+    te = frames_by_v[v]
+    if te.height == 0:
+        return []
+    b = boosters[v]
+    p = b.predict(xgb.DMatrix(te.select(b.feature_names).to_numpy().astype(float), feature_names=b.feature_names))
+    return [{"variant": v, "set": label, **r}
+            for r in xt.per_season_calibration(te["game_id"].to_numpy(), te["goal"].to_numpy().astype(float), p)]
+cal = pl.DataFrame(
+    season_rows("st", holdout, "holdout") + season_rows("st", oot, "out-of-time")
+    + season_rows("5v5", holdout, "holdout") + season_rows("5v5", oot, "out-of-time")
+)
+st_tbl = cal.filter(pl.col("variant") == "st").select("set", "season", "n", "goals", "xg_sum", "ratio", "z", "auc")
+st_max_z = float(cal.filter((pl.col("variant") == "st") & (pl.col("set") != "out-of-time"))["z"].abs().max())
+gt_show(
+    GT(st_tbl.to_pandas())
+    .tab_header(title=f"Special-teams calibration by season — {EVAL_LABEL} (+ out-of-time)",
+                subtitle="ratio = goals / ΣxG; z = binomial calibration z-score; auc = per-season rank AUC")
+    .fmt_number(columns=["n", "goals"], sep_mark=",", decimals=0)
+    .fmt_number(columns=["xg_sum"], decimals=1)
+    .fmt_number(columns=["ratio", "auc"], decimals=3)
+    .fmt_number(columns=["z"], decimals=2)
+)
+```
+
+```{python}
+if META:
+    verdict, src = st_gates(META["info_st"]), "committed xg_model_meta.json"
+else:  # no python meta: evaluate the drift statistic on the render-time held-out ST shots
+    verdict, src = st_gates({"cv_auc": None, "max_abs_season_z": round(st_max_z, 3)}), f"render-time {EVAL_LABEL}"
+gate_tbl = pl.DataFrame({
+    "check": ["cv AUC ≥ 0.81", "ST drift: max |z| over held-out seasons ≤ ceiling", "stage verdict"],
+    "observed": [str(verdict["cv_auc"]) if verdict["cv_auc"] is not None else "n/a (no python meta)",
+                 str(verdict["st_max_abs_season_z"]), ""],
+    "threshold": ["0.81", str(verdict["st_drift_ceiling"]), ""],
+    "pass": [str(verdict["cv_auc"] >= 0.81) if verdict["cv_auc"] is not None else "n/a",
+             str(verdict["st_drift_pass"]), str(verdict["gate_pass"]) if META else "n/a"],
+})
+gt_show(GT(gate_tbl.to_pandas()).tab_header(title="Stage gates (nhl_model_02_xg_st.st_gates)", subtitle=f"evaluated on the {src}"))
+```
+
+```{python}
+#| fig-cap: "Per-season calibration: observed goals / ΣxG (points) against the ±2 SE band a calibrated model occupies (bars); the second point shape marks out-of-time seasons."
+cd = cal.with_columns(pl.col("season").cast(pl.Utf8)).to_pandas()
+(
+    ggplot(cd, aes("season", "ratio", color="variant"))
+    + geom_hline(yintercept=1, linetype="dashed", color="gray")
+    + geom_errorbar(aes(ymin="1 - 2 * se_ratio", ymax="1 + 2 * se_ratio"), width=0.4, alpha=0.5)
+    + geom_point(aes(shape="set"), size=2.5)
+    + facet_wrap("~variant", ncol=1)
+    + labs(x="season (start year)", y="goals / ΣxG", title=f"Per-season calibration — {EVAL_LABEL}")
+    + theme_minimal()
+)
+```
+
+```{python}
+#| output: asis
+if META:
+    print("Both boosters carry era one-hots, so a booster fit on this frame sits inside the band in every season it was "
+          "trained on; the informative rows are the out-of-time ones, which is where a level drift first shows.")
+else:
+    print(f"A booster calibrated to this frame sits inside the band in every season it was trained on — the 2026-09-02 "
+          f"python special-teams retrain did (max |z| 2.008 on its exact holdout, the observation that set the {_ST_DRIFT_MAX_ABS_Z} "
+          f"ceiling). The committed 2026-04 R boosters do **not** on this frame (max |z| {st_max_z:.1f} here): they score "
+          "25–30% too high on every season through 2023-24 and only 2024-25 / 2025-26 come close — a level miscalibration, "
+          "not drift, recorded under *Known issue* below. The drift ceiling has teeth: it fails exactly this.")
+```
+
 
 ## Results — players and teams
 
@@ -398,29 +563,55 @@ spread between the two is exactly what the embedded xG columns in
 ## Provenance & reproducibility
 
 - **Trained on:** this repository's committed play-by-play
-  (`nhl/pbp/parquet/`, seasons in the corpus table above), 2026-04 fit;
-  grouped 80/20 split by `game_id`, grouped 5-fold CV for
-  `min_child_weight`, seed 37.
+  (`nhl/pbp/parquet/`, seasons in the corpus table above); committed boosters
+  = the 2026-04 fit; grouped 80/20 split by `game_id`, grouped 5-fold CV for
+  `min_child_weight`, seed 37 (the python trainer persists the partition in
+  `models/xg_model_split.json`).
 - **Artifacts:** `models/xg_model_5v5.json`, `models/xg_model_st.json`
-  (committed — the promotion step); output ships inside `nhl_pbp_full`.
+  (committed — the promotion step); python sidecars `models/xg_model_meta.json`
+  (feature lists, CV + exact-holdout metrics, per-season calibration, PS
+  constant) and `models/xg_model_split.json`, committed with the first
+  gate-passing python retrain; every stage run appends a `models/ledger.jsonl`
+  line (including failed ones). Output ships inside `nhl_pbp_full`.
 - **Retrain:** `scripts/nhl_models.sh` (stages `nhl_model_01_xg_5v5` /
-  `nhl_model_02_xg_st`; fingerprint-skipped when unchanged; gates frozen in
-  `models/manifest.yaml`, registry row in `models/REGISTRY.md`).
+  `nhl_model_02_xg_st`; fingerprint-skipped when unchanged, `--force` to
+  retrain); gates frozen in `models/manifest.yaml` (cv AUC floors + the ST
+  per-season drift ceiling), registry row in `models/REGISTRY.md`.
 - **Rebuild this document:** `scripts/render_model_docs.sh` (Quarto → GFM;
-  uses this repo's `.venv` via `QUARTO_PYTHON`; `uv sync --group docs`).
+  uses this repo's `.venv` via `QUARTO_PYTHON`; `uv sync --group docs --group train`).
+
 
 ## Avenues for improvement & open issues
 
 - **Pre-shot context** — rush/rebound flags exist, but passing sequences and
   screens do not; public-feed models plateau here, so the honest gain is
   better rebound/rush definitions, not more trees.
-- **Commit the python meta sidecar** — `xg_model_meta.json` (feature lists +
-  per-retrain metrics) is regenerated per run but only the R-era `.rds` is
-  committed; committing the json would let this document quote the exact
-  training-time holdout metrics instead of the CV gates.
-- **Exact holdout reproduction** — the render-time evaluation is a
-  near-holdout because the corpus has grown since the fit; persisting the
-  training-time game-id partition alongside the meta would make the exact
-  test set reproducible forever.
-- **Known issue:** the ST sample is ~5× smaller than 5v5 — its gate floor is
-  lower for that reason, and per-season ST calibration drift is unmonitored.
+- **Blocked by a gate (2026-09-01, PR #PR_NUMBER_PLACEHOLDER):** *Commit the
+  python meta sidecar* — the trainer now writes `models/xg_model_meta.json`
+  with the exact training-time CV/holdout metrics and this document reads it
+  when present, but the 2026-09-02 python retrain on this repository's parquet
+  frame fell below the frozen floors (special teams cv AUC **0.7569** vs ≥ 0.81)
+  and was not promoted (`models/ledger.jsonl`); the 5v5 stage of that attempt was
+  not run to completion.
+  Gates are never lowered; the sidecar lands with the first passing retrain.
+- **Blocked by the same gate (2026-09-01, PR #PR_NUMBER_PLACEHOLDER):** *Exact
+  holdout reproduction* — `models/xg_model_split.json` (train/test `game_id`
+  partition) is written by every python retrain and this document switches to
+  the exact holdout automatically when it is committed; until then the
+  evaluation is the labeled near-holdout replay.
+- **Resolved (2026-09-01, PR #PR_NUMBER_PLACEHOLDER):** *Per-season ST
+  calibration drift* — monitored by the per-season table and figure above; the
+  trainer records the statistic in the meta and stage `nhl_model_02_xg_st`
+  gates on the observed-value-derived ceiling `max |z| ≤ _ST_DRIFT_MAX_ABS_Z`.
+- **Known issue (measured 2026-09-01):** the committed 2026-04 R-trained
+  boosters, scored through this repository's python feature frame,
+  over-predict goals by 25–30% on every season through 2023-24 (goals/ΣxG
+  0.68–0.81; |z| up to 14.8 for 5v5 and 9.2 for ST on the seed-37
+  near-holdout) while 2024-25 and 2025-26 sit at 0.92–0.93, and their
+  near-holdout AUC is 0.778/0.761 against the fit's 0.832/0.821. A python
+  booster trained on this same frame is calibrated per season (ST max |z|
+  2.008) but tops out at the same discrimination (ST cv AUC 0.7569), so the
+  deficit is in the **frame**, not the booster: the R training frame and the
+  python frame disagree for pre-2024 seasons. That is an R↔Python parity
+  question (handed to `sdv-parity-reviewer`), not a modeling one, and it
+  blocks promoting any python retrain until resolved.
