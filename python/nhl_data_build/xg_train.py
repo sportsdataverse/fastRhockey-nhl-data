@@ -293,7 +293,10 @@ def per_season_calibration(game_ids: np.ndarray, y: np.ndarray, p: np.ndarray) -
                 "mean_xg": round(float(r["xg_sum"]) / r["n"], 4),
                 "ratio": round(float(r["goals"]) / r["xg_sum"], 4) if r["xg_sum"] > 0 else None,
                 "se_ratio": round(float(np.sqrt(r["var"])) / r["xg_sum"], 4) if r["xg_sum"] > 0 else None,
-                "z": round(float(z), 3),
+                # NOT rounded: max_abs_season_z gates on this, and a true |z| of 3.0004
+                # rounded to 3.0 would slip under a <= 3.0 ceiling. Rounding is presentation
+                # (docs/models/nhl_xg.qmd formats the column), never storage.
+                "z": float(z),
                 "auc": round(_rank_auc(sub["xg"].to_numpy(), sub["goal"].to_numpy()), 4),
             }
         )
@@ -301,9 +304,13 @@ def per_season_calibration(game_ids: np.ndarray, y: np.ndarray, p: np.ndarray) -
 
 
 def max_abs_season_z(rows: list[dict]) -> float | None:
-    """The drift statistic a stage gates on: the worst per-season |z| (None if no season has one)."""
+    """The drift statistic a stage gates on: the worst per-season |z| (None if no season has one).
+
+    Full precision on purpose -- this value is compared against the drift ceiling, and a
+    rounded 3.0004 -> 3.0 would pass a ``<= 3.0`` gate it should fail. Round at render time.
+    """
     zs = [abs(r["z"]) for r in rows if r.get("z") is not None and r["z"] == r["z"]]
-    return round(max(zs), 3) if zs else None
+    return max(zs) if zs else None
 
 
 def _json_safe(obj: object) -> object:

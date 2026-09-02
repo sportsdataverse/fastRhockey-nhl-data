@@ -111,8 +111,11 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: nhl-xg-${{ matrix.stage }}
+          # models/xg_model_*.json covers the boosters plus the
+          # xg_model_meta.json / xg_model_split.json sidecars. Keep the glob
+          # lines bare: @actions/glob takes the WHOLE line, '#' included.
           path: |
-            models/xg_model_*.json   # boosters + xg_model_meta.json + xg_model_split.json sidecars
+            models/xg_model_*.json
             models/xg_model_report.md
             models/ledger.jsonl
           if-no-files-found: warn

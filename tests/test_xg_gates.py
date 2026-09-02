@@ -66,3 +66,26 @@ def test_split_matches_meta_and_is_a_partition() -> None:
         assert len(test) == meta[f"info_{v}"]["n_games_test"], f"{v}: split file and meta disagree on the holdout"
         assert len(train) == meta[f"info_{v}"]["n_games_train"]
         assert len(meta[f"xg_feature_names_{v}"]) == (36 if v == "5v5" else 38)
+
+
+def test_drift_statistic_is_not_rounded_before_the_ceiling() -> None:
+    """A |z| just over the ceiling must FAIL, not round its way under it.
+
+    ``per_season_calibration`` used to store ``round(z, 3)`` and
+    ``max_abs_season_z`` rounded again, so a true 3.0004 presented as 3.0 and
+    passed a ``<= 3.0`` gate. Both now keep full precision; rounding is
+    presentation only.
+    """
+    from nhl_data_build.xg_train import max_abs_season_z
+    from nhl_model_02_xg_st import _ST_DRIFT_MAX_ABS_Z
+
+    ceiling = _ST_DRIFT_MAX_ABS_Z
+    assert ceiling is not None
+    just_over = ceiling + 4e-4  # rounds to the ceiling at 3 dp
+    assert round(just_over, 3) == pytest.approx(ceiling), "fixture must be inside the old rounding hole"
+
+    observed = max_abs_season_z([{"season": 2018, "z": just_over}])
+    assert observed > ceiling, f"drift statistic was rounded down to {observed}"
+    assert st_gates({"cv_auc": 0.99, "max_abs_season_z": observed})["st_drift_pass"] is False
+    # and the honest side: a value under the ceiling still passes
+    assert st_gates({"cv_auc": 0.99, "max_abs_season_z": ceiling - 1e-3})["st_drift_pass"] is True

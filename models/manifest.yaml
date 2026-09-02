@@ -12,7 +12,12 @@
 # Feature lists are era-derived at train time (no code constant), so there is
 # no features/ registry in this repo — models/xg_model_meta.json records the
 # per-retrain feature names instead, and models/xg_model_split.json the exact
-# train/test game_id partition (both committed with the boosters since 2026-09).
+# train/test game_id partition. Both are written by every python retrain but
+# are committed only ALONGSIDE A PROMOTED BOOSTER: a sidecar from a run that
+# failed the gates would describe a model that does not ship. As of 2026-09-02
+# neither is committed — the python ST retrain missed the cv-AUC floor (see
+# "Retrain attempts" in models/REGISTRY.md), so the boosters in the tree are
+# still the 2026-04 R fit and the writeup falls back to the seed-37 replay.
 
 driver: scripts/nhl_models.sh
 
@@ -31,9 +36,9 @@ suites:
         artifact: models/xg_model_st.json
         release_tag: null
         gate: "cv_auc >= 0.81 (observed 0.8213)"
-    sidecars:
-      - models/xg_model_meta.json   # feature lists, CV + exact-holdout metrics, per-season calibration (committed 2026-09)
-      - models/xg_model_split.json  # train/test game_id partition per variant (committed 2026-09)
+    sidecars:  # declared always; committed only with a gate-passing promoted retrain
+      - models/xg_model_meta.json   # feature lists, CV + exact-holdout metrics, per-season calibration (NOT yet committed)
+      - models/xg_model_split.json  # train/test game_id partition per variant (NOT yet committed)
       - models/xg_model_report.md
 
 # hockeyR reproduction lineage — R-only, retrained via the local runbook

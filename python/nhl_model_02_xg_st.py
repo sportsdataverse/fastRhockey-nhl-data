@@ -76,7 +76,13 @@ def main(argv: list[str] | None = None) -> int:
         suite="nhl_data_build",
         force=args.force,
         config={"model": "xg_st", "pbp": args.pbp, "quick": args.quick},
-        artifacts=[Path(args.out) / "xg_model_st.json"],
+        # Both sidecars are stage artifacts too: train_xg_models writes them, and the
+        # fingerprint skip must not declare the stage done when one has been removed.
+        artifacts=[
+            Path(args.out) / "xg_model_st.json",
+            Path(args.out) / "xg_model_meta.json",
+            Path(args.out) / "xg_model_split.json",
+        ],
         train=train,
         smoke=args.quick,
     )
