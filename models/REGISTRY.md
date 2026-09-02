@@ -12,16 +12,21 @@ consumers as the xG columns inside the published `nhl_pbp_full` datasets
 
 ## fastRhockey xG suite (`models/`)
 
-Trained on this repo's full NHL play-by-play (`nhl/pbp/full/rds/`, 16 seasons
-2010-11 → 2025-26, five era groupings). Two trainers, one recipe:
-`R/build_xg_model.R` (canonical) and its port
-`python/nhl_data_build/xg_train.py` (grouped 80/20 split, logloss+auc CV).
+Trained on this repo's full NHL play-by-play (16 seasons 2009-10 → 2025-26, no
+2014-15; five era groupings). Two trainers, one recipe: `R/build_xg_model.R`
+(canonical; the COMMITTED 2026-04 boosters) and its port
+`python/nhl_data_build/xg_train.py` (grouped 80/20 split by `game_id`, seed 37,
+logloss+auc grouped 5-fold CV). The python trainer writes two sidecars beside the
+boosters — `xg_model_meta.json` (feature lists, CV + exact-holdout metrics, per-season
+calibration) and `xg_model_split.json` (the train/test `game_id` partition) — which
+are committed with the first python retrain that passes the frozen gates (see
+"Retrain attempts" below: the 2026-09-02 attempt did not).
 
 | model | artifact(s) | release tag | training data | fitting script | gates at publish | last retrain | cadence |
 |---|---|---|---|---|---|---|---|
 | xG 5v5 | `models/xg_model_5v5.json` | — (committed; output ships in `nhl_pbp_full`) | nhl pbp 2011–2026, era-grouped | `R/build_xg_model.R` / `nhl_data_build/xg_train.py` | CV AUC **0.8322**, log-loss **0.2053** (README table; grouped split — no game leakage) | 2026-04 | as-needed / manual |
-| xG special teams | `models/xg_model_st.json` | — (committed; output ships in `nhl_pbp_full`) | nhl pbp 2011–2026, era-grouped | `R/build_xg_model.R` / `nhl_data_build/xg_train.py` | CV AUC **0.8213**, log-loss **0.2567** | 2026-04 | as-needed / manual |
-| xG meta (incl. penalty-shot constant) | `models/xg_model_meta.rds` | — (committed) | derived at train time | `R/build_xg_model.R` (python port emits `xg_model_meta.json`) | rides the suite's gates | 2026-04 | as-needed / manual |
+| xG special teams | `models/xg_model_st.json` | — (committed; output ships in `nhl_pbp_full`) | nhl pbp 2011–2026, era-grouped | `R/build_xg_model.R` / `nhl_data_build/xg_train.py` (stage `nhl_model_02_xg_st`) | CV AUC **0.8213**, log-loss **0.2567** (2026-04 fit); floors: cv AUC ≥ 0.81 **and** per-season calibration drift max holdout-season \|z\| ≤ 3.0 (ceiling derived 2026-09-02 from the observed 2.008 in season 2018; never raised) | 2026-04 | annual July cron + dispatch (`nhl_model_pipeline.yml`) |
+| xG meta (incl. penalty-shot constant) | `models/xg_model_meta.rds` (R era, committed); python sidecars `models/xg_model_meta.json` + `models/xg_model_split.json` (written by every python retrain, committed with the first gate-passing one — none yet) | — (committed) | derived at train time | `R/build_xg_model.R` / `nhl_data_build/xg_train.py` | rides the suite's gates; `tests/test_xg_gates.py` bites on the committed python meta/split once present | 2026-04 | as-needed / manual |
 
 ## Vendored hockeyR models (`hockeyR/`)
 
@@ -38,6 +43,11 @@ design** (needs the `hockeyR-data` sibling checkout).
 
 - `models/manifest.yaml` — single home for the model/stage list (guarded by `tests/test_model_manifest.py`).
 - One model = one numbered pipeline: `python/nhl_model_01_xg_5v5.py` / `nhl_model_02_xg_st.py`; run subsets with `scripts/nhl_models.sh`; retrain CI = `nhl_model_pipeline.yml` (dispatch + annual July cron; previously the cadence had NO workflow behind it).
-- Gate floors frozen just below the 2026-04 observed values (5v5 cv AUC ≥ 0.82, ST ≥ 0.81); never lowered; `--quick` smoke runs tolerate misses.
-- Fingerprints: stages skip when `hash(code subtree, config)` is unchanged (`--force` to retrain); every trained model appends a `models/ledger.jsonl` line; each retrain rewrites the `xg_model_meta.json` + `xg_model_report.md` sidecars (single-variant runs merge, never clobber).
+- Gate floors frozen just below the 2026-04 observed values (5v5 cv AUC ≥ 0.82, ST ≥ 0.81); never lowered; `--quick` smoke runs tolerate misses. ST per-season calibration drift ceiling `max |z| ≤ 3.0` over the exact-holdout seasons (`nhl_model_02_xg_st._ST_DRIFT_MAX_ABS_Z`; z = (goals − ΣxG)/√ΣxG(1−xG) per season, `xg_train.per_season_calibration`, recorded in `info_st.per_season_calibration`), derived 2026-09-02 from the observed max |z| = 2.008 (season 2018, 15 holdout seasons) of the python ST retrain — observed + ~1 z-unit = the per-season 99.7% band, exceeded by a calibrated model's 15-season max ~4% of the time; a ceiling is never raised.
+- Fingerprints: stages skip when `hash(code subtree, config)` is unchanged (`--force` to retrain); every trained model appends a `models/ledger.jsonl` line; each retrain rewrites the `xg_model_meta.json` + `xg_model_split.json` + `xg_model_report.md` sidecars (single-variant runs merge, never clobber — but two single-variant runs must not overlap in time: each reads the sidecars at start and writes at end).
 - Promotion = committing the retrained `models/*.json` (this repo's step-6 convention); CI only uploads run artifacts, it never pushes.
+
+
+## Retrain attempts (python trainer, this repo's parquet frame)
+
+- **2026-09-02** — `scripts/nhl_models.sh --force 01` / `02` on the committed corpus (16 seasons). ST: cv AUC **0.7569** vs floor 0.81 → **FAIL**, not promoted (holdout AUC 0.7556, per-season calibration excellent: max |z| 2.008, goals/ΣxG 0.93–1.08). 5v5 result recorded in `models/ledger.jsonl`. The committed 2026-04 R boosters scored on the same python frame reach only 0.761 / 0.778 (ST / 5v5) and over-predict goals by 25–30% on every season through 2023-24 (|z| up to 9.2 / 14.8), so the deficit is in the python FRAME vs the R training frame for pre-2024 seasons — an R↔Python parity question (`sdv-parity-reviewer` follow-up) that blocks promoting any python retrain. Ledger lines are committed; the run's sidecars were not (they would describe a non-promoted model).

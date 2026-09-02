@@ -24,7 +24,13 @@ def _table_rows() -> list[str]:
 
 
 def _required() -> list[str]:
-    on_disk = sorted(f"models/{p.name}" for p in (ROOT / "models").iterdir() if p.suffix in {".json", ".rds", ".ubj"})
+    # dotfiles are local state, not artifacts: a local retrain writes the gitignored
+    # .fingerprints.json skip-cache into models/, which is not a model to register.
+    on_disk = sorted(
+        f"models/{p.name}"
+        for p in (ROOT / "models").iterdir()
+        if p.suffix in {".json", ".rds", ".ubj"} and not p.name.startswith(".")
+    )
     vendored = [a for a in HOCKEYR_ARTIFACTS if (ROOT / a).exists()]
     return on_disk + vendored
 
