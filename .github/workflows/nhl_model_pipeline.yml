@@ -112,7 +112,7 @@ jobs:
         with:
           name: nhl-xg-${{ matrix.stage }}
           path: |
-            models/xg_model_*.json
+            models/xg_model_*.json   # boosters + xg_model_meta.json + xg_model_split.json sidecars
             models/xg_model_report.md
             models/ledger.jsonl
           if-no-files-found: warn

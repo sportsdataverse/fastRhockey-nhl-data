@@ -11,7 +11,8 @@
 #
 # Feature lists are era-derived at train time (no code constant), so there is
 # no features/ registry in this repo — models/xg_model_meta.json records the
-# per-retrain feature names instead.
+# per-retrain feature names instead, and models/xg_model_split.json the exact
+# train/test game_id partition (both committed with the boosters since 2026-09).
 
 driver: scripts/nhl_models.sh
 
@@ -31,7 +32,8 @@ suites:
         release_tag: null
         gate: "cv_auc >= 0.81 (observed 0.8213)"
     sidecars:
-      - models/xg_model_meta.json
+      - models/xg_model_meta.json   # feature lists, CV + exact-holdout metrics, per-season calibration (committed 2026-09)
+      - models/xg_model_split.json  # train/test game_id partition per variant (committed 2026-09)
       - models/xg_model_report.md
 
 # hockeyR reproduction lineage — R-only, retrained via the local runbook
