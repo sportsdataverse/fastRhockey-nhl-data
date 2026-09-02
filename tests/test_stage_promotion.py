@@ -123,3 +123,55 @@ def test_missing_candidate_artifact_is_not_promoted(tmp_path, monkeypatch):
     )
     assert rc == 1
     assert {a.name: _sha(a) for a in artifacts} == before
+
+
+def test_promotion_is_all_or_nothing_when_a_copy_fails(tmp_path, monkeypatch):
+    """A copy that raises mid-promotion must not leave a new booster beside stale metadata.
+
+    CodeRabbit, PR #8: stopping a FAILED gate from touching the champion does not help
+    if a PASSED gate can still tear it apart halfway through the copy sweep.
+    """
+    import shutil as _shutil
+
+    models, artifacts = _champion(tmp_path)
+    # a third champion file (the report) that is not in `artifacts` -- it must be
+    # restored too, so the assertion covers the whole directory, not just the booster
+    (models / "xg_model_report.md").write_text("CHAMPION-REPORT", encoding="utf-8")
+    before = {p.name: _sha(p) for p in models.iterdir() if p.is_file()}
+    monkeypatch.setattr("nhl_data_build._stage.LEDGER", tmp_path / "ledger.jsonl")
+
+    def train(out_dir: Path):
+        _write_candidate(out_dir, "NEW")
+        (out_dir / "xg_model_report.md").write_text("NEW-REPORT", encoding="utf-8")
+        return {"cv_auc": 0.84, "gate_pass": True}
+
+    real_copy2 = _shutil.copy2
+    calls = {"n": 0}
+
+    cand_dir = models / CANDIDATE_DIR / "xg_5v5"
+
+    def flaky_copy2(src, dst, *a, **kw):
+        # fail only the PROMOTION copies (candidate -> champion), and only after the
+        # first has landed; the snapshot and the restore must be free to run
+        if Path(src).parent == cand_dir:
+            calls["n"] += 1
+            if calls["n"] > 1:
+                raise OSError(28, "No space left on device")
+        return real_copy2(src, dst, *a, **kw)
+
+    monkeypatch.setattr("nhl_data_build._stage.shutil.copy2", flaky_copy2)
+
+    rc = run_stage(
+        name="xg_5v5",
+        suite="nhl_data_build",
+        config={"model": "xg_5v5"},
+        artifacts=artifacts,
+        train=train,
+        force=True,
+    )
+
+    assert rc == 1, "a torn promotion must surface as a non-zero rc, not a silent partial state"
+    assert calls["n"] > 1, "the injected failure never fired -- the test would pass vacuously"
+    after = {p.name: _sha(p) for p in models.iterdir() if p.is_file()}
+    assert after == before, "promotion tore the champion: some files were replaced, others were not"
+    assert not (models / ".fingerprints.json").is_file()  # a torn run is not recorded as done
