@@ -1060,7 +1060,7 @@ columns in `nhl_pbp_full` exist to expose.
 - **Pre-shot context** — rush/rebound flags exist, but passing sequences
   and screens do not; public-feed models plateau here, so the honest
   gain is better rebound/rush definitions, not more trees.
-- **Blocked by a gate (2026-09-01, PR \#PR_NUMBER_PLACEHOLDER):**
+- **Blocked by a gate (2026-09-01, PR \#7):**
   *Commit the python meta sidecar* — the trainer now writes
   `models/xg_model_meta.json` with the exact training-time CV/holdout
   metrics and this document reads it when present, but the 2026-09-02
@@ -1069,13 +1069,13 @@ columns in `nhl_pbp_full` exist to expose.
   promoted (`models/ledger.jsonl`); the 5v5 stage of that attempt was
   not run to completion. Gates are never lowered; the sidecar lands with
   the first passing retrain.
-- **Blocked by the same gate (2026-09-01, PR \#PR_NUMBER_PLACEHOLDER):**
+- **Blocked by the same gate (2026-09-01, PR \#7):**
   *Exact holdout reproduction* — `models/xg_model_split.json`
   (train/test `game_id` partition) is written by every python retrain
   and this document switches to the exact holdout automatically when it
   is committed; until then the evaluation is the labeled near-holdout
   replay.
-- **Resolved (2026-09-01, PR \#PR_NUMBER_PLACEHOLDER):** *Per-season ST
+- **Resolved (2026-09-01, PR \#7):** *Per-season ST
   calibration drift* — monitored by the per-season table and figure
   above; the trainer records the statistic in the meta and stage
   `nhl_model_02_xg_st` gates on the observed-value-derived ceiling
