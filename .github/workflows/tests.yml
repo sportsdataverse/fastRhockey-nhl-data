@@ -28,6 +28,8 @@ jobs:
           sparse-checkout: |
             python
             tests
+            models
+            .github
             scripts
             R
             pyproject.toml
