@@ -7,12 +7,14 @@ different corpus can over-price every shot forever and every gate stays green.
 ``artifact_calibration`` closes that hole: it scores an existing booster on the frame
 ``prepare_training_frame`` builds NOW and reports goals / ΣxG overall and per season.
 
-Measured 2026-09-02 on the committed 2026-04 boosters over ``nhl/pbp/full/parquet``
-(17 files, 1,829,710 5v5 rows / 359,730 ST): overall goals/ΣxG **0.7676** (5v5) and
-**0.7616** (ST) — a 25-30% over-prediction on every season through 2023-24. Dropping
-``MISSED_SHOT`` from the same corpus moves those to **1.0556** / **1.0663**, and to
-0.99-1.02 for each individual season 2009-10 … 2023-24 — which is what identifies the
-champions' training corpus as one that carried no missed shots for those seasons.
+Measured 2026-09-02 on the committed 2026-04 boosters over ``nhl/pbp/parquet`` -- the
+stages' own default glob (1,724,290 5v5 rows / 349,232 ST): overall goals/ΣxG **0.7711**
+(5v5) and **0.7679** (ST) — a 25-30% over-prediction on every season through 2023-24.
+Dropping ``MISSED_SHOT`` from the same corpus moves those to **1.0618** / **1.0777**, and
+to 0.99-1.02 for each individual season 2009-10 … 2023-24 — which is what identifies the
+champions' training corpus as one that carried no missed shots for those seasons. (The R
+trainer reads ``nhl/pbp/full/parquet`` instead, which gives the same picture at 0.7676 /
+0.7616 -- the two directories are NOT the same corpus; see ``models/REGISTRY.md``.)
 The R and python feature recipes themselves were proved identical on real games
 (0 row difference, 0 value difference on 32 of 33 shared features), so this is an
 artifact/corpus defect, not a recipe port defect. Full evidence:
