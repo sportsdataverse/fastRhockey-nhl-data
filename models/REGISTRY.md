@@ -12,8 +12,23 @@ consumers as the xG columns inside the published `nhl_pbp_full` datasets
 
 ## fastRhockey xG suite (`models/`)
 
-Trained on this repo's full NHL play-by-play (16 seasons 2009-10 → 2025-26, no
-2014-15; five era groupings). Two trainers, one recipe: `R/build_xg_model.R`
+Trained on this repo's full NHL play-by-play, five era groupings. **The two trainers
+read two different pbp directories and each is missing a different season** (verified
+2026-09-02 by reading `season` out of every file; the two are NOT interchangeable
+corpora):
+
+- `nhl/pbp/parquet/` — read by `nhl_model_01/02` (the python stages' default glob).
+  16 seasons 2009-10 → 2025-26; **2014-15 absent** (no `play_by_play_2015.parquet`).
+  Naming is otherwise consistent and no season is duplicated.
+- `nhl/pbp/full/{rds,parquet}` — read by the R trainer via `NHL_PBP_RDS_DIR`.
+  A different 16 seasons: **2013-14 absent** and **2018-19 duplicated**.
+
+The `full/` hole is a naming-convention split: `play_by_play_2014…2018` are named by
+season START year where every other file is named by END year, so the end-year-2014
+slot is never written and 2018-19 lands in both `_2018` (1,359 games) and `_2019`
+(1,358). Fix the producer before treating the two trainers as comparable.
+
+Two trainers, one recipe: `R/build_xg_model.R`
 (canonical; the COMMITTED 2026-04 boosters) and its port
 `python/nhl_data_build/xg_train.py` (grouped 80/20 split by `game_id`, seed 37,
 logloss+auc grouped 5-fold CV). The python trainer writes two sidecars beside the
@@ -47,8 +62,11 @@ design** (needs the `hockeyR-data` sibling checkout).
 - Fingerprints: stages skip when `hash(code subtree, config)` is unchanged (`--force` to retrain); every trained model appends a `models/ledger.jsonl` line; each retrain rewrites the `xg_model_meta.json` + `xg_model_split.json` + `xg_model_report.md` sidecars (single-variant runs merge, never clobber — but two single-variant runs must not overlap in time: each reads the sidecars at start and writes at end).
 - **Candidate/promote (2026-09-02).** A stage trains into `models/.candidate/<stage>/` (gitignored, seeded from the current champion so a single-variant sidecar merge still sees its sibling) and `nhl_data_build._stage.run_stage` copies the files onto the champion paths **only when `gate_pass` is not `False`**. A failing run leaves every champion file byte-identical, still appends its `models/ledger.jsonl` row, keeps the candidate for inspection, and does NOT record its fingerprint (so the next run retrains rather than skipping). Before this, the trainer wrote straight to `models/` and the gate was checked afterwards: the 2026-09-02 stage-01 retrain scored cv_auc **0.7786** with `gate_pass: false` and overwrote `models/xg_model_5v5.json` in place. Promotion itself is **all-or-nothing**: every champion file about to be overwritten is snapshotted to `models/.candidate/<stage>.rollback/` first and restored (rc 1) if any copy raises, so a partial sweep can never leave a new booster beside stale `xg_model_meta.json` / `xg_model_split.json`. Guarded by `tests/test_stage_promotion.py`.
 - Promotion = committing the retrained `models/*.json` (this repo's step-6 convention); CI only uploads run artifacts, it never pushes.
+- **The 2026-04 champions do not price the current frame (measured 2026-09-02).** `nhl_data_build.xg_parity.artifact_calibration` scores an EXISTING booster on the frame `prepare_training_frame` builds now — the check no promotion gate can make, because `cv_auc` is scale-free and the ST drift ceiling reads a *retrain's own* meta. On `nhl/pbp/parquet` (the stages' own glob; 1,724,290 5v5 / 349,232 ST rows) the committed boosters score goals/ΣxG **0.7711** (5v5) and **0.7679** (ST) — a 25-30% over-prediction on every season through 2023-24. Dropping `MISSED_SHOT` from the same corpus moves them to **1.0618** / **1.0777**, and to 0.99-1.02 for each individual season 2009-10 … 2023-24 (2024-25 and 2025-26, the only two already near-calibrated on the Fenwick frame at 0.949 / 0.913, blow out to 1.365 / 1.327). That identifies the 2026-04 training corpus as one carrying no missed shots for those seasons. The R (`R/build_xg_model.R`) and python (`xg_train.prepare_training_frame`) recipes were proved identical on real games first — same rows, same values on 32 of 33 shared features — so this is an artifact/corpus defect, not a port defect.
+- **The frozen AUC floors are therefore not achievable and must be RE-DERIVED, not lowered.** Re-fitting the R script's own params (max_depth 4, eta .06, gamma 1, subsample/colsample .8, min_child_weight 8, 1500 rounds, seed-37 grouped 80/20) on `nhl/pbp/parquet` gives holdout AUC **0.7794** 5v5 / **0.7542** ST with goals/ΣxG **1.0042** / **1.0064** — well calibrated, and matching the two python retrains recorded below (0.7786 / 0.7569) that were read as failures. The same fit on a SHOT|GOAL-only frame gives 0.7738 / **0.7611**, so the recorded 0.8322 / 0.8213 is not reproducible from any reconstruction of the current corpus. Floors stay where they are until a fit on a CORRECTED corpus sets new ones from its own observation.
+- **Corpus integrity blocks that re-derivation.** Neither pbp directory is complete and they are incomplete in different places — see the two-directory note at the top of this section. A floor re-derived on `nhl/pbp/parquet` is a floor fitted without 2014-15; one re-derived on `nhl/pbp/full` is fitted without 2013-14 and with 2018-19 counted twice. Fix the producer output first, then re-derive.
 
 
 ## Retrain attempts (python trainer, this repo's parquet frame)
 
-- **2026-09-02** — `scripts/nhl_models.sh --force 01` / `02` on the committed corpus (16 seasons). ST: cv AUC **0.7569** vs floor 0.81 → **FAIL**, not promoted (holdout AUC 0.7556, per-season calibration excellent: max |z| 2.008, goals/ΣxG 0.93–1.08). 5v5 result recorded in `models/ledger.jsonl`. The committed 2026-04 R boosters scored on the same python frame reach only 0.761 / 0.778 (ST / 5v5) and over-predict goals by 25–30% on every season through 2023-24 (|z| up to 9.2 / 14.8), so the deficit is in the python FRAME vs the R training frame for pre-2024 seasons — an R↔Python parity question (`sdv-parity-reviewer` follow-up) that blocks promoting any python retrain. Ledger lines are committed; the run's sidecars were not (they would describe a non-promoted model).
+- **2026-09-02** — `scripts/nhl_models.sh --force 01` / `02` on the committed corpus (16 seasons). ST: cv AUC **0.7569** vs floor 0.81 → **FAIL**, not promoted (holdout AUC 0.7556, per-season calibration excellent: max |z| 2.008, goals/ΣxG 0.93–1.08). 5v5 result recorded in `models/ledger.jsonl`. The committed 2026-04 R boosters scored on the same python frame reach only 0.761 / 0.778 (ST / 5v5) and over-predict goals by 25–30% on every season through 2023-24 (|z| up to 9.2 / 14.8). **This was originally read as a python-FRAME-vs-R-frame parity problem. It is not** (settled 2026-09-02, see the champion-calibration bullet above): the two recipes were run on byte-identical input rows and returned the same rows and the same values on 32 of 33 shared features, so 0.7569 is an honest fit measured against a floor the current corpus cannot reach — not a frame deficit. The blocker is the champion artifact and the corpus, not the port. Ledger lines are committed; the run's sidecars were not (they would describe a non-promoted model).
