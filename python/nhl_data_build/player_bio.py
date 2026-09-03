@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import io
 import os
+from functools import lru_cache
 from pathlib import Path
 
 import polars as pl
@@ -57,16 +58,21 @@ def resolve_source(source: str | Path | None = None) -> str:
     return str(LOCAL_INDEX) if LOCAL_INDEX.is_file() else INDEX_URL
 
 
-def load_player_bio(source: str | Path | None = None) -> pl.DataFrame:
-    """The bio index as a frame. An unreachable source is EMPTY, never an error.
-
-    A missing index must degrade the roster dataset to null handedness, not fail
-    the season build: this is an enrichment, and the 17 other families in the run
-    do not depend on it.
+@lru_cache(maxsize=4)
+def _load_cached(src: str) -> pl.DataFrame:
+    """Read + normalise one source. Cached: a multi-season run
+    (``-s 2010 -e 2026``) attaches per season and would otherwise re-download the
+    same index 17 times. Keyed on the RESOLVED source so two spellings of the same
+    default share an entry. Frames are only ever selected/joined downstream, never
+    mutated in place, so one instance is safe to share.
     """
-    src = resolve_source(source)
     try:
-        if src.startswith(("http://", "https://")):
+        if src.startswith("http://"):
+            # Never read bio over cleartext. This frame decides a published
+            # column, so a MITM could flip shoots_catches for every player in
+            # the release; https is available for the only remote source we ship.
+            return pl.DataFrame(schema=SCHEMA)
+        if src.startswith("https://"):
             body = _default_opener(src)
             if not body:
                 return pl.DataFrame(schema=SCHEMA)
@@ -75,12 +81,32 @@ def load_player_bio(source: str | Path | None = None) -> pl.DataFrame:
             if not Path(src).is_file():
                 return pl.DataFrame(schema=SCHEMA)
             df = pl.read_parquet(src)
+
+        df = df.rename({k: v for k, v in _RENAME.items() if k in df.columns})
+        if "player_id" not in df.columns:
+            # No join key = nothing joinable. Caught here rather than left to
+            # raise on the cast below, which sits in the season build's path and
+            # would take the whole run down over an optional enrichment.
+            return pl.DataFrame(schema=SCHEMA)
+        keep = [c for c in SCHEMA if c in df.columns]
+        # One row per player, enforced here rather than trusted from upstream: a
+        # duplicated key would fan the LEFT join out and multiply roster rows,
+        # silently inflating the published dataset.
+        return df.select(keep).with_columns(pl.col("player_id").cast(pl.Utf8)).unique(
+            subset=["player_id"], keep="first"
+        )
     except Exception:
         return pl.DataFrame(schema=SCHEMA)
 
-    df = df.rename({k: v for k, v in _RENAME.items() if k in df.columns})
-    keep = [c for c in SCHEMA if c in df.columns]
-    return df.select(keep).with_columns(pl.col("player_id").cast(pl.Utf8))
+
+def load_player_bio(source: str | Path | None = None) -> pl.DataFrame:
+    """The bio index as a frame. An unreachable source is EMPTY, never an error.
+
+    A missing index must degrade the roster dataset to null handedness, not fail
+    the season build: this is an enrichment, and the 17 other families in the run
+    do not depend on it.
+    """
+    return _load_cached(resolve_source(source))
 
 
 def attach_player_bio(
@@ -107,10 +133,20 @@ def attach_player_bio(
         # depending on whether the index happened to be reachable.
         return rosters.with_columns([pl.lit(None, dtype=SCHEMA[c]).alias(c) for c in want if c not in rosters.columns])
 
+    # A partial index must not change the OUTPUT schema. Without this, a bio frame
+    # that happens to lack shoots_catches drops the column entirely, while the
+    # empty-index path above adds a typed null -- so the dataset's columns would
+    # depend on the shape of an optional input.
+    missing = [c for c in want if c not in bio.columns]
+    if missing:
+        bio = bio.with_columns([pl.lit(None, dtype=SCHEMA[c]).alias(c) for c in missing])
+
     left = rosters.with_columns(_pid=pl.col("player_id").cast(pl.Int64, strict=False).cast(pl.Utf8))
-    right = bio.select(["player_id", *[c for c in want if c in bio.columns]]).rename({"player_id": "_pid"})
+    right = bio.select(["player_id", *want]).rename({"player_id": "_pid"})
     assert left.schema["_pid"] == right.schema["_pid"], "join-key dtype mismatch on _pid"
-    return left.join(right, on="_pid", how="left").drop("_pid")
+    # m:1 asserts what the loader already guarantees. Cheap, and it fails loudly
+    # rather than quietly emitting duplicated roster rows if that ever breaks.
+    return left.join(right, on="_pid", how="left", validate="m:1").drop("_pid")
 
 
 def coverage(rosters: pl.DataFrame, column: str = "shoots_catches") -> dict:
