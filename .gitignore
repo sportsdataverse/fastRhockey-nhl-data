@@ -71,7 +71,7 @@ docs/*
 !docs/models/
 !docs/models/**
 
-# Agent / tooling state -- local scratch, never part of the repo.
+# Agent / tooling state -- local scratch; ignore untracked contents.
 .omc/
 **/.omc/
 .understand-anything/
