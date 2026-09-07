@@ -133,8 +133,16 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("-e", "--end", type=int, help="end season end-year (default: --start)")
     ap.add_argument("--final-dir", required=True, help="dir of final/{gid}.json (fastRhockey-nhl-raw nhl/json/final)")
     ap.add_argument("--out-dir", default="nhl")
-    ap.add_argument("--families", nargs="+", default=None, metavar="KEY",
-                    help="restrict to these dataset families (default: all)")
+    ap.add_argument(
+        "--families", nargs="+", default=None, metavar="KEY", help="restrict to these dataset families (default: all)"
+    )
+    ap.add_argument(
+        "--player-bio",
+        default=None,
+        metavar="PATH_OR_URL",
+        help="nhl-raw bio index supplying game_rosters handedness (default: sibling "
+        "checkout if present, else the raw repo URL). Pass '' to skip the join.",
+    )
     args = ap.parse_args(argv)
     if args.families:
         from nhl_data_build.config import TYPES
@@ -146,6 +154,15 @@ def main(argv: list[str] | None = None) -> int:
         season = build_season_from_dir(args.final_dir, season_end_year=year)
         if args.families:
             season = {k: v for k, v in season.items() if k in args.families}
+        # Handedness is not in the game feed -- it comes from nhl-raw's per-player
+        # landing capture. Enrichment, not a dependency: an unreachable index nulls
+        # the column and the season still builds (see player_bio.load_player_bio).
+        if "game_rosters" in season and args.player_bio != "":
+            from nhl_data_build.player_bio import attach_player_bio, coverage
+
+            season["game_rosters"] = attach_player_bio(season["game_rosters"], source=args.player_bio)
+            cov = coverage(season["game_rosters"])
+            print(f"season {year}: handedness on {cov['matched']:,}/{cov['rows']:,} roster rows ({cov['pct']}%)")
         written = write_datasets(season, args.out_dir, year)
         print(f"season {year}: {sum(written.values())} rows across {len(written)} datasets -> {args.out_dir}")
     return 0
