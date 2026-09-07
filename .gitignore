@@ -70,3 +70,9 @@ models/.candidate/
 docs/*
 !docs/models/
 !docs/models/**
+
+# Agent / tooling state -- local scratch; ignore untracked contents.
+.omc/
+**/.omc/
+.understand-anything/
+**/.understand-anything/
