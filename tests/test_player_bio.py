@@ -14,6 +14,16 @@ import polars as pl
 import pytest
 from nhl_data_build.player_bio import SCHEMA, attach_player_bio, coverage, load_player_bio
 
+
+@pytest.fixture(autouse=True)
+def _clear_bio_cache():
+    """The loader is lru_cached; without this a frame computed under one test's
+    monkeypatched opener leaks into the next test keyed on the same source."""
+    pb._load_cached.cache_clear()
+    yield
+    pb._load_cached.cache_clear()
+
+
 BIO = pl.DataFrame(
     {
         "player_id": ["8478402", "8471214"],
@@ -94,7 +104,7 @@ def test_index_without_the_join_key_is_empty_not_an_exception(tmp_path):
     assert load_player_bio(p).height == 0
 
 
-def test_partial_index_still_yields_the_requested_column(tmp_path):
+def test_partial_index_still_yields_the_requested_column():
     """A bio frame lacking shoots_catches must not silently drop the column: the
     empty-index path adds a typed null, so the output schema would otherwise
     depend on the shape of an optional input."""
@@ -127,4 +137,55 @@ def test_index_is_read_once_across_a_multi_season_run(tmp_path):
     info = pb._load_cached.cache_info()
     assert info.misses - before.misses == 1
     assert info.hits >= 16
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        pl.DataFrame({"player_id": [8478402, 8478402], "shoots_catches": ["L", "R"]}),  # dupes -> m:1
+        pl.DataFrame({"shoots_catches": ["L"]}),                                        # no join key
+        pl.DataFrame({"player_id": [8478402], "shoots_catches": ["L"]}).with_columns(
+            pl.col("player_id").cast(pl.Int64)                                          # wrong key dtype
+        ),
+    ],
+    ids=["duplicate-players", "no-join-key", "wrong-key-dtype"],
+)
+def test_a_malformed_bio_frame_degrades_it_does_not_kill_the_season(bad):
+    """season.py calls attach_player_bio with NO try/except, so any raise here
+    takes down all 18 dataset families for that season.
+
+    Each of these three used to raise: validate="m:1" on duplicates, a
+    ColumnNotFoundError on the missing key, and an AssertionError on the dtype
+    guard (which -O would have stripped entirely). The m:1 raise was introduced
+    by the fix commit itself and had no test -- the existing duplicate test fed
+    the join a frame the LOADER had already deduped, so the validator never fired.
+    """
+    rosters = pl.DataFrame({"player_id": [8478402, 8471214]})
+    with pytest.warns(RuntimeWarning, match="player bio join failed"):
+        out = attach_player_bio(rosters, bad)
+    assert out.height == 2, "row count must be preserved on the degradation path"
+    assert out["shoots_catches"].to_list() == [None, None]
+    assert out.schema["shoots_catches"] == pl.Utf8
+
+
+def test_re_attaching_replaces_rather_than_colliding():
+    """A second attach must not leave `shoots_catches_right` beside a stale
+    original -- polars auto-suffixes the duplicate, and coverage() would then
+    report on the stale column."""
+    rosters = pl.DataFrame({"player_id": [8478402]})
+    once = attach_player_bio(rosters, BIO)
+    twice = attach_player_bio(once, BIO)
+    assert [c for c in twice.columns if c.endswith("_right")] == []
+    assert twice.columns == once.columns
+    assert twice["shoots_catches"].to_list() == ["L"]
+
+
+def test_the_cached_frame_cannot_be_poisoned_by_a_caller(tmp_path):
+    """The loader hands out a clone, so an in-place mutation by one caller cannot
+    corrupt every later season of a multi-season run."""
+    p = tmp_path / "bio.parquet"
+    pl.DataFrame({"player_id": ["8478402"], "shoots_catches": ["L"]}).write_parquet(p)
+    first = load_player_bio(p)
+    first.drop_in_place("shoots_catches")
+    assert "shoots_catches" in load_player_bio(p).columns
 

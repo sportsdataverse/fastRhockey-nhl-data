@@ -21,10 +21,12 @@ from __future__ import annotations
 
 import io
 import os
+import warnings
 from functools import lru_cache
 from pathlib import Path
 
 import polars as pl
+from polars.datatypes import DataTypeClass as PolarsDataType
 
 from nhl_data_build.fetch import RAW_BASE, _default_opener
 
@@ -34,7 +36,7 @@ INDEX_URL = f"{RAW_BASE}/nhl/{INDEX_NAME}"
 #: Sibling checkout, when there is one -- a dev box reads it locally and offline.
 LOCAL_INDEX = Path(__file__).resolve().parents[3] / "fastRhockey-nhl-raw" / "nhl" / INDEX_NAME
 
-SCHEMA: dict[str, pl.DataType] = {
+SCHEMA: dict[str, PolarsDataType] = {
     "player_id": pl.Utf8,
     "shoots_catches": pl.Utf8,
     "position_code_bio": pl.Utf8,
@@ -53,9 +55,15 @@ def resolve_source(source: str | Path | None = None) -> str:
     """Explicit arg > ``NHL_PLAYER_BIO`` env > sibling checkout > the raw repo URL."""
     if source:
         return str(source)
-    if os.environ.get("NHL_PLAYER_BIO"):
-        return os.environ["NHL_PLAYER_BIO"]
-    return str(LOCAL_INDEX) if LOCAL_INDEX.is_file() else INDEX_URL
+    src = os.environ.get("NHL_PLAYER_BIO") or (str(LOCAL_INDEX) if LOCAL_INDEX.is_file() else INDEX_URL)
+    if src.startswith(("http://", "https://")):
+        return src
+    # Normalise: 'nhl/x.parquet', 'nhl\x.parquet' and './nhl/x.parquet' are ONE
+    # cache entry rather than three reads (and three slots of a maxsize-4 cache).
+    try:
+        return str(Path(src).resolve())
+    except OSError:
+        return str(src)
 
 
 @lru_cache(maxsize=4)
@@ -106,7 +114,17 @@ def load_player_bio(source: str | Path | None = None) -> pl.DataFrame:
     the season build: this is an enrichment, and the 17 other families in the run
     do not depend on it.
     """
-    return _load_cached(resolve_source(source))
+    # .clone() is an O(1) Arrow refcount bump, and it means the cache cannot be
+    # poisoned: polars has in-place mutators (insert_column, drop_in_place,
+    # hstack(in_place=True), Series.scatter), and one applied to a returned frame
+    # would corrupt every remaining season of a 17-season run. The alternative
+    # was a docstring asking callers not to mutate.
+    return _load_cached(resolve_source(source)).clone()
+
+
+def _null_fill(rosters: pl.DataFrame, want: list[str]) -> pl.DataFrame:
+    """The degradation path: the requested columns present, as typed nulls."""
+    return rosters.with_columns([pl.lit(None, dtype=SCHEMA[c]).alias(c) for c in want if c not in rosters.columns])
 
 
 def attach_player_bio(
@@ -131,22 +149,47 @@ def attach_player_bio(
     if bio.height == 0 or rosters.height == 0:
         # Still add the columns, so the dataset's schema does not change shape
         # depending on whether the index happened to be reachable.
-        return rosters.with_columns([pl.lit(None, dtype=SCHEMA[c]).alias(c) for c in want if c not in rosters.columns])
+        return _null_fill(rosters, want)
 
-    # A partial index must not change the OUTPUT schema. Without this, a bio frame
-    # that happens to lack shoots_catches drops the column entirely, while the
-    # empty-index path above adds a typed null -- so the dataset's columns would
-    # depend on the shape of an optional input.
-    missing = [c for c in want if c not in bio.columns]
-    if missing:
-        bio = bio.with_columns([pl.lit(None, dtype=SCHEMA[c]).alias(c) for c in missing])
+    # Re-attaching must REPLACE, not collide. polars auto-suffixes a duplicate to
+    # `shoots_catches_right`, leaving the stale original in place -- and coverage()
+    # then reports on the stale one. Same rule as the typed-null fill above: the
+    # output schema must not depend on the shape of an optional input, and that
+    # includes whether this frame was already enriched.
+    stale = [c for c in want if c in rosters.columns]
+    if stale:
+        rosters = rosters.drop(stale)
 
-    left = rosters.with_columns(_pid=pl.col("player_id").cast(pl.Int64, strict=False).cast(pl.Utf8))
-    right = bio.select(["player_id", *want]).rename({"player_id": "_pid"})
-    assert left.schema["_pid"] == right.schema["_pid"], "join-key dtype mismatch on _pid"
-    # m:1 asserts what the loader already guarantees. Cheap, and it fails loudly
-    # rather than quietly emitting duplicated roster rows if that ever breaks.
-    return left.join(right, on="_pid", how="left", validate="m:1").drop("_pid")
+    try:
+        # A partial index must not change the OUTPUT schema either: a bio frame
+        # lacking shoots_catches would otherwise drop the column entirely, while
+        # the empty-index path above adds a typed null.
+        absent = [c for c in want if c not in bio.columns]
+        if absent:
+            bio = bio.with_columns([pl.lit(None, dtype=SCHEMA[c]).alias(c) for c in absent])
+
+        left = rosters.with_columns(_pid=pl.col("player_id").cast(pl.Int64, strict=False).cast(pl.Utf8))
+        right = bio.select(["player_id", *want]).rename({"player_id": "_pid"})
+        if left.schema["_pid"] != right.schema["_pid"]:
+            # Not an `assert`: -O strips those, and this is a data guard.
+            raise TypeError(f"join-key dtype mismatch: {left.schema['_pid']} vs {right.schema['_pid']}")
+        # m:1 asserts what the loader already guarantees; maintain_order pins row
+        # order, which polars documents as unspecified without it and which reaches
+        # the published parquet with no intervening sort.
+        return left.join(right, on="_pid", how="left", validate="m:1", maintain_order="left").drop("_pid")
+    except Exception as exc:
+        # THE contract: this is an enrichment, and season.py calls it with NO
+        # try/except, so any raise here kills all 18 dataset families for the
+        # season. A caller-supplied bio frame that is malformed -- wrong key dtype,
+        # no player_id, duplicated players -- must degrade to nulls exactly like an
+        # unreachable index. Warned, never silent: a corrupt index should be
+        # visible in the build log without being fatal.
+        warnings.warn(
+            f"player bio join failed ({type(exc).__name__}: {exc}); continuing with null handedness",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return _null_fill(rosters, want)
 
 
 def coverage(rosters: pl.DataFrame, column: str = "shoots_catches") -> dict:
