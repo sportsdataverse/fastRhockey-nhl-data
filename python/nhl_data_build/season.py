@@ -165,6 +165,25 @@ def main(argv: list[str] | None = None) -> int:
             print(f"season {year}: handedness on {cov['matched']:,}/{cov['rows']:,} roster rows ({cov['pct']}%)")
         written = write_datasets(season, args.out_dir, year)
         print(f"season {year}: {sum(written.values())} rows across {len(written)} datasets -> {args.out_dir}")
+        # --families narrows `season` to a subset of dataset keys; the
+        # schedule's completion flags need EVERY family's game_id set (a
+        # narrowed run would otherwise flag every excluded family False for
+        # every game, overwriting correct, previously-published flags). A
+        # --families rerun is for one dataset, not the schedule -- skip it.
+        if args.families:
+            print(f"season {year}: schedule skipped (--families narrows the completion flags)")
+        else:
+            try:
+                from nhl_data_build.schedule import build_and_write_schedule
+
+                n_sched = build_and_write_schedule(season, args.out_dir, year)
+                print(f"season {year}: schedule ({n_sched} games) -> {args.out_dir}/schedules")
+            except Exception as exc:  # noqa: BLE001 — one season's schedule build
+                # (missing raw parquet, an unexpected game_id dtype/null in an
+                # older season) must not abort every OTHER season's compile.
+                print(
+                    f"season {year}: schedule build failed ({type(exc).__name__}: {exc}) -- skipping schedule dataset"
+                )
     return 0
 
 
