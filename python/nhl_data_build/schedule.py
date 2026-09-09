@@ -36,6 +36,44 @@ from nhl_data_build.season import RDS_CLASS as _RDS_CLASS
 _FLAG_KEYS: list[str] = [key for key, *_ in DATASETS] + ["player_box"]
 
 
+def _sanitize_utf8(table: "object") -> "object":
+    """Strip schema/field metadata and replace invalid UTF-8 column bytes
+    before polars sees any of it.
+
+    Confirmed live 2026-09-09 on season 2010, in two rounds: (1) R/arrow can
+    write genuinely non-UTF-8 bytes into a Utf8 COLUMN's data, and (2) even
+    after fixing that, the SAME panic recurred from the schema/field-level
+    metadata dict (the latin1 key metadata fetch_schedule's docstring already
+    called out for the ``polars.read_parquet`` path -- it turns out
+    ``pl.from_arrow`` hits the identical FFI schema-conversion code, not a
+    separate, safer path). Both are pyarrow-tolerant, polars-Rust-fatal: a
+    Rust ``panic!`` (``pyo3_runtime.PanicException``) that is NOT a subclass
+    of ``Exception`` and killed the whole process straight through a bare
+    ``except Exception`` wrapper in season.py, aborting every remaining
+    season in a multi-season compile run. Metadata isn't needed for this
+    dataset's columns, so it's simplest to drop it entirely rather than
+    attempt to re-encode it; casting each string column to binary is a
+    zero-copy reinterpret (no validation), so its bytes can be decoded
+    leniently in plain Python instead of Rust's strict validator.
+    """
+    import pyarrow as pa
+
+    cols = []
+    fields = []
+    for i, field in enumerate(table.schema):
+        col = table.column(i)
+        clean_field = field.remove_metadata()
+        if pa.types.is_string(field.type) or pa.types.is_large_string(field.type):
+            raw_bytes = col.cast(pa.binary())
+            cleaned = [b.decode("utf-8", "replace") if b is not None else None for b in raw_bytes.to_pylist()]
+            cols.append(pa.array(cleaned, type=pa.string()))
+        else:
+            cols.append(col)
+        fields.append(clean_field)
+    clean_schema = pa.schema(fields)  # no table-level metadata either
+    return pa.Table.from_arrays(cols, schema=clean_schema)
+
+
 def fetch_schedule(
     season_end_year: int,
     *,
@@ -44,8 +82,11 @@ def fetch_schedule(
 ) -> pl.DataFrame:
     """The raw repo's own compiled schedule for one season (all columns).
 
-    pyarrow, not polars.read_parquet: these files are R/arrow-written and their
-    latin1 key metadata trips polars' strict UTF-8 parquet reader (see fetch.py).
+    pyarrow, not polars.read_parquet: these files are R/arrow-written and can
+    carry non-UTF-8 metadata/column bytes that trip polars' strict Rust-level
+    ingestion (see fetch.py, and ``_sanitize_utf8`` above for the full story --
+    it turns out pyarrow-then-``pl.from_arrow`` isn't actually a safe bypass on
+    its own, contrary to what this docstring originally assumed).
     """
     import pyarrow.parquet as pq
 
@@ -54,7 +95,8 @@ def fetch_schedule(
     raw = op(url)
     if raw is None:
         raise FileNotFoundError(f"schedule parquet not found: {url}")
-    return pl.from_arrow(pq.read_table(io.BytesIO(raw)))
+    table = _sanitize_utf8(pq.read_table(io.BytesIO(raw)))
+    return pl.from_arrow(table)
 
 
 # R's tribble names every flag column after its DATASETS key verbatim except
