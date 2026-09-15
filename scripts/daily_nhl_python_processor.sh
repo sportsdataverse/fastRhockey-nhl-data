@@ -92,7 +92,11 @@ OUT_DIR="${REPO_DIR}/nhl"
 # `uv run`. sdv-orch invokes this from a systemd unit, whose PATH is the systemd
 # default and does NOT include /root/.local/bin where uv lives -- `uv` exits 127
 # there while working fine in an interactive shell.
-PYBIN="${NHL_PYBIN:-${REPO_DIR}/python/.venv/bin/python}"
+# The uv project (pyproject.toml + uv.lock) lives at the repo root, so its venv is
+# ${REPO_DIR}/.venv. python/.venv is a stale pre-consolidation venv that `uv sync`
+# never updates -- on the droplet it still carried sdv-py 0.0.72, which cannot
+# import upload_release_sidecars, so publishing failed on import.
+PYBIN="${NHL_PYBIN:-${REPO_DIR}/.venv/bin/python}"
 
 # Fail before touching git if the upstream checkout isn't where we expect. A
 # missing final dir would otherwise compile zero games and "succeed", quietly
@@ -103,7 +107,7 @@ if [ ! -d "${FINAL_DIR}" ]; then
 fi
 
 if [ ! -x "${PYBIN}" ]; then
-    echo "::error ::python venv not found at ${PYBIN} -- run 'uv sync' in ${REPO_DIR}/python"
+    echo "::error ::python venv not found at ${PYBIN} -- run 'uv sync --frozen' in ${REPO_DIR}"
     exit 1
 fi
 
@@ -133,13 +137,17 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
 
         # Publish only what compiled. Uploading is idempotent (--clobber), so a
         # partial season still ships the datasets that built.
-        ( cd python && "${PYBIN}" -m nhl_data_03_publish -s "${i}" --out-dir "${OUT_DIR}" )
+        # Stage 19 since ed360e4 renumbered it; nhl_data_03_publish no longer exists.
+        ( cd python && "${PYBIN}" -m nhl_data_19_publish -s "${i}" --out-dir "${OUT_DIR}" )
+        echo "PUBLISH_RC=$?" > "/tmp/_nhl_publish_rc_${i}"
 
         sdv_commit_push "NHL Data Updated (Start: $i End: $i)" nhl || PUSH_RC=1
     } 2>&1 | tee "$TMPLOG"
 
     COMPILE_RC=$(sed 's/COMPILE_RC=//' "/tmp/_nhl_compile_rc_${i}" 2>/dev/null)
     rm -f "/tmp/_nhl_compile_rc_${i}"
+    PUBLISH_RC=$(sed 's/PUBLISH_RC=//' "/tmp/_nhl_publish_rc_${i}" 2>/dev/null)
+    rm -f "/tmp/_nhl_publish_rc_${i}"
 
     cp "$TMPLOG" "$LOGFILE"
     git stash -u --quiet 2>/dev/null || true
@@ -154,10 +162,16 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
         echo "::error ::nhl_data_build.season for season $i exited with code ${COMPILE_RC}"
         ANY_FAILED=1
     fi
+    # A failed publish is a failed run: the compile can succeed while nothing
+    # reaches sportsdataverse-data. No rc file means the publish step never ran.
+    if [ "${PUBLISH_RC:-missing}" != "0" ]; then
+        echo "::error ::nhl_data_19_publish for season $i exited with code ${PUBLISH_RC:-missing}"
+        ANY_FAILED=1
+    fi
 done
 
 if [ "${ANY_FAILED}" != "0" ]; then
-    echo "::error ::At least one season's compile exited non-zero. See per-season logs."
+    echo "::error ::At least one season's compile or publish exited non-zero. See per-season logs."
     exit 1
 fi
 

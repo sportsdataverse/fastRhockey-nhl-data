@@ -102,8 +102,8 @@ jobs:
           # falls through to the date guess below, so a raw-side backfill of an older
           # season would compile the current one instead.
           if [ -z "$START" ] && [ -n "$PAYLOAD_MSG" ]; then
-            START=$(printf '%s' "$PAYLOAD_MSG" | grep -o -E '[0-9]+' | head -1)
-            END=$(printf '%s' "$PAYLOAD_MSG" | grep -o -E '[0-9]+' | tail -1)
+            START=$(printf '%s' "$PAYLOAD_MSG" | grep -oE 'Start: *[0-9]{4}' | head -1 | grep -oE '[0-9]{4}')
+            END=$(printf '%s' "$PAYLOAD_MSG" | grep -oE 'End: *[0-9]{4}' | head -1 | grep -oE '[0-9]{4}')
           fi
 
           if [ -z "$START" ]; then
@@ -139,7 +139,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.SDV_GH_TOKEN }}
         run: |
-          uv run python -m nhl_data_03_publish \
+          uv run python -m nhl_data_19_publish \
             -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }} \
             --out-dir "$GITHUB_WORKSPACE/nhl"
 
