@@ -66,9 +66,13 @@ jobs:
       run:
         working-directory: python
     steps:
+      # A run queued in the concurrency group would otherwise check out the SHA of
+      # its trigger, not the branch as it is when the job starts, and build on a
+      # stale tree (wehoop-wnba-stats-data run 37207505807, 2026-10-04).
       - name: Checkout nhl-data
         uses: actions/checkout@v5
         with:
+          ref: main
           persist-credentials: false  # the commit-back step authenticates the push explicitly
 
       # Track B: fetch this season's finals over HTTP (enumerated from the raw
