@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Python port of the fastRhockey-nhl-data reshaper (final.json -> season datasets)"
 requires-python = ">=3.10"
 dependencies = [
-    "polars>=1.0,<2.0",
+    "polars>=1.0",
     "pyarrow>=14.0",
     "numpy>=1.26",
     # native .rds writing (write_rds) so the python producer emits every released
