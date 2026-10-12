@@ -3,8 +3,9 @@
 Numbered CLI over ``nhl_data_build.publish.publish_season``, which was
 previously reachable only as inline ``python -c`` snippets in the workflow
 and the droplet processor — un-enumerable and un-runnable by hand. Uploads
-are idempotent (``--clobber`` under the hood), so a partial season still
-ships the datasets that built. Single home: models/manifest.yaml.
+are idempotent (``--clobber`` under the hood, and assets whose sha256 already
+matches the release are skipped), so a partial season still ships the
+datasets that built. Single home: models/manifest.yaml.
 
 Usage::
 

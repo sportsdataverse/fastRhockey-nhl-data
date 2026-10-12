@@ -8,7 +8,9 @@ the release must already exist on ``sportsdataverse-data`` (created once, like t
 
 from __future__ import annotations
 
+import hashlib
 import subprocess
+import sys
 from pathlib import Path
 
 from sportsdataverse.release import upload_release_sidecars
@@ -56,13 +58,43 @@ PKG_FUNCTION: dict[str, str] = {
 }
 
 
-def _gh(args: list[str]) -> None:
-    """Single ``gh`` chokepoint -- tests monkeypatch this to stay offline."""
-    subprocess.run(
-        ["gh", *args],
-        check=True,
-        timeout=600,  # fail fast instead of hanging the daily workflow on a stuck upload/auth prompt
-    )
+def _gh(args: list[str]) -> str:
+    """Single ``gh`` chokepoint -- tests monkeypatch this to stay offline. Returns stdout."""
+    try:
+        return subprocess.run(
+            ["gh", *args],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=600,  # fail fast instead of hanging the daily workflow on a stuck upload/auth prompt
+        ).stdout
+    except subprocess.CalledProcessError as exc:
+        sys.stderr.write(exc.stderr or "")
+        raise
+
+
+def _release_digests(tag: str, repo: str) -> dict[str, str] | None:
+    """``{asset name: "sha256:<hex>"}`` for *tag* in ONE API call; ``None`` = no release.
+
+    The release object embeds every asset with a GitHub-computed ``digest``, so one
+    listing per tag replaces a per-file probe. The droplet shares one 5,000/h quota
+    and the old upload-everything run cost ~500 requests per season.
+    """
+    try:
+        out = _gh(["api", f"repos/{repo}/releases/tags/{tag}", "--jq", r'.assets[] | "\(.name)\t\(.digest)"'])
+    except subprocess.CalledProcessError as exc:
+        if "404" in (exc.stderr or ""):
+            return None  # first publish of this tag
+        raise  # auth / rate limit must surface
+    return dict(ln.split("\t", 1) for ln in (out or "").splitlines() if "\t" in ln)
+
+
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()  # not hashlib.file_digest: requires-python is >=3.10
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return "sha256:" + h.hexdigest()
 
 
 def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
@@ -73,24 +105,46 @@ def publish_file(path: Path, release_tag: str, *, repo: str = _REPO) -> None:
 def publish_season(
     out_dir: str | Path, season_year: int, *, repo: str = _REPO, dry_run: bool = False
 ) -> list[tuple[str, str]]:
-    """Upload every present ``{prefix}_{season_year}.{parquet,rds,csv}`` to its ``nhl_*`` release.
+    """Upload every changed ``{prefix}_{season_year}.{parquet,rds,csv}`` to its ``nhl_*`` release.
 
-    All three released formats ship to the tag — the release is the distribution
-    channel (rds/csv are build artifacts, not committed to this repo).
+    All three released formats ship to the tag -- the release is the distribution
+    channel (rds/csv are build artifacts, not committed to this repo). Returns the
+    ``(tag, asset)`` pairs uploaded (all present files on a dry run).
+
+    One release listing per tag; a file whose sha256 matches its asset is skipped.
+    The rds embeds a write timestamp so it never matches itself: when the parquet
+    matches and the rds/csv are already on the release, the whole dataset is
+    skipped. The parquet uploads LAST, so a matching parquet means the previous
+    upload of its siblings completed.
     """
     out = Path(out_dir)
     done: list[tuple[str, str]] = []
     for prefix, tag, key in _PUBLISH:
-        uploaded = 0
-        for sub, ext in (("parquet", "parquet"), ("rds", "rds"), ("csv", "csv")):
-            path = out / key / sub / f"{prefix}_{season_year}.{ext}"
-            if not path.exists():
-                continue
-            if dry_run:
+        paths = [
+            p
+            for sub in ("rds", "csv", "parquet")  # parquet last
+            if (p := out / key / sub / f"{prefix}_{season_year}.{sub}").exists()
+        ]
+        if not paths:
+            continue
+        if dry_run:
+            for path in paths:
                 print(f"[dry-run] {path.name} -> {repo}@{tag}")
-            else:
-                publish_file(path, tag, repo=repo)
-                uploaded += 1
+                done.append((tag, path.name))
+            continue
+        remote = _release_digests(tag, repo)
+        if remote is None:
+            _gh(["release", "create", tag, "--repo", repo, "--title", tag, "--notes", f"{tag} (fastRhockey-nhl-data)"])
+            remote = {}
+        pq = paths[-1] if paths[-1].suffix == ".parquet" else None
+        if pq is not None and remote.get(pq.name) == _sha256(pq) and all(p.name in remote for p in paths):
+            continue  # unchanged dataset: rds/csv are derived from this parquet
+        uploaded = 0
+        for path in paths:
+            if path is not pq and remote.get(path.name) == _sha256(path):
+                continue
+            publish_file(path, tag, repo=repo)
+            uploaded += 1
             done.append((tag, path.name))
         # stamp LAST so the timestamp describes a finished upload, and only when
         # something actually uploaded -- a stamp on a no-op run would claim data

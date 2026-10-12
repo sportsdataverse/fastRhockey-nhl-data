@@ -40,9 +40,11 @@ def test_publish_season_stamps_each_tag_last(tmp_path, monkeypatch):
 
     publish.publish_season(tmp_path, 2025)
 
-    names = [Path(c[3]).name for c in calls if c[:2] == ["release", "upload"]]
-    assert names == [f"{prefix}_2025.parquet", f"{prefix}_2025.rds", *SIDECAR_NAMES]
-    assert all(c[2] == tag and c[-1] == "--clobber" for c in calls)
+    uploads = [c for c in calls if c[:2] == ["release", "upload"]]
+    names = [Path(c[3]).name for c in uploads]
+    # parquet LAST: a matching parquet marks its siblings as already uploaded
+    assert names == [f"{prefix}_2025.rds", f"{prefix}_2025.parquet", *SIDECAR_NAMES]
+    assert all(c[2] == tag and c[-1] == "--clobber" for c in uploads)
 
 
 def test_no_files_means_no_stamp(tmp_path, monkeypatch):
