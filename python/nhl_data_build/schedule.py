@@ -34,6 +34,13 @@ from nhl_data_build.season import RDS_CLASS as _RDS_CLASS
 # plus the derived player_box. pbp_lite mirrors pbp's game_id set 1:1, so it
 # gets no flag of its own -- matches the R tribble, which never had one either.
 _FLAG_KEYS: list[str] = [key for key, *_ in DATASETS] + ["player_box"]
+# R's flag column order (fastRhockey::.nhl_attach_data_flags flag_cols; every
+# R-written nhl_schedule_{year}.parquet), keyed by DATASETS key.
+_FLAG_ORDER: list[str] = [
+    "pbp", "team_box", "player_box", "skater_box", "goalie_box", "game_info", "game_rosters", "scoring",
+    "penalties", "scratches", "linescore", "three_stars", "shifts", "officials", "shots_by_period", "shootout",
+]  # fmt: skip
+assert sorted(_FLAG_ORDER) == sorted(_FLAG_KEYS), "flag order drifted from DATASETS"
 
 
 def _sanitize_utf8(table: "object") -> "object":
@@ -110,9 +117,10 @@ _FLAG_COLUMN_NAME = {"pbp": "PBP"}
 def add_completion_flags(sched: pl.DataFrame, season: dict[str, pl.DataFrame]) -> pl.DataFrame:
     """Port of ``nhl_data_creation.R`` STEP 5 -- one boolean column per dataset
     family, true where that game's data made it into this season's compile."""
-    sched = sched.with_columns(pl.col("game_id").cast(pl.Int64))
+    # No cast of game_id itself: the raw file carries R's int32, and an Int64 cast here
+    # is what turned the Python-compiled seasons' schedule ids int64.
     exprs = []
-    for key in _FLAG_KEYS:
+    for key in _FLAG_ORDER:
         df = season.get(key)
         ids: set[int] = set()
         if df is not None and "game_id" in df.columns:
@@ -120,6 +128,24 @@ def add_completion_flags(sched: pl.DataFrame, season: dict[str, pl.DataFrame]) -
         col_name = _FLAG_COLUMN_NAME.get(key, key)
         exprs.append(pl.col("game_id").is_in(sorted(ids)).alias(col_name))
     return sched.with_columns(exprs).unique().sort("game_date", descending=True)
+
+
+def _write_r_typed_parquet(df: pl.DataFrame, path: Path) -> None:
+    """Write with R/arrow's physical types -- int32 integers, plain ``string`` (polars
+    always writes ``large_string``) -- so a compiled season reads back with the same
+    arrow schema as every R-written one."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    tbl = df.to_arrow()
+    fields = [
+        pa.field(
+            f.name,
+            pa.string() if pa.types.is_large_string(f.type) else pa.int32() if pa.types.is_integer(f.type) else f.type,
+        )
+        for f in tbl.schema
+    ]
+    pq.write_table(tbl.cast(pa.schema(fields)), path, compression="gzip")
 
 
 def write_schedule(df: pl.DataFrame, out_dir: str | Path, season_year: int) -> int:
@@ -132,7 +158,7 @@ def write_schedule(df: pl.DataFrame, out_dir: str | Path, season_year: int) -> i
     for sub in ("parquet", "rds", "csv"):
         (out / "schedules" / sub).mkdir(parents=True, exist_ok=True)
     stem = f"nhl_schedule_{season_year}"
-    flat.write_parquet(out / "schedules" / "parquet" / f"{stem}.parquet", compression="gzip")
+    _write_r_typed_parquet(flat, out / "schedules" / "parquet" / f"{stem}.parquet")
     write_rds(
         flat,
         out / "schedules" / "rds" / f"{stem}.rds",
