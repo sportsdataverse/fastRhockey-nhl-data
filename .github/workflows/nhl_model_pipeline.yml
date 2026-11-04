@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: false
+      dry_run:
+        description: 'Smoke test: --quick on two seasons (2025-2026) only; nothing is committed either way'
+        required: false
+        type: boolean
+        default: false
   schedule:
     # 06:00 UTC 15 July — deep offseason, after the season's pbp is settled.
     - cron: '0 6 15 7 *'
@@ -101,10 +106,14 @@ jobs:
         env:
           STAGE: ${{ matrix.stage }}
           QUICK: ${{ inputs.quick }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          EXTRA=""
-          if [ "${QUICK}" = "true" ]; then EXTRA="--quick"; fi
-          uv run --no-sync python -m "${STAGE}" ${EXTRA}
+          ARGS=()
+          if [ "${QUICK}" = "true" ]; then ARGS=(--quick); fi
+          # dry run: a tiny slice, always retrained (the fingerprint skip would make it a no-op);
+          # the glob is quoted so the trainer, not the shell, expands it
+          if [ "${DRY_RUN}" = "true" ]; then ARGS=(--quick --force --pbp 'nhl/pbp/parquet/play_by_play_202[56].parquet'); fi
+          uv run --no-sync python -m "${STAGE}" "${ARGS[@]}"
 
       - name: Upload retrained artifacts (promotion stays a human commit)
         if: steps.sel.outputs.selected == 'true'
