@@ -107,6 +107,7 @@ jobs:
           STAGE: ${{ matrix.stage }}
           QUICK: ${{ inputs.quick }}
           DRY_RUN: ${{ inputs.dry_run }}
+          PYTHONPATH: python   # the stage modules live in python/, as scripts/nhl_models.sh runs them
         run: |
           ARGS=()
           if [ "${QUICK}" = "true" ]; then ARGS=(--quick); fi
