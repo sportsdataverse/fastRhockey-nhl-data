@@ -1,7 +1,5 @@
-From https://github.com/sportsdataverse/fastRhockey-nhl-data
-   419f857..5d63af2  main       -> origin/main
-season 2027: handedness on 9,839/9,840 roster rows (99.99%)
-season 2027: 424295 rows across 17 datasets -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl
+season 2027: handedness on 9,997/10,000 roster rows (99.97%)
+season 2027: 430966 rows across 17 datasets -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl
 season 2027: schedule (1344 games) -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl/schedules
-2027: 54 assets uploaded
+2027: 51 assets uploaded
 pushed: NHL Data Updated (Start: 2027 End: 2027) (attempt 1)
