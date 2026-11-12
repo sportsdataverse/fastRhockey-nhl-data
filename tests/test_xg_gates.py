@@ -13,6 +13,8 @@ import json
 from pathlib import Path
 
 import pytest
+from nhl_model_01_xg_5v5 import _CV_AUC_FLOOR as FLOOR_5V5
+from nhl_model_02_xg_st import _CV_AUC_FLOOR as FLOOR_ST
 from nhl_model_02_xg_st import st_gates
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,8 +46,8 @@ def test_sidecars_travel_together() -> None:
 
 def test_frozen_cv_auc_floors_hold() -> None:
     meta = _meta()
-    assert meta["info_5v5"]["cv_auc"] >= 0.82, meta["info_5v5"]["cv_auc"]  # 5v5 floor (nhl_model_01_xg_5v5)
-    assert meta["info_st"]["cv_auc"] >= 0.81, meta["info_st"]["cv_auc"]  # ST floor (nhl_model_02_xg_st)
+    assert meta["info_5v5"]["cv_auc"] >= FLOOR_5V5, meta["info_5v5"]["cv_auc"]
+    assert meta["info_st"]["cv_auc"] >= FLOOR_ST, meta["info_st"]["cv_auc"]
 
 
 def test_st_drift_gate_holds_on_committed_meta() -> None:
