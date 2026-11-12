@@ -89,6 +89,31 @@ _LAST_EVENT_COL = {
     "GOAL": "last_goal",
 }
 
+# Every pbp column prepare_training_frame / penalty_shot_xg read (either spelling of the
+# team columns, see _harmonize). The full pbp is 94 columns x ~19M rows across seasons;
+# reading all of it killed both CI retrain jobs on 2026-11-12 (run 43147042866: no
+# output, exit 143 / cancelled), so the stages read only these.
+TRAINING_COLUMNS: tuple[str, ...] = (
+    "game_id", "season", "period_type", "event_type", "secondary_type", "strength_state",
+    "game_seconds", "x", "y", "x_fixed", "shot_distance", "shot_angle", "empty_net",
+    "home_skaters", "away_skaters", "event_team", "event_team_abbr", "home_team", "home_abbr",
+    "away_team", "away_abbr",
+)  # fmt: skip
+
+
+def load_pbp(pattern: str) -> pl.DataFrame:
+    """Concatenate the pbp parquets matching ``pattern``, reading only ``TRAINING_COLUMNS``."""
+    import pyarrow.parquet as pq
+
+    files = sorted(glob.glob(pattern))
+    if not files:
+        raise SystemExit(f"no pbp parquet matched {pattern!r}")
+    frames = []
+    for f in files:
+        present = set(pq.read_schema(f).names)
+        frames.append(pl.read_parquet(f, columns=[c for c in TRAINING_COLUMNS if c in present]))
+    return pl.concat(frames, how="diagonal_relaxed")
+
 
 def _harmonize(pbp: pl.DataFrame) -> pl.DataFrame:
     """Standardize to event_team / home_team / away_team (R column harmonisation)."""
@@ -267,7 +292,11 @@ def per_season_calibration(game_ids: np.ndarray, y: np.ndarray, p: np.ndarray) -
     (goals / xG) is the human-readable companion; ``auc`` is the per-season rank AUC.
     """
     df = pl.DataFrame(
-        {"game_id": np.asarray(game_ids, dtype=np.int64), "goal": np.asarray(y, dtype=float), "xg": np.asarray(p, dtype=float)}
+        {
+            "game_id": np.asarray(game_ids, dtype=np.int64),
+            "goal": np.asarray(y, dtype=float),
+            "xg": np.asarray(p, dtype=float),
+        }
     ).with_columns(season=season_of_game())
     tab = (
         df.group_by("season")
@@ -493,19 +522,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default="models", help="output dir for the .json models + meta + report")
     ap.add_argument("--quick", action="store_true", help="reduced grid/rounds (smoke run)")
     ap.add_argument("--figures", action="store_true", help="also write feature-importance PNGs (needs matplotlib)")
-    ap.add_argument("--variant", choices=["5v5", "st", "both"], default="both",
-                    help="train one booster (meta merges) or both")
+    ap.add_argument(
+        "--variant", choices=["5v5", "st", "both"], default="both", help="train one booster (meta merges) or both"
+    )
     args = ap.parse_args(argv)
 
-    files = sorted(glob.glob(args.pbp))
-    if not files:
-        ap.error(f"no pbp parquet matched {args.pbp!r}")
-    pbp = pl.concat([pl.read_parquet(f) for f in files], how="diagonal_relaxed")
+    pbp = load_pbp(args.pbp)
     variants = ("5v5", "st") if args.variant == "both" else (args.variant,)
     meta = train_xg_models(pbp, args.out, quick=args.quick, figures=args.figures, variants=variants)
-    feats_bits = ", ".join(
-        f"{v} {len(meta[f'xg_feature_names_{v}'])} feats" for v in variants
-    )
+    feats_bits = ", ".join(f"{v} {len(meta[f'xg_feature_names_{v}'])} feats" for v in variants)
     print(
         f"trained xG models -> {args.out} ({feats_bits}); sidecars: {_META_FILE}, {_SPLIT_FILE}; "
         f"report: {args.out}/xg_model_report.md"

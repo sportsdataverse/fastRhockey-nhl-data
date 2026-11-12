@@ -108,6 +108,7 @@ jobs:
           QUICK: ${{ inputs.quick }}
           DRY_RUN: ${{ inputs.dry_run }}
           PYTHONPATH: python   # the stage modules live in python/, as scripts/nhl_models.sh runs them
+          PYTHONUNBUFFERED: "1"   # a killed job must still show how far it got (run 43147042866 logged nothing)
         run: |
           ARGS=()
           if [ "${QUICK}" = "true" ]; then ARGS=(--quick); fi
