@@ -37,3 +37,16 @@ def test_st_feature_recipe() -> None:
     assert len(feats) == 38, f"expected 38 st features, got {len(feats)}"
     assert {"total_skaters_on", "event_team_advantage"} <= set(feats)
     assert fst.height > 0, "ST fixture exercised no rows — recipe regressions would be invisible"
+
+
+def test_load_pbp_reads_only_training_columns_without_changing_the_frames(tmp_path) -> None:
+    from nhl_data_build.xg_train import TRAINING_COLUMNS, load_pbp, penalty_shot_xg
+
+    full = _pbp()
+    path = tmp_path / "play_by_play_2025.parquet"
+    full.write_parquet(path)
+    narrow = load_pbp(str(tmp_path / "play_by_play_*.parquet"))
+    assert set(narrow.columns) <= set(TRAINING_COLUMNS) and narrow.width < full.width
+    for variant in ("5v5", "st"):
+        assert prepare_training_frame(narrow, variant=variant).equals(prepare_training_frame(full, variant=variant))
+    assert penalty_shot_xg(narrow) == penalty_shot_xg(full)

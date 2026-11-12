@@ -23,7 +23,6 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import glob as _glob
 from pathlib import Path
 
 # Derived 2026-09-02 from the observed exact-holdout max |z| = 2.008 (season 2018, 15 holdout
@@ -61,13 +60,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     def train(out_dir: Path):
-        import polars as pl
-        from nhl_data_build.xg_train import train_xg_models
+        from nhl_data_build.xg_train import load_pbp, train_xg_models
 
-        files = sorted(_glob.glob(args.pbp))
-        if not files:
-            raise SystemExit(f"no pbp parquet matched {args.pbp!r}")
-        pbp = pl.concat([pl.read_parquet(f) for f in files], how="diagonal_relaxed")
+        pbp = load_pbp(args.pbp)
         meta = train_xg_models(pbp, out_dir, quick=args.quick, variants=("st",))
         return st_gates(meta["info_st"])
 
