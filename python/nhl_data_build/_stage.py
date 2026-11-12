@@ -24,6 +24,7 @@ if any copy fails, and the run then returns a non-zero rc.
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 from typing import Callable, Optional
@@ -126,6 +127,7 @@ def run_stage(
 
     if gates is not None and gates.get("gate_pass") is False:
         print(f"[{name}] gate: FAIL" + (" (smoke run, tolerated)" if smoke else ""))
+        print(f"[{name}] gates: {json.dumps(gates, sort_keys=True, default=str)}")
         print(f"[{name}] NOT promoted -- champion files under {champion_dir} are unchanged.")
         print(f"[{name}] candidate kept for inspection: {candidate}")
         return 0 if smoke else 1
