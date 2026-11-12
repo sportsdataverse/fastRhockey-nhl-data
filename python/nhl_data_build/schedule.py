@@ -148,11 +148,90 @@ def _write_r_typed_parquet(df: pl.DataFrame, path: Path) -> None:
     pq.write_table(tbl.cast(pa.schema(fields)), path, compression="gzip")
 
 
+_FINAL_STATES = ("OFF", "FINAL")
+# Below this many finished games a single scoreline is plausible (a test slice, a
+# season's first night); above it, it is a placeholder, not results.
+_MIN_FINALS_FOR_SCORE_CHECK = 50
+
+
+def _check_final_scores(df: pl.DataFrame, season_year: int) -> None:
+    """Refuse a schedule whose finished games all carry one scoreline.
+
+    Confirmed 2026-11-11: the ``nhl_schedules`` release assets for 2010-2013 and
+    2019-2023 (uploaded 2026-07-18, before the Python cutover) gave every final game
+    the same score (3-6 for all 1,504 games of 2022, 3-2 for 2023), while the raw
+    repo's schedules and this repo's committed copies had the real ones.
+    """
+    if not {"game_state", "home_score", "away_score"} <= set(df.columns):
+        return
+    finals = df.filter(pl.col("game_state").is_in(_FINAL_STATES))
+    if finals.height < _MIN_FINALS_FOR_SCORE_CHECK:
+        return
+    if finals.select("home_score", "away_score").unique().height == 1:
+        h, a = finals.row(0, named=True)["home_score"], finals.row(0, named=True)["away_score"]
+        raise ValueError(
+            f"schedule {season_year}: all {finals.height} final games score {a}-{h} (away-home); "
+            "placeholder scores, not results -- refusing to write"
+        )
+
+
+def committed_game_ids(nhl_dir: str | Path, season_year: int) -> dict[str, pl.DataFrame]:
+    """Each family's ``game_id`` set from this repo's committed season parquets.
+
+    Lets :func:`rebuild_schedule` set the completion flags without recompiling a
+    season: the committed ``nhl/{key}/parquet/{prefix}_{year}.parquet`` files are what
+    the daily job published for that season. A missing file means that family has no
+    games that season, which flags every game False -- the same as a compile would.
+    """
+    import pyarrow.parquet as pq
+
+    out: dict[str, pl.DataFrame] = {}
+    prefixes = [(key, prefix) for key, _field, prefix, _tag, _desc in DATASETS] + [("player_box", "player_box")]
+    for key, prefix in prefixes:
+        path = Path(nhl_dir) / key / "parquet" / f"{prefix}_{season_year}.parquet"
+        if path.exists():
+            ids = pq.read_table(path, columns=["game_id"]).column("game_id").to_pylist()
+            out[key] = pl.DataFrame({"game_id": ids}, schema={"game_id": pl.Int64})
+    return out
+
+
+def rebuild_schedule(
+    nhl_dir: str | Path,
+    season_year: int,
+    *,
+    raw_base: str = RAW_BASE,
+    opener: Callable[[str], bytes | None] | None = None,
+) -> int:
+    """Rewrite one season's schedule from the raw repo, flagged against the committed
+    season files -- a schedule-only repair that recompiles no games."""
+    sched = fetch_schedule(season_year, raw_base=raw_base, opener=opener)
+    enriched = add_completion_flags(sched, committed_game_ids(nhl_dir, season_year))
+    return write_schedule(enriched, nhl_dir, season_year)
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    ap = argparse.ArgumentParser(
+        prog="python -m nhl_data_build.schedule",
+        description="Rebuild season schedules from the raw repo without recompiling the season.",
+    )
+    ap.add_argument("-s", "--start", type=int, required=True, help="start season end-year (e.g. 2023 = 2022-23)")
+    ap.add_argument("-e", "--end", type=int, help="end season end-year (default: --start)")
+    ap.add_argument("--nhl-dir", default="nhl", help="this repo's committed nhl/ data dir (read and written)")
+    args = ap.parse_args(argv)
+    for year in range(args.start, (args.end or args.start) + 1):
+        n = rebuild_schedule(args.nhl_dir, year)
+        print(f"season {year}: schedule ({n} games) -> {args.nhl_dir}/schedules")
+    return 0
+
+
 def write_schedule(df: pl.DataFrame, out_dir: str | Path, season_year: int) -> int:
     """Write to ``{out_dir}/schedules/{parquet,rds,csv}/nhl_schedule_{year}.*`` --
     the exact path ``fetch.py`` and the raw repo's own convention expect."""
     if df.height == 0:
         return 0
+    _check_final_scores(df, season_year)
     flat = prepare_for_parquet(df, "schedules")
     out = Path(out_dir)
     for sub in ("parquet", "rds", "csv"):
@@ -182,3 +261,7 @@ def build_and_write_schedule(
     sched = fetch_schedule(season_year, raw_base=raw_base)
     enriched = add_completion_flags(sched, season)
     return write_schedule(enriched, out_dir, season_year)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
