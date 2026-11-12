@@ -131,6 +131,6 @@ jobs:
             models/xg_model_*.json
             models/xg_model_report.md
             models/ledger.jsonl
-            models/.candidate/**/xg_model_meta.json
+            models/.candidate/**/xg_model_*.json
           if-no-files-found: warn
           retention-days: 30
