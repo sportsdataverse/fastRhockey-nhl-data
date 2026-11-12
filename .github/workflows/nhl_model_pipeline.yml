@@ -118,10 +118,12 @@ jobs:
           uv run --no-sync python -m "${STAGE}" "${ARGS[@]}"
 
       - name: Upload retrained artifacts (promotion stays a human commit)
-        if: steps.sel.outputs.selected == 'true'
+        # always(): a gate FAIL exits 1, and its ledger row + candidate are what explain it
+        if: always() && steps.sel.outputs.selected == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: nhl-xg-${{ matrix.stage }}
+          include-hidden-files: true   # the failed candidate lives under models/.candidate/
           # models/xg_model_*.json covers the boosters plus the
           # xg_model_meta.json / xg_model_split.json sidecars. Keep the glob
           # lines bare: @actions/glob takes the WHOLE line, '#' included.
@@ -129,5 +131,6 @@ jobs:
             models/xg_model_*.json
             models/xg_model_report.md
             models/ledger.jsonl
+            models/.candidate/**/xg_model_meta.json
           if-no-files-found: warn
           retention-days: 30
