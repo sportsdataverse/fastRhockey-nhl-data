@@ -1,33 +1,5 @@
 season 2015: handedness on 52,757/52,757 roster rows (100.0%)
 season 2015: 1977430 rows across 18 datasets -> C:/Users/saiem/Documents/GitHub-Data/sdv-dev/hockey-dev/fastRhockey-nhl-data/nhl
 season 2015: schedule (1319 games) -> C:/Users/saiem/Documents/GitHub-Data/sdv-dev/hockey-dev/fastRhockey-nhl-data/nhl/schedules
-HTTP 403: API rate limit exceeded for user ID 25425933. If you reach out to GitHub Support for help, please include the request ID DC3F:B53E2:35BAAE:ABF60A:6AF7282E and timestamp 2026-11-13 15:09:34 UTC. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) (https://api.github.com/repos/sportsdataverse/sportsdataverse-data/releases/assets/391393857)
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "C:\Users\saiem\Documents\GitHub-Data\sdv-dev\hockey-dev\fastRhockey-nhl-data\python\nhl_data_19_publish.py", line 40, in <module>
-    raise SystemExit(main())
-                     ~~~~^^
-  File "C:\Users\saiem\Documents\GitHub-Data\sdv-dev\hockey-dev\fastRhockey-nhl-data\python\nhl_data_19_publish.py", line 34, in main
-    done = publish_season(a.out_dir, season, repo=a.repo, dry_run=a.dry_run)
-  File "C:\Users\saiem\Documents\GitHub-Data\sdv-dev\hockey-dev\fastRhockey-nhl-data\python\nhl_data_build\publish.py", line 148, in publish_season
-    publish_file(path, tag, repo=repo)
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\saiem\Documents\GitHub-Data\sdv-dev\hockey-dev\fastRhockey-nhl-data\python\nhl_data_build\publish.py", line 104, in publish_file
-    _gh(["release", "upload", release_tag, str(path), "--repo", repo, "--clobber"])
-    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\saiem\Documents\GitHub-Data\sdv-dev\hockey-dev\fastRhockey-nhl-data\python\nhl_data_build\publish.py", line 66, in _gh
-    return subprocess.run(
-           ~~~~~~~~~~~~~~^
-        ["gh", *args],
-        ^^^^^^^^^^^^^^
-    ...<3 lines>...
-        timeout=600,  # fail fast instead of hanging the daily workflow on a stuck upload/auth prompt
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ).stdout
-    ^
-  File "C:\Users\saiem\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\Lib\subprocess.py", line 577, in run
-    raise CalledProcessError(retcode, process.args,
-                             output=stdout, stderr=stderr)
-subprocess.CalledProcessError: Command '['gh', 'release', 'upload', 'nhl_pbp_full', 'C:\\Users\\saiem\\Documents\\GitHub-Data\\sdv-dev\\hockey-dev\\fastRhockey-nhl-data\\nhl\\pbp\\rds\\play_by_play_2015.rds', '--repo', 'sportsdataverse/sportsdataverse-data', '--clobber']' returned non-zero exit status 1.
+2015: 44 assets uploaded
 pushed: NHL Data Updated (Start: 2015 End: 2015) (attempt 1)
