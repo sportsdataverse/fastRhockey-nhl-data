@@ -1,0 +1,684 @@
+{
+  "xg_model_ps": 0.3183705,
+  "seed": 37,
+  "xgboost_version": "3.3.0",
+  "split_file": "xg_model_split.json",
+  "corpus_seasons": [
+    "20092010",
+    "20102011",
+    "20112012",
+    "20122013",
+    "20132014",
+    "20142015",
+    "20152016",
+    "20162017",
+    "20172018",
+    "20182019",
+    "20192020",
+    "20202021",
+    "20212022",
+    "20222023",
+    "20232024",
+    "20242025",
+    "20252026",
+    "20262027"
+  ],
+  "xg_feature_names_5v5": [
+    "shot_distance",
+    "shot_angle",
+    "rebound",
+    "rush",
+    "time_since_last",
+    "distance_from_last",
+    "cross_ice_event",
+    "empty_net",
+    "last_x",
+    "last_y",
+    "era_2011_2013",
+    "era_2014_2018",
+    "era_2019_2021",
+    "era_2022_2024",
+    "era_2025_on",
+    "wrist_shot",
+    "snap_shot",
+    "slap_shot",
+    "backhand",
+    "wrap_around",
+    "tip_in",
+    "deflected",
+    "poke",
+    "batted",
+    "between_legs",
+    "cradle",
+    "last_faceoff",
+    "last_giveaway",
+    "last_takeaway",
+    "last_blocked_shot",
+    "last_hit",
+    "last_missed_shot",
+    "last_shot",
+    "last_stop",
+    "last_penalty",
+    "last_goal"
+  ],
+  "info_5v5": {
+    "trained_at": "2026-11-12T10:15:02+00:00",
+    "min_child_weight": 7,
+    "nrounds": 1327,
+    "n_train": 1485915,
+    "n_test": 372192,
+    "n_games_train": 17764,
+    "n_games_test": 4441,
+    "goal_rate": 0.0677,
+    "cv_logloss": 0.2116,
+    "cv_auc": 0.7787,
+    "test_logloss": 0.2112,
+    "baseline_logloss": 0.2476,
+    "test_auc": 0.7797,
+    "per_season_calibration": [
+      {
+        "season": 2009,
+        "n": 21894,
+        "goals": 1439,
+        "xg_sum": 1471.71,
+        "goal_rate": 0.0657,
+        "mean_xg": 0.0672,
+        "ratio": 0.9778,
+        "se_ratio": 0.024,
+        "z": -0.9268833421174618,
+        "auc": 0.7723
+      },
+      {
+        "season": 2010,
+        "n": 22592,
+        "goals": 1497,
+        "xg_sum": 1474.53,
+        "goal_rate": 0.0663,
+        "mean_xg": 0.0653,
+        "ratio": 1.0152,
+        "se_ratio": 0.0238,
+        "z": 0.6400250402407045,
+        "auc": 0.7919
+      },
+      {
+        "season": 2011,
+        "n": 18818,
+        "goals": 1181,
+        "xg_sum": 1201.29,
+        "goal_rate": 0.0628,
+        "mean_xg": 0.0638,
+        "ratio": 0.9831,
+        "se_ratio": 0.0265,
+        "z": -0.6370759298862311,
+        "auc": 0.7747
+      },
+      {
+        "season": 2012,
+        "n": 14751,
+        "goals": 967,
+        "xg_sum": 962.0,
+        "goal_rate": 0.0656,
+        "mean_xg": 0.0652,
+        "ratio": 1.0052,
+        "se_ratio": 0.0295,
+        "z": 0.17652561589754193,
+        "auc": 0.7867
+      },
+      {
+        "season": 2013,
+        "n": 21102,
+        "goals": 1359,
+        "xg_sum": 1331.71,
+        "goal_rate": 0.0644,
+        "mean_xg": 0.0631,
+        "ratio": 1.0205,
+        "se_ratio": 0.0252,
+        "z": 0.8126667795972804,
+        "auc": 0.7739
+      },
+      {
+        "season": 2014,
+        "n": 22650,
+        "goals": 1455,
+        "xg_sum": 1473.28,
+        "goal_rate": 0.0642,
+        "mean_xg": 0.065,
+        "ratio": 0.9876,
+        "se_ratio": 0.0239,
+        "z": -0.5191481863038437,
+        "auc": 0.7699
+      },
+      {
+        "season": 2015,
+        "n": 21258,
+        "goals": 1369,
+        "xg_sum": 1432.19,
+        "goal_rate": 0.0644,
+        "mean_xg": 0.0674,
+        "ratio": 0.9559,
+        "se_ratio": 0.024,
+        "z": -1.836538120552847,
+        "auc": 0.7934
+      },
+      {
+        "season": 2016,
+        "n": 22061,
+        "goals": 1494,
+        "xg_sum": 1465.67,
+        "goal_rate": 0.0677,
+        "mean_xg": 0.0664,
+        "ratio": 1.0193,
+        "se_ratio": 0.0239,
+        "z": 0.809594074697414,
+        "auc": 0.7792
+      },
+      {
+        "season": 2017,
+        "n": 24156,
+        "goals": 1563,
+        "xg_sum": 1585.11,
+        "goal_rate": 0.0647,
+        "mean_xg": 0.0656,
+        "ratio": 0.9861,
+        "se_ratio": 0.023,
+        "z": -0.6073786065041838,
+        "auc": 0.7797
+      },
+      {
+        "season": 2018,
+        "n": 21902,
+        "goals": 1550,
+        "xg_sum": 1503.31,
+        "goal_rate": 0.0708,
+        "mean_xg": 0.0686,
+        "ratio": 1.0311,
+        "se_ratio": 0.0236,
+        "z": 1.3169479360690097,
+        "auc": 0.7809
+      },
+      {
+        "season": 2019,
+        "n": 19306,
+        "goals": 1341,
+        "xg_sum": 1340.33,
+        "goal_rate": 0.0695,
+        "mean_xg": 0.0694,
+        "ratio": 1.0005,
+        "se_ratio": 0.0249,
+        "z": 0.020028607627491587,
+        "auc": 0.7815
+      },
+      {
+        "season": 2020,
+        "n": 15462,
+        "goals": 1097,
+        "xg_sum": 1068.97,
+        "goal_rate": 0.0709,
+        "mean_xg": 0.0691,
+        "ratio": 1.0262,
+        "se_ratio": 0.0279,
+        "z": 0.9392298024105253,
+        "auc": 0.7772
+      },
+      {
+        "season": 2021,
+        "n": 23257,
+        "goals": 1676,
+        "xg_sum": 1650.55,
+        "goal_rate": 0.0721,
+        "mean_xg": 0.071,
+        "ratio": 1.0154,
+        "se_ratio": 0.0225,
+        "z": 0.684392817780424,
+        "auc": 0.7605
+      },
+      {
+        "season": 2022,
+        "n": 25375,
+        "goals": 1784,
+        "xg_sum": 1845.99,
+        "goal_rate": 0.0703,
+        "mean_xg": 0.0727,
+        "ratio": 0.9664,
+        "se_ratio": 0.0214,
+        "z": -1.5716615003806045,
+        "auc": 0.7675
+      },
+      {
+        "season": 2023,
+        "n": 25862,
+        "goals": 1806,
+        "xg_sum": 1811.93,
+        "goal_rate": 0.0698,
+        "mean_xg": 0.0701,
+        "ratio": 0.9967,
+        "se_ratio": 0.0215,
+        "z": -0.15241502015082345,
+        "auc": 0.7805
+      },
+      {
+        "season": 2024,
+        "n": 24048,
+        "goals": 1649,
+        "xg_sum": 1650.71,
+        "goal_rate": 0.0686,
+        "mean_xg": 0.0686,
+        "ratio": 0.999,
+        "se_ratio": 0.0225,
+        "z": -0.0461113611837097,
+        "auc": 0.8
+      },
+      {
+        "season": 2025,
+        "n": 23254,
+        "goals": 1645,
+        "xg_sum": 1712.25,
+        "goal_rate": 0.0707,
+        "mean_xg": 0.0736,
+        "ratio": 0.9607,
+        "se_ratio": 0.022,
+        "z": -1.783404904265505,
+        "auc": 0.7821
+      },
+      {
+        "season": 2026,
+        "n": 4444,
+        "goals": 325,
+        "xg_sum": 339.02,
+        "goal_rate": 0.0731,
+        "mean_xg": 0.0763,
+        "ratio": 0.9586,
+        "se_ratio": 0.0497,
+        "z": -0.832385195289791,
+        "auc": 0.762
+      }
+    ],
+    "max_abs_season_z": 1.836538120552847,
+    "importance": [
+      {
+        "feature": "empty_net",
+        "gain": 559.39
+      },
+      {
+        "feature": "rebound",
+        "gain": 131.61
+      },
+      {
+        "feature": "shot_distance",
+        "gain": 123.6
+      },
+      {
+        "feature": "snap_shot",
+        "gain": 67.04
+      },
+      {
+        "feature": "cross_ice_event",
+        "gain": 55.96
+      },
+      {
+        "feature": "backhand",
+        "gain": 51.91
+      },
+      {
+        "feature": "wrap_around",
+        "gain": 47.38
+      },
+      {
+        "feature": "slap_shot",
+        "gain": 46.56
+      },
+      {
+        "feature": "last_hit",
+        "gain": 46.0
+      },
+      {
+        "feature": "wrist_shot",
+        "gain": 44.7
+      },
+      {
+        "feature": "era_2025_on",
+        "gain": 39.72
+      },
+      {
+        "feature": "shot_angle",
+        "gain": 33.17
+      },
+      {
+        "feature": "tip_in",
+        "gain": 26.73
+      },
+      {
+        "feature": "time_since_last",
+        "gain": 23.75
+      },
+      {
+        "feature": "era_2022_2024",
+        "gain": 23.61
+      }
+    ]
+  },
+  "xg_feature_names_st": [
+    "shot_distance",
+    "shot_angle",
+    "rebound",
+    "rush",
+    "time_since_last",
+    "distance_from_last",
+    "cross_ice_event",
+    "empty_net",
+    "last_x",
+    "last_y",
+    "era_2011_2013",
+    "era_2014_2018",
+    "era_2019_2021",
+    "era_2022_2024",
+    "era_2025_on",
+    "total_skaters_on",
+    "event_team_advantage",
+    "wrist_shot",
+    "snap_shot",
+    "slap_shot",
+    "backhand",
+    "wrap_around",
+    "tip_in",
+    "deflected",
+    "poke",
+    "batted",
+    "between_legs",
+    "cradle",
+    "last_faceoff",
+    "last_giveaway",
+    "last_takeaway",
+    "last_blocked_shot",
+    "last_hit",
+    "last_missed_shot",
+    "last_shot",
+    "last_stop",
+    "last_penalty",
+    "last_goal"
+  ],
+  "info_st": {
+    "trained_at": "2026-11-12T08:25:30+00:00",
+    "min_child_weight": 8,
+    "nrounds": 537,
+    "n_train": 303626,
+    "n_test": 75335,
+    "n_games_train": 16560,
+    "n_games_test": 4141,
+    "goal_rate": 0.1024,
+    "cv_logloss": 0.2825,
+    "cv_auc": 0.757,
+    "test_logloss": 0.2806,
+    "baseline_logloss": 0.3283,
+    "test_auc": 0.7557,
+    "per_season_calibration": [
+      {
+        "season": 2010,
+        "n": 5222,
+        "goals": 435,
+        "xg_sum": 491.28,
+        "goal_rate": 0.0833,
+        "mean_xg": 0.0941,
+        "ratio": 0.8854,
+        "se_ratio": 0.0402,
+        "z": -2.8464838692434595,
+        "auc": 0.7401
+      },
+      {
+        "season": 2011,
+        "n": 4626,
+        "goals": 404,
+        "xg_sum": 421.88,
+        "goal_rate": 0.0873,
+        "mean_xg": 0.0912,
+        "ratio": 0.9576,
+        "se_ratio": 0.0436,
+        "z": -0.971024422933295,
+        "auc": 0.7984
+      },
+      {
+        "season": 2012,
+        "n": 3043,
+        "goals": 284,
+        "xg_sum": 286.97,
+        "goal_rate": 0.0933,
+        "mean_xg": 0.0943,
+        "ratio": 0.9896,
+        "se_ratio": 0.0528,
+        "z": -0.19630399255100683,
+        "auc": 0.74
+      },
+      {
+        "season": 2013,
+        "n": 4898,
+        "goals": 427,
+        "xg_sum": 447.29,
+        "goal_rate": 0.0872,
+        "mean_xg": 0.0913,
+        "ratio": 0.9546,
+        "se_ratio": 0.0424,
+        "z": -1.069446247947886,
+        "auc": 0.749
+      },
+      {
+        "season": 2014,
+        "n": 4397,
+        "goals": 416,
+        "xg_sum": 407.75,
+        "goal_rate": 0.0946,
+        "mean_xg": 0.0927,
+        "ratio": 1.0202,
+        "se_ratio": 0.0441,
+        "z": 0.4585579766505754,
+        "auc": 0.759
+      },
+      {
+        "season": 2015,
+        "n": 4294,
+        "goals": 407,
+        "xg_sum": 411.5,
+        "goal_rate": 0.0948,
+        "mean_xg": 0.0958,
+        "ratio": 0.9891,
+        "se_ratio": 0.0439,
+        "z": -0.2491398591103779,
+        "auc": 0.7495
+      },
+      {
+        "season": 2016,
+        "n": 4409,
+        "goals": 415,
+        "xg_sum": 430.49,
+        "goal_rate": 0.0941,
+        "mean_xg": 0.0976,
+        "ratio": 0.964,
+        "se_ratio": 0.0429,
+        "z": -0.8390786112494976,
+        "auc": 0.7509
+      },
+      {
+        "season": 2017,
+        "n": 5487,
+        "goals": 581,
+        "xg_sum": 545.84,
+        "goal_rate": 0.1059,
+        "mean_xg": 0.0995,
+        "ratio": 1.0644,
+        "se_ratio": 0.0377,
+        "z": 1.709354271689955,
+        "auc": 0.7572
+      },
+      {
+        "season": 2018,
+        "n": 4900,
+        "goals": 537,
+        "xg_sum": 524.61,
+        "goal_rate": 0.1096,
+        "mean_xg": 0.1071,
+        "ratio": 1.0236,
+        "se_ratio": 0.0381,
+        "z": 0.6196050342358062,
+        "auc": 0.7459
+      },
+      {
+        "season": 2019,
+        "n": 3893,
+        "goals": 399,
+        "xg_sum": 403.25,
+        "goal_rate": 0.1025,
+        "mean_xg": 0.1036,
+        "ratio": 0.9895,
+        "se_ratio": 0.044,
+        "z": -0.2393951801148681,
+        "auc": 0.7568
+      },
+      {
+        "season": 2020,
+        "n": 2982,
+        "goals": 330,
+        "xg_sum": 325.47,
+        "goal_rate": 0.1107,
+        "mean_xg": 0.1091,
+        "ratio": 1.0139,
+        "se_ratio": 0.0481,
+        "z": 0.289686935020149,
+        "auc": 0.7693
+      },
+      {
+        "season": 2021,
+        "n": 5526,
+        "goals": 598,
+        "xg_sum": 588.55,
+        "goal_rate": 0.1082,
+        "mean_xg": 0.1065,
+        "ratio": 1.0161,
+        "se_ratio": 0.036,
+        "z": 0.446384943057802,
+        "auc": 0.7582
+      },
+      {
+        "season": 2022,
+        "n": 5408,
+        "goals": 613,
+        "xg_sum": 588.46,
+        "goal_rate": 0.1134,
+        "mean_xg": 0.1088,
+        "ratio": 1.0417,
+        "se_ratio": 0.0364,
+        "z": 1.1461918869076095,
+        "auc": 0.7368
+      },
+      {
+        "season": 2023,
+        "n": 4699,
+        "goals": 513,
+        "xg_sum": 522.6,
+        "goal_rate": 0.1092,
+        "mean_xg": 0.1112,
+        "ratio": 0.9816,
+        "se_ratio": 0.0384,
+        "z": -0.4781802473064221,
+        "auc": 0.7683
+      },
+      {
+        "season": 2024,
+        "n": 4967,
+        "goals": 558,
+        "xg_sum": 555.92,
+        "goal_rate": 0.1123,
+        "mean_xg": 0.1119,
+        "ratio": 1.0037,
+        "se_ratio": 0.037,
+        "z": 0.10130199093103415,
+        "auc": 0.7504
+      },
+      {
+        "season": 2025,
+        "n": 5348,
+        "goals": 587,
+        "xg_sum": 621.76,
+        "goal_rate": 0.1098,
+        "mean_xg": 0.1163,
+        "ratio": 0.9441,
+        "se_ratio": 0.0351,
+        "z": -1.5913870529546625,
+        "auc": 0.7582
+      },
+      {
+        "season": 2026,
+        "n": 1236,
+        "goals": 139,
+        "xg_sum": 142.55,
+        "goal_rate": 0.1125,
+        "mean_xg": 0.1153,
+        "ratio": 0.9751,
+        "se_ratio": 0.0748,
+        "z": -0.33276916697178394,
+        "auc": 0.7184
+      }
+    ],
+    "max_abs_season_z": 2.8464838692434595,
+    "importance": [
+      {
+        "feature": "empty_net",
+        "gain": 379.47
+      },
+      {
+        "feature": "rebound",
+        "gain": 83.58
+      },
+      {
+        "feature": "shot_distance",
+        "gain": 57.48
+      },
+      {
+        "feature": "event_team_advantage",
+        "gain": 45.58
+      },
+      {
+        "feature": "snap_shot",
+        "gain": 41.04
+      },
+      {
+        "feature": "total_skaters_on",
+        "gain": 35.84
+      },
+      {
+        "feature": "last_faceoff",
+        "gain": 33.6
+      },
+      {
+        "feature": "cross_ice_event",
+        "gain": 27.81
+      },
+      {
+        "feature": "era_2025_on",
+        "gain": 24.03
+      },
+      {
+        "feature": "wrist_shot",
+        "gain": 20.99
+      },
+      {
+        "feature": "time_since_last",
+        "gain": 20.21
+      },
+      {
+        "feature": "backhand",
+        "gain": 19.88
+      },
+      {
+        "feature": "slap_shot",
+        "gain": 17.87
+      },
+      {
+        "feature": "era_2022_2024",
+        "gain": 17.13
+      },
+      {
+        "feature": "tip_in",
+        "gain": 15.8
+      }
+    ]
+  }
+}

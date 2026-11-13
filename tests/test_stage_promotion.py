@@ -175,3 +175,28 @@ def test_promotion_is_all_or_nothing_when_a_copy_fails(tmp_path, monkeypatch):
     after = {p.name: _sha(p) for p in models.iterdir() if p.is_file()}
     assert after == before, "promotion tore the champion: some files were replaced, others were not"
     assert not (models / ".fingerprints.json").is_file()  # a torn run is not recorded as done
+
+
+def test_promotion_keeps_the_ledger_row_it_just_wrote(tmp_path, monkeypatch):
+    """The ledger lives IN models/ (the champion dir) in production.
+
+    Regression for run 43181159544: the candidate was seeded with every champion
+    file, ledger.jsonl included, and promotion copied that stale ledger back over
+    the row ``run_stage`` had just appended -- both promoting runs left no trace.
+    """
+    models, artifacts = _champion(tmp_path)
+    ledger = models / "ledger.jsonl"
+    ledger.write_text('{"model": "old"}\n', encoding="utf-8")
+    monkeypatch.setattr("nhl_data_build._stage.LEDGER", ledger)
+
+    def train(out_dir: Path):
+        _write_candidate(out_dir, "PASSED")
+        return {"cv_auc": 0.84, "gate_pass": True}
+
+    rc = run_stage(
+        name="xg_5v5", suite="nhl_data_build", config={"model": "xg_5v5"}, artifacts=artifacts, train=train, force=True
+    )
+
+    assert rc == 0
+    rows = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert [r["model"] for r in rows] == ["old", "xg_5v5"], rows

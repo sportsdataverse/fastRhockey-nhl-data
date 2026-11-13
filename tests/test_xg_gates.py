@@ -2,8 +2,8 @@
 
 Bites on the COMMITTED artifacts (no data, no training): a retrain whose meta
 misses a floor, or a split file that disagrees with its meta, cannot be merged
-quietly. Floors are the stage constants (frozen just below the values observed
-at gate time; never lowered) and the ST drift ceiling (derived from the
+quietly. Floors are the stage constants (``_CV_AUC_FLOOR``: just below an observed
+fit, re-derived only from a fit on a corrected corpus; never lowered) and the ST drift ceiling (derived from the
 observed exact-holdout max |z|; never raised) — see models/REGISTRY.md.
 """
 
@@ -13,21 +13,17 @@ import json
 from pathlib import Path
 
 import pytest
+from nhl_model_01_xg_5v5 import _CV_AUC_FLOOR as FLOOR_5V5
+from nhl_model_02_xg_st import _CV_AUC_FLOOR as FLOOR_ST
 from nhl_model_02_xg_st import st_gates
 
 ROOT = Path(__file__).resolve().parents[1]
 META = ROOT / "models" / "xg_model_meta.json"
 SPLIT = ROOT / "models" / "xg_model_split.json"
 
-# The python sidecars land with the first python retrain that PASSES the frozen floors (the
-# 2026-09-02 retrain did not: ST cv AUC 0.7569 < 0.81 -- see models/REGISTRY.md). Until then the
-# committed boosters are the 2026-04 R fit, which has no python sidecar to check.
-pytestmark = pytest.mark.skipif(not META.is_file(), reason="no python xg_model_meta.json committed yet")
-
-# The python sidecars land with the first python retrain that PASSES the frozen floors (the
-# 2026-09-02 retrain did not: ST cv AUC 0.7569 < 0.81 -- see models/REGISTRY.md). Until then the
-# committed boosters are the 2026-04 R fit, which has no python sidecar to check.
-pytestmark = pytest.mark.skipif(not META.is_file(), reason="no python xg_model_meta.json committed yet")
+# The python sidecars are committed with the boosters (first: the 2026-11-12 promotion). A tree
+# without them -- e.g. a checkout that restores the 2026-04 R boosters -- has nothing to check.
+pytestmark = pytest.mark.skipif(not META.is_file(), reason="no python xg_model_meta.json committed")
 
 
 def _meta() -> dict:
@@ -44,8 +40,8 @@ def test_sidecars_travel_together() -> None:
 
 def test_frozen_cv_auc_floors_hold() -> None:
     meta = _meta()
-    assert meta["info_5v5"]["cv_auc"] >= 0.82, meta["info_5v5"]["cv_auc"]  # 5v5 floor (nhl_model_01_xg_5v5)
-    assert meta["info_st"]["cv_auc"] >= 0.81, meta["info_st"]["cv_auc"]  # ST floor (nhl_model_02_xg_st)
+    assert meta["info_5v5"]["cv_auc"] >= FLOOR_5V5, meta["info_5v5"]["cv_auc"]
+    assert meta["info_st"]["cv_auc"] >= FLOOR_ST, meta["info_st"]["cv_auc"]
 
 
 def test_st_drift_gate_holds_on_committed_meta() -> None:

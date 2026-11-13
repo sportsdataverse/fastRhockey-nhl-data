@@ -50,7 +50,9 @@ def _seed_candidate(champion_dir: Path, candidate: Path) -> None:
     if not champion_dir.is_dir():
         return
     for src in champion_dir.iterdir():
-        if src.is_file() and not src.name.startswith("."):
+        # the ledger is appended to in place while the candidate trains; a seeded copy
+        # would be promoted back over the new row (run 43181159544 lost both rows that way)
+        if src.is_file() and not src.name.startswith(".") and src.resolve() != LEDGER.resolve():
             shutil.copy2(src, candidate / src.name)
 
 
