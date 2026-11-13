@@ -1,7 +1,5 @@
-From https://github.com/sportsdataverse/fastRhockey-nhl-data
-   d3db0b8..488d511  fix/xg-train-column-pruned-load -> origin/fix/xg-train-column-pruned-load
-season 2027: handedness on 11,905/11,920 roster rows (99.87%)
-season 2027: 514085 rows across 17 datasets -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl
+season 2027: handedness on 12,344/12,360 roster rows (99.87%)
+season 2027: 532847 rows across 17 datasets -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl
 season 2027: schedule (1344 games) -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl/schedules
 2027: 54 assets uploaded
 pushed: NHL Data Updated (Start: 2027 End: 2027) (attempt 1)
