@@ -24,6 +24,7 @@ _PUBLISH: list[tuple[str, str, str]] = [(prefix, tag, key) for key, _field, pref
 _PUBLISH += [
     ("play_by_play_lite", "nhl_pbp_lite", "pbp_lite"),
     ("player_box", "nhl_player_boxscores", "player_box"),
+    ("rosters", "nhl_rosters", "rosters"),  # R STEP 4; dropped by the Python port until 2026-11-13
     ("nhl_schedule", "nhl_schedules", "schedules"),
 ]
 
@@ -46,6 +47,7 @@ PKG_FUNCTION: dict[str, str] = {
     "nhl_pbp_lite": "fastRhockey::load_nhl_pbp_lite()",
     "nhl_penalties": "fastRhockey::load_nhl_penalties()",
     "nhl_player_boxscores": "fastRhockey::load_nhl_player_boxscores()",
+    "nhl_rosters": "fastRhockey::load_nhl_rosters()",
     "nhl_schedules": "fastRhockey::load_nhl_schedule()",
     "nhl_scoring": "fastRhockey::load_nhl_scoring()",
     "nhl_scratches": "fastRhockey::load_nhl_scratches()",

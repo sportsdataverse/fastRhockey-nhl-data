@@ -35,6 +35,7 @@ DATASETS: list[tuple[str, str, str, str, str]] = [
 TYPES: dict[str, str] = {key: desc for key, _f, _p, _t, desc in DATASETS} | {
     "pbp_lite": "NHL play-by-play data (lite)",
     "player_box": "NHL player boxscores",
+    "rosters": "NHL rosters",
 }
 
 # Blocks that are a direct list-of-rows in final.json -> attach game_id/season/game_date.

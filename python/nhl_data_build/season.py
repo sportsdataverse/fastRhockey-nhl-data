@@ -18,7 +18,7 @@ from pathlib import Path
 import polars as pl
 from sportsdataverse._rds import write_rds
 
-from nhl_data_build.build import build_season, pbp_lite
+from nhl_data_build.build import build_season, pbp_lite, season_rosters
 from nhl_data_build.config import DATASETS, TYPES
 from nhl_data_build.flatten import prepare_for_parquet
 
@@ -121,6 +121,8 @@ def write_datasets(
     if "pbp" in season:
         _write(pbp_lite(season["pbp"]), "pbp_lite", "play_by_play_lite")
     _write(season.get("player_box"), "player_box", "player_box")
+    if "game_rosters" in season:
+        _write(season_rosters(season["game_rosters"], season_year), "rosters", "rosters")
     return written
 
 

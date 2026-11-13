@@ -35,6 +35,10 @@ def test_build_and_write(tmp_path: Path) -> None:
     assert written["skater_box"] == 36
     assert (out / "skater_box" / "parquet" / "skater_box_2025.parquet").exists()
     assert (out / "pbp_lite" / "parquet" / "play_by_play_lite_2025.parquet").exists()
+    # nhl_rosters: game_rosters minus game_id (the R STEP 4 derive the port had dropped)
+    rosters = pl.read_parquet(out / "rosters" / "parquet" / "rosters_2025.parquet")
+    assert "game_id" not in rosters.columns and rosters.height == written["rosters"] > 0
+    assert rosters["season"].unique().to_list() == [2025]  # END year, not the API id 20242025
 
     # nested datasets are flattened on write
     scoring = pl.read_parquet(out / "scoring" / "parquet" / "scoring_2025.parquet")

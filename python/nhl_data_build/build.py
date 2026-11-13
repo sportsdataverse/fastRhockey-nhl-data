@@ -23,6 +23,20 @@ def pbp_lite(pbp: pl.DataFrame) -> pl.DataFrame:
     return pbp.filter(pl.col("event_type") != "CHANGE")
 
 
+def season_rosters(game_rosters: pl.DataFrame, season_year: int) -> pl.DataFrame:
+    """Port of R STEP 4 (``nhl_rosters``): game_rosters minus ``game_id``, distinct.
+
+    R overwrites ``season`` with the END year (``rosters_unique$season <- season_year``):
+    game_rosters carries the API id (20262027), the nhl_rosters tag has always shipped 2027.
+    Int32 = the R integer every prior rosters_{year} asset carries.
+    """
+    return (
+        game_rosters.drop("game_id", strict=False)
+        .with_columns(season=pl.lit(season_year, dtype=pl.Int32))
+        .unique(maintain_order=True)
+    )
+
+
 def _rows_to_frame(rows: list[dict]) -> pl.DataFrame:
     # infer_schema_length=None scans the whole batch so heterogeneous dicts (e.g. player_box =
     # skater+goalie column union) bind cleanly without per-row frame construction.
