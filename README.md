@@ -575,8 +575,8 @@ The final model performance:
 
 | Model | CV Log-loss | CV AUC |
 |:-----:|:-----------:|:------:|
-|  5v5  |   0.2116    | 0.7787 |
-|  ST   |   0.2825    | 0.7570 |
+|  5v5  |   0.1906    | 0.7820 |
+|  ST   |   0.2806    | 0.7574 |
 
 Both log-loss and AUC are between 0 and 1. A *lower* log-loss is better;
 a *higher* AUC is better. Gaurav Dembla provides great resources on

@@ -31,6 +31,23 @@ def test_5v5_feature_recipe() -> None:
     assert "goal" in f5.columns and f5.height > 0
 
 
+def test_5v5_frame_is_the_5v5_population_the_scorers_route_to_it() -> None:
+    """The 5v5 booster scores only strength_state == "5v5" shots (fastRhockey, nhl-raw,
+    sportsdataverse-py), so it must be fit on exactly those: a frame that also carries power-play
+    shots teaches it a blended conversion rate it then applies to 5v5 shots."""
+    pbp = _pbp()
+    f5 = prepare_training_frame(pbp, variant="5v5")
+    unblocked = pbp.filter(
+        pl.col("event_type").is_in(["SHOT", "MISSED_SHOT", "GOAL"])
+        & (pl.col("period_type") != "SHOOTOUT")
+        & ((pl.col("secondary_type") != "Penalty Shot") | pl.col("secondary_type").is_null())
+    )
+    n5 = unblocked.filter(pl.col("strength_state") == "5v5").height
+    assert unblocked.height > n5 > 0, "fixture must carry both 5v5 and non-5v5 shots"
+    assert f5.height <= n5, f"5v5 frame has {f5.height} rows, more than the {n5} 5v5 shots"
+    assert f5.height >= 0.9 * n5
+
+
 def test_st_feature_recipe() -> None:
     fst = prepare_training_frame(_pbp(), variant="st")
     feats = [c for c in fst.columns if c not in ("game_id", "goal")]

@@ -291,6 +291,8 @@ model_feats_5v5 <- c(
 pbp_shots_5v5 <- pbp_all %>%
     # filter out shootouts
     filter(period_type != "SHOOTOUT") %>%
+    # 5v5 only: every scorer routes only strength_state == "5v5" shots to this booster
+    filter(strength_state == "5v5") %>%
     # remove penalty shots
     filter(secondary_type != "Penalty Shot" | is.na(secondary_type)) %>%
     # add model feature variables

@@ -29,12 +29,12 @@ suites:
         stage: python/nhl_model_01_xg_5v5.py
         artifact: models/xg_model_5v5.json
         release_tag: null  # committed artifact; output ships in nhl_pbp_full
-        gate: "cv_auc >= 0.77 (observed 0.7787)"
+        gate: "cv_auc >= 0.77 (observed 0.782; fit on 5v5 shots only)"
       xg_st:
         stage: python/nhl_model_02_xg_st.py
         artifact: models/xg_model_st.json
         release_tag: null
-        gate: "cv_auc >= 0.75 (observed 0.7570); max holdout-season |z| <= 3.0 (observed 2.846)"
+        gate: "cv_auc >= 0.75 (observed 0.7574); max holdout-season |z| <= 3.0 (observed 2.04)"
     sidecars:  # committed only with a gate-passing promoted retrain
       - models/xg_model_meta.json   # feature lists, CV + exact-holdout metrics, per-season calibration
       - models/xg_model_split.json  # train/test game_id partition per variant

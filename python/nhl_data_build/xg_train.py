@@ -152,8 +152,13 @@ def _event_zone() -> pl.Expr:
 def prepare_training_frame(pbp: pl.DataFrame, *, variant: str) -> pl.DataFrame:
     """Build the model matrix (features + ``goal`` target) for one variant.
 
-    variant ``"5v5"`` = all non-shootout/non-PS unblocked shots; ``"st"`` = special-teams
-    strengths only (+ total_skaters_on / event_team_advantage).
+    variant ``"5v5"`` = non-shootout/non-PS unblocked shots at ``strength_state == "5v5"``;
+    ``"st"`` = special-teams strengths only (+ total_skaters_on / event_team_advantage).
+
+    The 5v5 booster was once fit on every strength (the R recipe's population) while every
+    scorer -- fastRhockey, fastRhockey-nhl-raw, sportsdataverse-py -- applies it to 5v5 shots
+    only. With no skater-count feature it learned a blended conversion rate and over-predicted
+    the 5v5 shots it scores (2010-11 published goals/xG 0.934 vs 1.003 on its own frame).
     """
     if variant not in ("5v5", "st"):
         raise ValueError(f"variant must be '5v5' or 'st', got {variant!r}")
@@ -164,6 +169,8 @@ def prepare_training_frame(pbp: pl.DataFrame, *, variant: str) -> pl.DataFrame:
     )
     if variant == "st":
         df = df.filter(pl.col("strength_state").is_in(_ST_STRENGTHS))
+    else:  # train on the population the scorers route to this booster
+        df = df.filter(pl.col("strength_state") == "5v5")
 
     grp = "game_id"
     df = (
