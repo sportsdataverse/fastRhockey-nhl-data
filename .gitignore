@@ -76,3 +76,4 @@ docs/*
 **/.omc/
 .understand-anything/
 **/.understand-anything/
+dist/
