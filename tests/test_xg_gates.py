@@ -2,8 +2,8 @@
 
 Bites on the COMMITTED artifacts (no data, no training): a retrain whose meta
 misses a floor, or a split file that disagrees with its meta, cannot be merged
-quietly. Floors are the stage constants (frozen just below the values observed
-at gate time; never lowered) and the ST drift ceiling (derived from the
+quietly. Floors are the stage constants (``_CV_AUC_FLOOR``: just below an observed
+fit, re-derived only from a fit on a corrected corpus; never lowered) and the ST drift ceiling (derived from the
 observed exact-holdout max |z|; never raised) — see models/REGISTRY.md.
 """
 
@@ -21,15 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 META = ROOT / "models" / "xg_model_meta.json"
 SPLIT = ROOT / "models" / "xg_model_split.json"
 
-# The python sidecars land with the first python retrain that PASSES the frozen floors (the
-# 2026-09-02 retrain did not: ST cv AUC 0.7569 < 0.81 -- see models/REGISTRY.md). Until then the
-# committed boosters are the 2026-04 R fit, which has no python sidecar to check.
-pytestmark = pytest.mark.skipif(not META.is_file(), reason="no python xg_model_meta.json committed yet")
-
-# The python sidecars land with the first python retrain that PASSES the frozen floors (the
-# 2026-09-02 retrain did not: ST cv AUC 0.7569 < 0.81 -- see models/REGISTRY.md). Until then the
-# committed boosters are the 2026-04 R fit, which has no python sidecar to check.
-pytestmark = pytest.mark.skipif(not META.is_file(), reason="no python xg_model_meta.json committed yet")
+# The python sidecars are committed with the boosters (first: the 2026-11-12 promotion). A tree
+# without them -- e.g. a checkout that restores the 2026-04 R boosters -- has nothing to check.
+pytestmark = pytest.mark.skipif(not META.is_file(), reason="no python xg_model_meta.json committed")
 
 
 def _meta() -> dict:

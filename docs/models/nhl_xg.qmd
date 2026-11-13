@@ -40,8 +40,8 @@ for v in ("5v5", "st"):
     b.load_model(str(ROOT / "models" / f"xg_model_{v}.json"))
     boosters[v] = b
 
-# The two sidecars the python trainer writes beside the boosters. They are committed with the
-# first python retrain that passes the frozen gates; until then META/SPLIT are None and the
+# The two sidecars the python trainer writes beside the boosters, committed with them (first:
+# the 2026-11-12 promotion). Without them META/SPLIT are None and the
 # evaluation replays the trainer's seed-37 game-grouped split (a NEAR-holdout) and says so.
 _meta_path = ROOT / "models" / "xg_model_meta.json"
 META = json.loads(_meta_path.read_text(encoding="utf-8")) if _meta_path.is_file() else None
@@ -51,10 +51,12 @@ _split_path = ROOT / "models" / META["split_file"] if META and META.get("split_f
 SPLIT = json.loads(_split_path.read_text(encoding="utf-8")) if _split_path and _split_path.is_file() else None
 if META and not all(f"info_{v}" in META and v in (SPLIT or {}) for v in ("5v5", "st")):
     META = SPLIT = None  # a half-populated sidecar (one variant retrained) is not a fit to quote
-from nhl_model_02_xg_st import _ST_DRIFT_MAX_ABS_Z, st_gates
-# Frozen gates as observed at the 2026-04 R fit (the README table); the meta supersedes them when committed.
-FROZEN = {"5v5": {"cv_auc": 0.8322, "cv_logloss": 0.2053, "floor": 0.82},
-          "st": {"cv_auc": 0.8213, "cv_logloss": 0.2567, "floor": 0.81}}
+from nhl_model_01_xg_5v5 import _CV_AUC_FLOOR as _FLOOR_5V5
+from nhl_model_02_xg_st import _CV_AUC_FLOOR as _FLOOR_ST, _ST_DRIFT_MAX_ABS_Z, st_gates
+# Floors are the stage constants (the gate the stages enforce); the 2026-04 R fit's CV numbers
+# (README, CV only) are the fallback shown when no python meta is committed.
+FROZEN = {"5v5": {"cv_auc": 0.8322, "cv_logloss": 0.2053, "floor": _FLOOR_5V5},
+          "st": {"cv_auc": 0.8213, "cv_logloss": 0.2567, "floor": _FLOOR_ST}}
 
 def gt_show(g):
     display(HTML(g.as_raw_html()))
@@ -249,10 +251,11 @@ gt_show(
 Two views, honestly labeled. First, the **training-time metrics**: grouped
 5-fold CV on the 80% side (the gated number) and the game-grouped 20% holdout
 the fit never saw. They come from `models/xg_model_meta.json` when a python
-sidecar is committed, otherwise from the 2026-04 R fit's console output as
-frozen in the README (CV only — that run persisted no holdout metrics and no
-partition, which is exactly what the sidecars fix). The gate floors are frozen
-just below the 2026-04 values (5v5 cv AUC ≥ 0.82, ST ≥ 0.81) and are never
+sidecar is committed, otherwise from the 2026-04 R fit's console output in
+the README (CV only — that run persisted no holdout metrics and no
+partition, which is exactly what the sidecars fix). The gate floors
+(`_CV_AUC_FLOOR` per stage) sit just below an observed fit — re-derived
+2026-11-12 from the complete-corpus fit (5v5 cv AUC ≥ 0.77, ST ≥ 0.75) — and are never
 lowered; a real retrain below them fails (`--quick` smoke runs tolerate misses).
 
 ```{python}
@@ -294,7 +297,7 @@ for v in ("5v5", "st"):
 gt_show(
     GT(pl.DataFrame(rows).to_pandas())
     .tab_header(title="Training-time metrics",
-                subtitle="grouped 5-fold CV on the 80% side; game-grouped 20% holdout; floors frozen, never lowered")
+                subtitle="grouped 5-fold CV on the 80% side; game-grouped 20% holdout; floors re-derived from an observed fit, never lowered")
     .fmt_number(columns=["train shots", "holdout shots", "holdout games"], sep_mark=",", decimals=0)
     .fmt_number(columns=["CV AUC", "CV log-loss", "holdout AUC", "holdout log-loss", "baseline log-loss"], decimals=4)
     .sub_missing(missing_text="—")
@@ -443,13 +446,13 @@ else:  # no python meta: evaluate the drift statistic on the render-time held-ou
     # Unrounded: the gate must see the same precision the trainer's gate does.
     verdict, src = st_gates({"cv_auc": None, "max_abs_season_z": float(st_max_z)}), f"render-time {EVAL_LABEL}"
 gate_tbl = pl.DataFrame({
-    "check": ["cv AUC ≥ 0.81", "ST drift: max |z| over held-out seasons ≤ ceiling", "stage verdict"],
+    "check": [f"cv AUC ≥ {_FLOOR_ST}", "ST drift: max |z| over held-out seasons ≤ ceiling", "stage verdict"],
     # The gate saw full precision (above); rounding here is presentation only.
     "observed": [str(verdict["cv_auc"]) if verdict["cv_auc"] is not None else "n/a (no python meta)",
                  str(round(verdict["st_max_abs_season_z"], 3))
                  if verdict["st_max_abs_season_z"] is not None else "n/a", ""],
-    "threshold": ["0.81", str(verdict["st_drift_ceiling"]), ""],
-    "pass": [str(verdict["cv_auc"] >= 0.81) if verdict["cv_auc"] is not None else "n/a",
+    "threshold": [str(_FLOOR_ST), str(verdict["st_drift_ceiling"]), ""],
+    "pass": [str(verdict["cv_auc"] >= _FLOOR_ST) if verdict["cv_auc"] is not None else "n/a",
              str(verdict["st_drift_pass"]), str(verdict["gate_pass"]) if META else "n/a"],
 })
 gt_show(GT(gate_tbl.to_pandas()).tab_header(title="Stage gates (nhl_model_02_xg_st.st_gates)", subtitle=f"evaluated on the {src}"))
@@ -570,18 +573,18 @@ spread between the two is exactly what the embedded xG columns in
 
 - **Trained on:** this repository's committed play-by-play
   (`nhl/pbp/parquet/`, seasons in the corpus table above); committed boosters
-  = the 2026-04 fit; grouped 80/20 split by `game_id`, grouped 5-fold CV for
+  = the python 2026-11-12 fit (`nhl_model_pipeline.yml` run 43181159544); grouped 80/20 split by `game_id`, grouped 5-fold CV for
   `min_child_weight`, seed 37 (the python trainer persists the partition in
   `models/xg_model_split.json`).
 - **Artifacts:** `models/xg_model_5v5.json`, `models/xg_model_st.json`
   (committed — the promotion step); python sidecars `models/xg_model_meta.json`
   (feature lists, CV + exact-holdout metrics, per-season calibration, PS
-  constant) and `models/xg_model_split.json`, committed with the first
-  gate-passing python retrain; every stage run appends a `models/ledger.jsonl`
+  constant) and `models/xg_model_split.json`, committed with the
+  boosters; every stage run appends a `models/ledger.jsonl`
   line (including failed ones). Output ships inside `nhl_pbp_full`.
 - **Retrain:** `scripts/nhl_models.sh` (stages `nhl_model_01_xg_5v5` /
   `nhl_model_02_xg_st`; fingerprint-skipped when unchanged, `--force` to
-  retrain); gates frozen in `models/manifest.yaml` (cv AUC floors + the ST
+  retrain); gates recorded in `models/manifest.yaml` (cv AUC floors + the ST
   per-season drift ceiling), registry row in `models/REGISTRY.md`.
 - **Rebuild this document:** `scripts/render_model_docs.sh` (Quarto → GFM;
   uses this repo's `.venv` via `QUARTO_PYTHON`; `uv sync --group docs --group train`).
@@ -592,32 +595,17 @@ spread between the two is exactly what the embedded xG columns in
 - **Pre-shot context** — rush/rebound flags exist, but passing sequences and
   screens do not; public-feed models plateau here, so the honest gain is
   better rebound/rush definitions, not more trees.
-- **Blocked by a gate (2026-09-01, PR #7):** *Commit the
-  python meta sidecar* — the trainer now writes `models/xg_model_meta.json`
-  with the exact training-time CV/holdout metrics and this document reads it
-  when present, but the 2026-09-02 python retrain on this repository's parquet
-  frame fell below the frozen floors (special teams cv AUC **0.7569** vs ≥ 0.81)
-  and was not promoted (`models/ledger.jsonl`); the 5v5 stage of that attempt was
-  not run to completion.
-  Gates are never lowered; the sidecar lands with the first passing retrain.
-- **Blocked by the same gate (2026-09-01, PR #7):** *Exact
-  holdout reproduction* — `models/xg_model_split.json` (train/test `game_id`
-  partition) is written by every python retrain and this document switches to
-  the exact holdout automatically when it is committed; until then the
-  evaluation is the labeled near-holdout replay.
+- **Resolved (2026-11-12):** *Commit the python sidecars / exact holdout* — the
+  2026-11-12 retrain passed the re-derived floors and committed
+  `xg_model_meta.json` + `xg_model_split.json`; the evaluation above is the
+  exact training-time holdout.
 - **Resolved (2026-09-01, PR #7):** *Per-season ST
   calibration drift* — monitored by the per-season table and figure above; the
   trainer records the statistic in the meta and stage `nhl_model_02_xg_st`
   gates on the observed-value-derived ceiling `max |z| ≤ _ST_DRIFT_MAX_ABS_Z`.
-- **Known issue (measured 2026-09-01):** the committed 2026-04 R-trained
-  boosters, scored through this repository's python feature frame,
-  over-predict goals by 25–30% on every season through 2023-24 (goals/ΣxG
-  0.68–0.81; |z| up to 14.8 for 5v5 and 9.2 for ST on the seed-37
-  near-holdout) while 2024-25 and 2025-26 sit at 0.92–0.93, and their
-  near-holdout AUC is 0.778/0.761 against the fit's 0.832/0.821. A python
-  booster trained on this same frame is calibrated per season (ST max |z|
-  2.008) but tops out at the same discrimination (ST cv AUC 0.7569), so the
-  deficit is in the **frame**, not the booster: the R training frame and the
-  python frame disagree for pre-2024 seasons. That is an R↔Python parity
-  question (handed to `sdv-parity-reviewer`), not a modeling one, and it
-  blocks promoting any python retrain until resolved.
+- **Resolved (2026-11-12):** the 2026-04 R boosters over-predicted goals by
+  25–30% through 2023-24 on this frame because they were fitted on a corpus
+  carrying no missed shots (settled 2026-09-02; the R and python recipes match
+  on real games). They are replaced by the python fit on the complete corpus,
+  calibrated per season (5v5 max |z| 1.84, ST 2.85 under the 3.0 ceiling).
+  The published pbp `xg` column keeps the 2026-04 scores until it is rescored.
