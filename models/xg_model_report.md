@@ -6,8 +6,8 @@ grouped CV + min_child_weight grid (XGBoost `binary:logistic`).
 
 | Model | train / test | min_child_weight | nrounds | CV logloss | CV AUC | Test logloss | Test AUC |
 |---|---|---:|---:|---:|---:|---:|---:|
-| 5v5 | 1485915 / 372192 | 7 | 1327 | 0.2116 | 0.7787 | 0.2112 | 0.7797 |
-| Special teams | 303626 / 75335 | 8 | 537 | 0.2825 | 0.7570 | 0.2806 | 0.7557 |
+| 5v5 | 1158143 / 290218 | 6 | 956 | 0.1906 | 0.7820 | 0.1908 | 0.7819 |
+| Special teams | 327917 / 81808 | 1 | 521 | 0.2806 | 0.7574 | 0.2772 | 0.7607 |
 | Penalty shot | - | - | - | - | - | - | constant **0.3184** |
 
 ## Era groupings
@@ -20,44 +20,44 @@ grouped CV + min_child_weight grid (XGBoost `binary:logistic`).
 
 ## 5v5 feature importance (top 15, by gain)
 
-Goal rate 0.0677 | 36 features.
+Goal rate 0.0579 | 36 features.
 
 | feature | gain |
 |---|---:|
-| `empty_net` | 559.39 |
-| `rebound` | 131.61 |
-| `shot_distance` | 123.6 |
-| `snap_shot` | 67.04 |
-| `cross_ice_event` | 55.96 |
-| `backhand` | 51.91 |
-| `wrap_around` | 47.38 |
-| `slap_shot` | 46.56 |
-| `last_hit` | 46.0 |
-| `wrist_shot` | 44.7 |
-| `era_2025_on` | 39.72 |
-| `shot_angle` | 33.17 |
-| `tip_in` | 26.73 |
-| `time_since_last` | 23.75 |
-| `era_2022_2024` | 23.61 |
+| `shot_distance` | 130.86 |
+| `cross_ice_event` | 68.18 |
+| `snap_shot` | 60.58 |
+| `last_hit` | 55.63 |
+| `empty_net` | 54.13 |
+| `rebound` | 52.82 |
+| `backhand` | 46.31 |
+| `wrap_around` | 43.43 |
+| `wrist_shot` | 37.78 |
+| `shot_angle` | 37.41 |
+| `tip_in` | 36.74 |
+| `last_shot` | 36.28 |
+| `era_2025_on` | 35.21 |
+| `last_faceoff` | 34.14 |
+| `slap_shot` | 32.7 |
 
 ## Special teams feature importance (top 15, by gain)
 
-Goal rate 0.1024 | 38 features.
+Goal rate 0.1016 | 38 features.
 
 | feature | gain |
 |---|---:|
-| `empty_net` | 379.47 |
-| `rebound` | 83.58 |
-| `shot_distance` | 57.48 |
-| `event_team_advantage` | 45.58 |
-| `snap_shot` | 41.04 |
-| `total_skaters_on` | 35.84 |
-| `last_faceoff` | 33.6 |
-| `cross_ice_event` | 27.81 |
-| `era_2025_on` | 24.03 |
-| `wrist_shot` | 20.99 |
-| `time_since_last` | 20.21 |
-| `backhand` | 19.88 |
-| `slap_shot` | 17.87 |
-| `era_2022_2024` | 17.13 |
-| `tip_in` | 15.8 |
+| `empty_net` | 351.92 |
+| `shot_distance` | 70.36 |
+| `event_team_advantage` | 57.07 |
+| `total_skaters_on` | 51.12 |
+| `snap_shot` | 39.43 |
+| `cross_ice_event` | 37.43 |
+| `time_since_last` | 26.73 |
+| `last_faceoff` | 26.23 |
+| `wrist_shot` | 22.35 |
+| `backhand` | 22.05 |
+| `era_2025_on` | 21.28 |
+| `slap_shot` | 20.41 |
+| `tip_in` | 17.5 |
+| `last_hit` | 16.95 |
+| `rebound` | 16.14 |
