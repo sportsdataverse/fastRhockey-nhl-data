@@ -506,6 +506,7 @@ def frame_with_identity(pbp_in):
     df = df.filter(
         (pl.col("period_type") != "SHOOTOUT")
         & ((pl.col("secondary_type") != "Penalty Shot") | pl.col("secondary_type").is_null())
+        & (pl.col("strength_state") == "5v5")  # the 5v5 booster's population, as in prepare_training_frame
     )
     grp = "game_id"
     df = df.with_columns(
