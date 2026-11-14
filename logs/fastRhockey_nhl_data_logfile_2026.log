@@ -1,54 +1,5 @@
-season 2026: 2416905 rows across 17 datasets -> /mnt/sdv_repos/fastRhockey-nhl-data/nhl
-51 assets uploaded
-[main ab5b75c] NHL Data Updated (Start: 2026 End: 2026)
- 51 files changed, 0 insertions(+), 0 deletions(-)
- rewrite nhl/game_info/parquet/game_info_2026.parquet (97%)
- rewrite nhl/game_rosters/parquet/game_rosters_2026.parquet (94%)
- rewrite nhl/goalie_box/parquet/goalie_box_2026.parquet (98%)
- rewrite nhl/linescore/parquet/linescore_2026.parquet (97%)
- rewrite nhl/officials/parquet/officials_2026.parquet (98%)
- create mode 100644 nhl/pbp/full/rds/play_by_play_2010.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2011.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2012.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2013.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2014.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2015.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2016.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2017.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2018.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2019.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2020.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2021.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2022.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2023.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2024.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2025.rds
- create mode 100644 nhl/pbp/full/rds/play_by_play_2026.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2010_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2011_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2012_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2013_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2014_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2015_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2016_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2017_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2018_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2019_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2020_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2021_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2022_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2023_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2024_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2025_lite.rds
- create mode 100644 nhl/pbp/lite/rds/play_by_play_2026_lite.rds
- rewrite nhl/penalties/parquet/penalties_2026.parquet (97%)
- rewrite nhl/player_box/parquet/player_box_2026.parquet (93%)
- rewrite nhl/scoring/parquet/scoring_2026.parquet (88%)
- rewrite nhl/scratches/parquet/scratches_2026.parquet (99%)
- rewrite nhl/shootout/parquet/shootout_summary_2026.parquet (96%)
- rewrite nhl/shots_by_period/parquet/shots_by_period_2026.parquet (99%)
- rewrite nhl/skater_box/parquet/skater_box_2026.parquet (94%)
- rewrite nhl/team_box/parquet/team_box_2026.parquet (96%)
- rewrite nhl/three_stars/parquet/three_stars_2026.parquet (98%)
-To https://github.com/sportsdataverse/fastRhockey-nhl-data.git
-   cb92af7..ab5b75c  main -> main
+season 2026: handedness on 55,757/55,758 roster rows (100.0%)
+season 2026: 2472663 rows across 18 datasets -> C:/Users/saiem/Documents/GitHub-Data/sdv-dev/hockey-dev/fastRhockey-nhl-data/nhl
+season 2026: schedule (1394 games) -> C:/Users/saiem/Documents/GitHub-Data/sdv-dev/hockey-dev/fastRhockey-nhl-data/nhl/schedules
+2026: 43 assets uploaded
+pushed: NHL Data Updated (Start: 2026 End: 2026) (attempt 1)
