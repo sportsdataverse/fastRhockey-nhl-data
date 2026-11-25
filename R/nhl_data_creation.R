@@ -297,6 +297,11 @@ DATASETS <- tibble::tribble(
           df$game_date <- game_json$game_info$game_date %||%
             game_json$game_info[[1]]$game_date %||% NA_character_
         }
+        # name.default is "X. Surname" except a few the API sends unspaced ("J.Kulich");
+        # only names with no space at all are rewritten (python/nhl_data_build/extract.py twin).
+        if (key %in% c("skater_box", "goalie_box") && "player_name" %in% names(df)) {
+          df$player_name <- sub("^(\\S+\\.)(\\S+)$", "\\1 \\2", df$player_name, perl = TRUE)
+        }
         out[[key]] <- df
       }
     }

@@ -11,9 +11,21 @@ In Python's parsed JSON every block is already a list[dict] / dict, so R's
 
 from __future__ import annotations
 
+import re
+
 from nhl_data_build.config import DATASETS, STANDARD_KEYS
 
 _FIELD = {key: field for key, field, _, _, _ in DATASETS}
+# The boxscore's name.default is "X. Surname" except for a few players the API sends unspaced
+# ("J.Kulich", "D.Jiricek", "D.Misyul": 187 of 891,579 box rows, 2009-10 to 2026-27). Only a
+# name with no space at all is rewritten, so "J.T. Compher" stays as it is.
+_UNSPACED_INITIAL = re.compile(r"^(\S+\.)(\S+)$")
+_BOX_KEYS = ("skater_box", "goalie_box")
+
+
+def normalize_player_name(name: str | None) -> str | None:
+    """``"J.Kulich"`` -> ``"J. Kulich"``; any name that already has a space is returned unchanged."""
+    return _UNSPACED_INITIAL.sub(r"\1 \2", name) if isinstance(name, str) else name
 
 
 def _game_info(game_json: dict) -> dict:
@@ -119,6 +131,10 @@ def extract_all(game_json: dict | None) -> dict[str, list[dict]]:
             rows = val if isinstance(val, list) else ([val] if isinstance(val, dict) else None)
             if rows:
                 out[key] = _attach_ids(rows, gi)
+                if key in _BOX_KEYS:
+                    for r in out[key]:
+                        if "player_name" in r:
+                            r["player_name"] = normalize_player_name(r["player_name"])
         elif key in ("scoring", "penalties"):
             rows = _extract_scoring_like(val, "goals" if key == "scoring" else "penalties", gid)
             if rows:
