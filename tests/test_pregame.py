@@ -202,3 +202,14 @@ def test_missing_capture_dates(games, captured, missing):
 def test_missing_capture_dates_skips_months_without_probes():
     # 2027-28 opens in late September; the probes start in October, so the 10-01 build must not fail
     assert pregame.missing_capture_dates(pl.Series(["2027-09-30"]), set(), date(2027, 10, 1)) == []
+
+
+def test_main_capture_era_season_without_a_schedule_fails(tmp_path):
+    (tmp_path / "raw" / "2027").mkdir(parents=True)
+    with pytest.raises(FileNotFoundError, match="schedule"):
+        _main(tmp_path, tmp_path / "nhl")
+
+
+def test_main_older_season_without_a_schedule_is_not_an_error(tmp_path):
+    (tmp_path / "raw").mkdir()
+    assert pregame.main(["-s", "2026", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(tmp_path / "nhl")]) == 0

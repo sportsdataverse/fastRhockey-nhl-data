@@ -281,6 +281,8 @@ def coverage(df: pl.DataFrame, docs: list[dict], lead: timedelta = timedelta(hou
 
 #: First day nhl-raw stage 03 captured pregame state.
 CAPTURE_START = "2026-11-25"
+#: END year of the season capture began in.
+CAPTURE_SEASON = 2027
 #: Months the sdv-orch pregame probe and commit deployments run (their crons: ``10-12,1-6``).
 PROBE_MONTHS = frozenset({10, 11, 12, 1, 2, 3, 4, 5, 6})
 #: A played game date this recent with no capture file means capture is failing now. Older gaps
@@ -308,6 +310,9 @@ def main(argv: list[str] | None = None) -> int:
         raise FileNotFoundError(f"pregame dir not found: {a.pregame_dir}")
     sched_path = out / "schedules" / "parquet" / f"nhl_schedule_{a.season}.parquet"
     captured = {p.stem for p in (Path(a.pregame_dir) / str(a.season)).glob("*.json")}
+    if a.season >= CAPTURE_SEASON and not sched_path.exists():
+        # without the schedule the gap check can't run; a capture-era season must have one
+        raise FileNotFoundError(f"[pregame] {a.season}: schedule not found: {sched_path}")
     if sched_path.exists():
         # a recent slate with no capture file means the probes are failing: fail, don't publish stale
         gaps = missing_capture_dates(
