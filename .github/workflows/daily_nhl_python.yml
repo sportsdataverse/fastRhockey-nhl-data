@@ -142,6 +142,29 @@ jobs:
           # would re-parse the finals 17x for no gain.
           uv run python -m nhl_data_build.season             -s ${{ steps.years.outputs.start }} -e ${{ steps.years.outputs.end }}             --final-dir "$GITHUB_WORKSPACE/_raw/nhl/json/final" --out-dir "$GITHUB_WORKSPACE/nhl"
 
+      # Pregame captures are small (one JSON per game date), so a blobless sparse checkout of
+      # nhl/pregame alone is cheap -- unlike final/. Same stage the droplet driver runs.
+      - name: Checkout nhl-raw pregame captures
+        uses: actions/checkout@v5
+        with:
+          repository: sportsdataverse/fastRhockey-nhl-raw
+          path: _pregame_raw
+          sparse-checkout: nhl/pregame
+          filter: blob:none
+          persist-credentials: false
+
+      # continue-on-error: a pregame failure must not stop the other ~18 datasets from publishing;
+      # the last step fails the run if it failed.
+      - name: Compile pregame snapshots
+        id: pregame
+        continue-on-error: true
+        run: |
+          rc=0  # every season compiles even when one fails; the step fails at the end
+          for s in $(seq ${{ steps.years.outputs.start }} ${{ steps.years.outputs.end }}); do
+            uv run python -m nhl_data_build.pregame -s "$s"               --pregame-dir "$GITHUB_WORKSPACE/_pregame_raw/nhl/pregame" --out-dir "$GITHUB_WORKSPACE/nhl" || rc=1
+          done
+          exit $rc
+
       - name: Publish to sportsdataverse-data releases
         if: ${{ github.event.inputs.publish != 'false' }}
         env:
@@ -164,3 +187,9 @@ jobs:
           # write token isn't left in the runner's git config for later steps to reuse.
           git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
             "HEAD:${GITHUB_REF_NAME}" || echo "nothing to push"
+
+      - name: Fail the run if the pregame compile failed
+        if: ${{ always() && steps.pregame.outcome == 'failure' }}
+        run: |
+          echo "::error ::nhl_data_build.pregame failed (see the Compile pregame snapshots step)"
+          exit 1

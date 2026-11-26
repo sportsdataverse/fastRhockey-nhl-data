@@ -158,6 +158,39 @@ fastRhockey-nhl-data/
 | [`nhl_player_boxscores`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_player_boxscores) | NHL player box scores (skaters + goalies) |
 | [`nhl_rosters`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_rosters) | NHL rosters |
 | [`nhl_schedules`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_schedules) | NHL schedules |
+| [`nhl_pregame_snapshots`](https://github.com/sportsdataverse/sportsdataverse-data/releases/tag/nhl_pregame_snapshots) | NHL pregame state (probable goalies, injury list) as `valid_from` / `valid_to` intervals, 2026-27 on |
+
+## Pregame snapshots
+
+`python -m nhl_data_build.pregame` compiles fastRhockey-nhl-raw's `nhl/pregame/{END_YEAR}/*.json`
+(probes every 30 minutes on game days, only state changes kept) into
+`nhl/pregame_snapshots/parquet/nhl_pregame_snapshots_{END_YEAR}.parquet`, one row per state interval,
+and both daily call sites publish it to `nhl_pregame_snapshots`. Capture started 2026-11-25; there is
+no earlier history and none can be backfilled.
+
+Read it as of a decision time `t`, never past it: a state is known iff
+`valid_from <= t < valid_to` (null `valid_to` = still current).
+`sportsdataverse.espn_snapshots.pregame_state_as_of(df, pl.col("start_time_utc") - pl.duration(hours=3))`
+applies that rule per game. The compile prints the coverage numbers each run (ESPN events bridged,
+games with both goalies known at puck drop minus 3 h, rows without an NHL player id, longest gap
+between probes). `R/nhl_pregame_snapshots.R` is the R twin of the compile; a parity test requires both to
+write the same table on a real captured day.
+
+| Column | Type | Meaning |
+|---|---|---|
+| `season` | Int32 | END year (2027 = 2026-27) |
+| `game_date` | Utf8 | ET game date |
+| `game_id` | Int64 | NHL game id, bridged from the ESPN event by ET date + both team abbreviations; null when the bridge fails |
+| `espn_event_id` | Int64 | ESPN event id |
+| `start_time_utc` | Datetime(UTC) | scheduled puck drop (ESPN) |
+| `team_id`, `team_abbr` | Int64, Utf8 | NHL team |
+| `kind` | Utf8 | `probable_goalie` or `injury` |
+| `player_id` | Int64 | NHL player id by folded name against the season roster (then the last three seasons' rosters, when the name is unique league-wide); null when ambiguous or unknown |
+| `espn_athlete_id`, `player_name` | Int64, Utf8 | ESPN's id and name, always present |
+| `status` | Utf8 | goalie: `Expected` / `Confirmed`; injury: `Out`, `Day-To-Day`, `Injured Reserve`, ... |
+| `valid_from` | Datetime(UTC) | first capture that showed this state |
+| `valid_to` | Datetime(UTC) | first capture that no longer showed it; null while current |
+| `source` | Utf8 | `espn_scoreboard` / `espn_injuries` |
 
 ## Model retrain
 

@@ -90,6 +90,8 @@ fi
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPOS_ROOT="${SDV_REPOS:-/mnt/sdv_repos}"
 FINAL_DIR="${NHL_RAW_FINAL_DIR:-${REPOS_ROOT}/fastRhockey-nhl-raw/nhl/json/final}"
+# Pregame captures (nhl-raw stage 03, written every 30 min on game days by sdv-orch deployments).
+PREGAME_DIR="${NHL_RAW_PREGAME_DIR:-${REPOS_ROOT}/fastRhockey-nhl-raw/nhl/pregame}"
 OUT_DIR="${REPO_DIR}/nhl"
 
 # Call the project venv's interpreter by absolute path rather than going through
@@ -139,6 +141,12 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
         ( cd python && "${PYBIN}" -m nhl_data_build.season                 -s "$i" -e "$i" --final-dir "${FINAL_DIR}" --out-dir "${OUT_DIR}" )
         echo "COMPILE_RC=$?" > "/tmp/_nhl_compile_rc_${i}"
 
+        # Pregame snapshots: reads the rosters + schedule the compile above just wrote, so it
+        # runs second. A season with no captures (every one before 2027) writes nothing; a played
+        # game date of the last 3 days with no capture file fails it (pregame.missing_capture_dates).
+        ( cd python && "${PYBIN}" -m nhl_data_build.pregame -s "$i" --pregame-dir "${PREGAME_DIR}" --out-dir "${OUT_DIR}" )
+        echo "PREGAME_RC=$?" > "/tmp/_nhl_pregame_rc_${i}"
+
         # Publish only what compiled. Uploading is idempotent (--clobber), so a
         # partial season still ships the datasets that built.
         # Stage 19 since ed360e4 renumbered it; nhl_data_03_publish no longer exists.
@@ -152,6 +160,8 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     rm -f "/tmp/_nhl_compile_rc_${i}"
     PUBLISH_RC=$(sed 's/PUBLISH_RC=//' "/tmp/_nhl_publish_rc_${i}" 2>/dev/null)
     rm -f "/tmp/_nhl_publish_rc_${i}"
+    PREGAME_RC=$(sed 's/PREGAME_RC=//' "/tmp/_nhl_pregame_rc_${i}" 2>/dev/null)
+    rm -f "/tmp/_nhl_pregame_rc_${i}"
 
     cp "$TMPLOG" "$LOGFILE"
     git stash -u --quiet 2>/dev/null || true
@@ -164,6 +174,10 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
     # finish the remaining seasons first.
     if [ "${COMPILE_RC:-0}" != "0" ]; then
         echo "::error ::nhl_data_build.season for season $i exited with code ${COMPILE_RC}"
+        ANY_FAILED=1
+    fi
+    if [ "${PREGAME_RC:-0}" != "0" ]; then
+        echo "::error ::nhl_data_build.pregame for season $i exited with code ${PREGAME_RC}"
         ANY_FAILED=1
     fi
     # A failed publish is a failed run: the compile can succeed while nothing
