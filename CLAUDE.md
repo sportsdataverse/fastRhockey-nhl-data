@@ -154,6 +154,12 @@ data-driven. The corresponding loader on the `fastRhockey` package side
 (`load_nhl_<key>()`) also needs a new catalog row in
 the fastRhockey package's `R/nhl_loaders.R`.
 
+`nhl_pregame_snapshots` is not a `final.json` block: `python/nhl_data_build/pregame.py` compiles
+nhl-raw's `nhl/pregame/{end_year}/*.json` captures (stage 03 there) into one row per state interval
+(`valid_from` / `valid_to`, probable goalies + injuries), after the season compile because it reads the
+rosters and schedule that compile writes. It is in `publish._PUBLISH` next to the derived datasets, and
+both call sites run it. Python only: there is no R twin.
+
 A "lite" play-by-play (`nhl_pbp_lite`) is generated from the full PBP by
 dropping a configurable set of columns; it shares the same compile path as
 `pbp` but writes to `nhl/pbp_lite/`.

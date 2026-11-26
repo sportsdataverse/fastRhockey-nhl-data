@@ -15,6 +15,7 @@ The (Python) scraper writes `final/{game_id}.json`; this reads it and reshapes.
 | compile a season | `build.py` (`build_season`, `pbp_lite`) | the per-key bind + distinct |
 | flatten nested cols for parquet | `flatten.py` (`flatten_struct_cols`) | `.flatten_struct_cols` |
 | read final dir → write parquet | `season.py` (`build_season_from_dir`, `write_datasets`) | the per-season loop |
+| pregame snapshots (valid_from / valid_to) | `pregame.py` (`compile_season`) | none (Python only) |
 | publish to releases | `publish.py` (`publish_season`) | `.upload_to_release` |
 | retrain xG models | `xg_train.py` (`train_xg_models`) | `build_xg_model.R` |
 
@@ -23,6 +24,8 @@ The (Python) scraper writes `final/{game_id}.json`; this reads it and reshapes.
 ```sh
 # compile a season's datasets from the raw repo's final JSONs
 uv run python -m nhl_data_build.season -s 2025 --final-dir ../../fastRhockey-nhl-raw/nhl/json/final --out-dir nhl
+# compile the pregame snapshot intervals (after the season compile: reads its rosters + schedule)
+uv run python -m nhl_data_build.pregame -s 2027 --pregame-dir ../../fastRhockey-nhl-raw/nhl/pregame --out-dir ../nhl
 # retrain xG models from a pbp parquet
 uv run python -c "import polars as pl; from nhl_data_build.xg_train import train_xg_models; train_xg_models(pl.read_parquet('nhl/pbp/parquet/play_by_play_2025.parquet'), 'models')"
 ```

@@ -113,7 +113,8 @@ coordinated breaking change:
 `nhl_game_info`, `nhl_game_rosters`, `nhl_rosters`, `nhl_schedules`,
 `nhl_scoring`, `nhl_penalties`, `nhl_scratches`, `nhl_linescore`,
 `nhl_three_stars`, `nhl_shifts`, `nhl_officials`, `nhl_shots_by_period`,
-`nhl_shootout`.
+`nhl_shootout`, `nhl_pregame_snapshots` (compiled by `nhl_data_build.pregame` from nhl-raw's
+`nhl/pregame/` captures; no `final.json` block and no R twin).
 
 ## Code Style
 
