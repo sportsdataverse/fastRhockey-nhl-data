@@ -26,6 +26,8 @@ _PUBLISH += [
     ("player_box", "nhl_player_boxscores", "player_box"),
     ("rosters", "nhl_rosters", "rosters"),  # R STEP 4; dropped by the Python port until 2026-11-13
     ("nhl_schedule", "nhl_schedules", "schedules"),
+    # not a final.json block: compiled from nhl-raw's nhl/pregame captures (nhl_data_build.pregame)
+    ("nhl_pregame_snapshots", "nhl_pregame_snapshots", "pregame_snapshots"),
 ]
 
 
@@ -57,6 +59,8 @@ PKG_FUNCTION: dict[str, str] = {
     "nhl_skater_boxscores": "fastRhockey::load_nhl_skater_boxscores()",
     "nhl_team_boxscores": "fastRhockey::load_nhl_team_boxscores()",
     "nhl_three_stars": "fastRhockey::load_nhl_three_stars()",
+    # Python-only dataset (no R producer, no fastRhockey loader yet)
+    "nhl_pregame_snapshots": "sportsdataverse.nhl.load_nhl_pregame_snapshots()",
 }
 
 
