@@ -57,6 +57,10 @@ if [ -z "$START_YEAR" ] || [ -z "$END_YEAR" ]; then
     exit 1
 fi
 
+# Pregame captures (nhl-raw stage 03); compiled by the R twin of nhl_data_build.pregame when a
+# local nhl-raw checkout is present (this fallback otherwise reads raw over HTTP).
+PREGAME_DIR="${NHL_RAW_PREGAME_DIR:-${SDV_REPOS:-/mnt/sdv_repos}/fastRhockey-nhl-raw/nhl/pregame}"
+
 mkdir -p logs
 for i in $(seq "${START_YEAR}" "${END_YEAR}")
 do
@@ -74,6 +78,11 @@ do
         git config --local user.name "Github Action"
         Rscript R/nhl_data_creation.R -s $i -e $i
         echo "RSCRIPT_RC=$?" > "/tmp/_rscript_rc_${i}"
+        if [ -d "${PREGAME_DIR}" ]; then
+            Rscript R/nhl_pregame_snapshots.R -s "$i" --pregame-dir "${PREGAME_DIR}" --out-dir nhl                 || echo "RSCRIPT_RC=1" > "/tmp/_rscript_rc_${i}"
+        else
+            echo "no pregame captures at ${PREGAME_DIR}; skipping nhl_pregame_snapshots"
+        fi
         # If R failed, leave any partially-written files alone so the next
         # daily run can pick them up via the resilient per-dataset
         # tryCatch in the R script; still try the git plumbing so the

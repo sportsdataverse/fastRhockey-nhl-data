@@ -18,6 +18,8 @@ the season schedule, the team by abbreviation, and the player by a folded-name k
 the season roster (team first, then the whole league when the name is unique). Rows that
 do not bridge stay in the table with a null NHL id and are counted.
 
+The R twin, ``R/nhl_pregame_snapshots.R``, must write the same table (``tests/test_pregame_r_parity.py``).
+
     uv run python -m nhl_data_build.pregame -s 2027 \\
         --pregame-dir ../../fastRhockey-nhl-raw/nhl/pregame --out-dir ../nhl
 """
@@ -231,7 +233,11 @@ def compile_day(doc: dict, schedule: pl.DataFrame, rosters: pl.DataFrame) -> pl.
             game_date=pl.lit(day),
         )
     )
-    return df.select(list(SCHEMA)).cast(SCHEMA).sort("game_id", "team_id", "kind", "player_name", "valid_from")
+    return (
+        df.select(list(SCHEMA))
+        .cast(SCHEMA)
+        .sort("game_id", "team_id", "kind", "player_name", "espn_athlete_id", "status", "valid_from")
+    )
 
 
 def compile_season(
