@@ -185,7 +185,7 @@ write the same table on a real captured day.
 | `start_time_utc` | Datetime(UTC) | scheduled puck drop (ESPN) |
 | `team_id`, `team_abbr` | Int64, Utf8 | NHL team |
 | `kind` | Utf8 | `probable_goalie` or `injury` |
-| `player_id` | Int64 | NHL player id by folded name against the season roster (then any season's, when the name is unique); null when ambiguous or unknown |
+| `player_id` | Int64 | NHL player id by folded name against the season roster (then the last three seasons' rosters, when the name is unique league-wide); null when ambiguous or unknown |
 | `espn_athlete_id`, `player_name` | Int64, Utf8 | ESPN's id and name, always present |
 | `status` | Utf8 | goalie: `Expected` / `Confirmed`; injury: `Out`, `Day-To-Day`, `Injured Reserve`, ... |
 | `valid_from` | Datetime(UTC) | first capture that showed this state |

@@ -25,7 +25,7 @@ The (Python) scraper writes `final/{game_id}.json`; this reads it and reshapes.
 # compile a season's datasets from the raw repo's final JSONs
 uv run python -m nhl_data_build.season -s 2025 --final-dir ../../fastRhockey-nhl-raw/nhl/json/final --out-dir nhl
 # compile the pregame snapshot intervals (after the season compile: reads its rosters + schedule)
-uv run python -m nhl_data_build.pregame -s 2027 --pregame-dir ../../fastRhockey-nhl-raw/nhl/pregame --out-dir ../nhl
+uv run python -m nhl_data_build.pregame -s 2027 --pregame-dir ../../fastRhockey-nhl-raw/nhl/pregame --out-dir nhl
 # retrain xG models from a pbp parquet
 uv run python -c "import polars as pl; from nhl_data_build.xg_train import train_xg_models; train_xg_models(pl.read_parquet('nhl/pbp/parquet/play_by_play_2025.parquet'), 'models')"
 ```

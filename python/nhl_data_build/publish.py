@@ -59,7 +59,7 @@ PKG_FUNCTION: dict[str, str] = {
     "nhl_skater_boxscores": "fastRhockey::load_nhl_skater_boxscores()",
     "nhl_team_boxscores": "fastRhockey::load_nhl_team_boxscores()",
     "nhl_three_stars": "fastRhockey::load_nhl_three_stars()",
-    # Python-only dataset (no R producer, no fastRhockey loader yet)
+    # Published from the Python build only (the R twin compiles it but does not upload; no fastRhockey loader yet)
     "nhl_pregame_snapshots": "sportsdataverse.nhl.load_nhl_pregame_snapshots()",
 }
 

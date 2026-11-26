@@ -58,7 +58,8 @@ if [ -z "$START_YEAR" ] || [ -z "$END_YEAR" ]; then
 fi
 
 # Pregame captures (nhl-raw stage 03); compiled by the R twin of nhl_data_build.pregame when a
-# local nhl-raw checkout is present (this fallback otherwise reads raw over HTTP).
+# local nhl-raw checkout is present (otherwise skipped). This fallback builds and commits the parquet
+# but does not upload it; nhl_pregame_snapshots is published by the Python path.
 PREGAME_DIR="${NHL_RAW_PREGAME_DIR:-${SDV_REPOS:-/mnt/sdv_repos}/fastRhockey-nhl-raw/nhl/pregame}"
 
 mkdir -p logs
@@ -105,7 +106,7 @@ do
     # failure if a season compile errored. Don't `exit` immediately --
     # iterate the rest of the requested seasons first.
     if [ "${RSCRIPT_RC:-0}" != "0" ]; then
-        echo "::error ::Rscript R/nhl_data_creation.R for season $i exited with code $RSCRIPT_RC"
+        echo "::error ::Rscript R/nhl_data_creation.R or R/nhl_pregame_snapshots.R for season $i exited with code $RSCRIPT_RC"
         ANY_FAILED=1
     fi
 done

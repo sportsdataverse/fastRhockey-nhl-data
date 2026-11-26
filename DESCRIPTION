@@ -15,7 +15,7 @@ URL: https://fastRhockey.sportsdataverse.org/,
     https://github.com/sportsdataverse/fastRhockey
 BugReports: https://github.com/sportsdataverse/fastRhockey/issues
 Depends:
-  R (>= 4.0.0)
+  R (>= 4.1.0)
 Imports:
     arrow (>= 5.0.0),
     cli (>= 3.4.1),

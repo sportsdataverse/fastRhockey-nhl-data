@@ -144,3 +144,31 @@ def test_main_writes_the_season_parquet(tmp_path, doc):
     assert pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(out)]) == 0
     written = pl.read_parquet(out / "pregame_snapshots" / "parquet" / "nhl_pregame_snapshots_2027.parquet")
     assert dict(written.schema) == pregame.SCHEMA and written.height > 0
+
+
+def _season_out(tmp_path, game_date: str):
+    out = tmp_path / "nhl"
+    (out / "schedules" / "parquet").mkdir(parents=True)
+    sched = pl.read_parquet(FIX / "pregame_schedule_2026-11-25.parquet")
+    sched.with_columns(game_date=pl.lit(game_date)).write_parquet(
+        out / "schedules" / "parquet" / "nhl_schedule_2027.parquet"
+    )
+    (tmp_path / "raw" / "2027").mkdir(parents=True)
+    return out
+
+
+def test_main_missing_pregame_dir_raises(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "nope"), "--out-dir", str(tmp_path / "nhl")])
+
+
+def test_main_no_captures_after_games_were_played_fails(tmp_path):
+    out = _season_out(tmp_path, "2026-11-25")  # played, on or after CAPTURE_START: captures must exist
+    with pytest.raises(RuntimeError, match="no captures"):
+        pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(out)])
+
+
+def test_main_no_captures_before_capture_began_is_not_an_error(tmp_path):
+    out = _season_out(tmp_path, "2025-11-25")  # all games before capture began
+    assert pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(out)]) == 0
+    assert not (out / "pregame_snapshots").exists()

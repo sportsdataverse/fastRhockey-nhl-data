@@ -278,6 +278,11 @@ def coverage(df: pl.DataFrame, docs: list[dict], lead: timedelta = timedelta(hou
     }
 
 
+#: First day nhl-raw stage 03 captured pregame state. From then on, a season with played games
+#: must have captures.
+CAPTURE_START = "2026-11-25"
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("-s", "--season", type=int, required=True, help="END year (2027 = 2026-27)")
@@ -287,10 +292,22 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(a.out_dir)
     if not Path(a.pregame_dir).is_dir():  # a wrong path must fail, not publish nothing
         raise FileNotFoundError(f"pregame dir not found: {a.pregame_dir}")
+    sched_path = out / "schedules" / "parquet" / f"nhl_schedule_{a.season}.parquet"
     if not any((Path(a.pregame_dir) / str(a.season)).glob("*.json")):
-        print(f"[pregame] {a.season}: no captures", flush=True)  # every season before 2026-27
+        # No captures is normal before capture began, or before a season's first game. Once games
+        # have been played since CAPTURE_START it means lost or misfiled captures: fail, don't go green.
+        played = 0
+        if sched_path.exists():
+            today = datetime.now(timezone.utc).date().isoformat()
+            dates = pl.read_parquet(sched_path, columns=["game_date"])["game_date"].cast(pl.String)
+            played = int(((dates >= CAPTURE_START) & (dates < today)).sum())
+        if played:
+            raise RuntimeError(
+                f"[pregame] {a.season}: no captures, but {played} games were played since capture began ({CAPTURE_START})"
+            )
+        print(f"[pregame] {a.season}: no captures (no games played since capture began)", flush=True)
         return 0
-    schedule = pl.read_parquet(out / "schedules" / "parquet" / f"nhl_schedule_{a.season}.parquet")
+    schedule = pl.read_parquet(sched_path)
     # every season's roster: the league-wide name fallback reaches players who have not dressed this season
     rosters = pl.concat(
         [

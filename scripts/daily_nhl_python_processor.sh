@@ -90,7 +90,7 @@ fi
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPOS_ROOT="${SDV_REPOS:-/mnt/sdv_repos}"
 FINAL_DIR="${NHL_RAW_FINAL_DIR:-${REPOS_ROOT}/fastRhockey-nhl-raw/nhl/json/final}"
-# Pregame captures (nhl-raw stage 03, written every 30 min on game days by its own cron).
+# Pregame captures (nhl-raw stage 03, written every 30 min on game days by sdv-orch deployments).
 PREGAME_DIR="${NHL_RAW_PREGAME_DIR:-${REPOS_ROOT}/fastRhockey-nhl-raw/nhl/pregame}"
 OUT_DIR="${REPO_DIR}/nhl"
 
