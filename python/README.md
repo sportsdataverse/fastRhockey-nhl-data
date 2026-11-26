@@ -15,7 +15,7 @@ The (Python) scraper writes `final/{game_id}.json`; this reads it and reshapes.
 | compile a season | `build.py` (`build_season`, `pbp_lite`) | the per-key bind + distinct |
 | flatten nested cols for parquet | `flatten.py` (`flatten_struct_cols`) | `.flatten_struct_cols` |
 | read final dir → write parquet | `season.py` (`build_season_from_dir`, `write_datasets`) | the per-season loop |
-| pregame snapshots (valid_from / valid_to) | `pregame.py` (`compile_season`) | none (Python only) |
+| pregame snapshots (valid_from / valid_to) | `pregame.py` (`compile_season`) | `R/nhl_pregame_snapshots.R` (twin, parity-tested) |
 | publish to releases | `publish.py` (`publish_season`) | `.upload_to_release` |
 | retrain xG models | `xg_train.py` (`train_xg_models`) | `build_xg_model.R` |
 

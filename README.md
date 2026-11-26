@@ -173,7 +173,8 @@ Read it as of a decision time `t`, never past it: a state is known iff
 `sportsdataverse.espn_snapshots.pregame_state_as_of(df, pl.col("start_time_utc") - pl.duration(hours=3))`
 applies that rule per game. The compile prints the coverage numbers each run (ESPN events bridged,
 games with both goalies known at puck drop minus 3 h, rows without an NHL player id, longest gap
-between probes).
+between probes). `R/nhl_pregame_snapshots.R` is the R twin of the compile; a parity test requires both to
+write the same table on a real captured day.
 
 | Column | Type | Meaning |
 |---|---|---|
