@@ -11,7 +11,7 @@ captures, plus one 2026-27 row per team: exactly the rows the bridge can read. S
 from __future__ import annotations
 
 import json
-from datetime import timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 import polars as pl
@@ -74,6 +74,7 @@ def test_coverage_numbers_on_the_real_day(table, doc):
         "goalie_both_teams_at_lead": 0,  # -3 h was before the first probe for every game
         "rows": 128,
         "rows_no_game_id": 0,
+        "rows_no_team_id": 0,
         "rows_no_player_id": 8,
         "max_probe_gap_min": pytest.approx(15.1, abs=0.1),
     }
@@ -157,18 +158,47 @@ def _season_out(tmp_path, game_date: str):
     return out
 
 
+def _main(tmp_path, out):
+    return pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(out)])
+
+
 def test_main_missing_pregame_dir_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "nope"), "--out-dir", str(tmp_path / "nhl")])
 
 
-def test_main_no_captures_after_games_were_played_fails(tmp_path):
-    out = _season_out(tmp_path, "2026-11-25")  # played, on or after CAPTURE_START: captures must exist
-    with pytest.raises(RuntimeError, match="no captures"):
-        pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(out)])
+def test_main_recent_played_date_without_a_capture_fails(tmp_path):
+    day = (date.today() - timedelta(days=1)).isoformat()
+    if int(day[5:7]) not in pregame.PROBE_MONTHS:
+        pytest.skip("yesterday is outside the probe months")
+    with pytest.raises(RuntimeError, match=day):
+        _main(tmp_path, _season_out(tmp_path, day))
 
 
-def test_main_no_captures_before_capture_began_is_not_an_error(tmp_path):
-    out = _season_out(tmp_path, "2025-11-25")  # all games before capture began
-    assert pregame.main(["-s", "2027", "--pregame-dir", str(tmp_path / "raw"), "--out-dir", str(out)]) == 0
+def test_main_games_before_capture_began_are_not_an_error(tmp_path):
+    out = _season_out(tmp_path, "2025-11-25")
+    assert _main(tmp_path, out) == 0
     assert not (out / "pregame_snapshots").exists()
+
+
+D = date(2026, 12, 10)
+
+
+@pytest.mark.parametrize(
+    ("games", "captured", "missing"),
+    [
+        (["2026-12-09"], set(), ["2026-12-09"]),  # yesterday, no file: probes are failing
+        (["2026-12-09"], {"2026-12-09"}, []),  # captured
+        (["2026-12-10", "2026-12-11"], set(), []),  # today's slate isn't over; future ones neither
+        (["2026-12-06"], set(), []),  # older than the window: can't be recaptured, stop failing
+        (["2026-12-07"], set(), ["2026-12-07"]),  # the window's oldest day still counts
+        (["2026-11-24"], set(), []),  # before capture began
+    ],
+)
+def test_missing_capture_dates(games, captured, missing):
+    assert pregame.missing_capture_dates(pl.Series(games), captured, D) == missing
+
+
+def test_missing_capture_dates_skips_months_without_probes():
+    # 2027-28 opens in late September; the probes start in October, so the 10-01 build must not fail
+    assert pregame.missing_capture_dates(pl.Series(["2027-09-30"]), set(), date(2027, 10, 1)) == []

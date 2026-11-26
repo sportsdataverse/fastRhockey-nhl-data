@@ -142,7 +142,8 @@ for i in $(seq "${START_YEAR}" "${END_YEAR}"); do
         echo "COMPILE_RC=$?" > "/tmp/_nhl_compile_rc_${i}"
 
         # Pregame snapshots: reads the rosters + schedule the compile above just wrote, so it
-        # runs second. A season with no captures (every one before 2027) writes nothing.
+        # runs second. A season with no captures (every one before 2027) writes nothing; a played
+        # game date of the last 3 days with no capture file fails it (pregame.missing_capture_dates).
         ( cd python && "${PYBIN}" -m nhl_data_build.pregame -s "$i" --pregame-dir "${PREGAME_DIR}" --out-dir "${OUT_DIR}" )
         echo "PREGAME_RC=$?" > "/tmp/_nhl_pregame_rc_${i}"
 

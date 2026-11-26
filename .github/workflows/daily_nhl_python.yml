@@ -159,9 +159,11 @@ jobs:
         id: pregame
         continue-on-error: true
         run: |
+          rc=0  # every season compiles even when one fails; the step fails at the end
           for s in $(seq ${{ steps.years.outputs.start }} ${{ steps.years.outputs.end }}); do
-            uv run python -m nhl_data_build.pregame -s "$s"               --pregame-dir "$GITHUB_WORKSPACE/_pregame_raw/nhl/pregame" --out-dir "$GITHUB_WORKSPACE/nhl"
+            uv run python -m nhl_data_build.pregame -s "$s"               --pregame-dir "$GITHUB_WORKSPACE/_pregame_raw/nhl/pregame" --out-dir "$GITHUB_WORKSPACE/nhl" || rc=1
           done
+          exit $rc
 
       - name: Publish to sportsdataverse-data releases
         if: ${{ github.event.inputs.publish != 'false' }}
@@ -189,5 +191,5 @@ jobs:
       - name: Fail the run if the pregame compile failed
         if: ${{ always() && steps.pregame.outcome == 'failure' }}
         run: |
-          echo "::error ::nhl_data_build.pregame failed; the other datasets were still published"
+          echo "::error ::nhl_data_build.pregame failed (see the Compile pregame snapshots step)"
           exit 1

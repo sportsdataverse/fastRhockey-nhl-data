@@ -13,6 +13,8 @@
 #
 #   Rscript R/nhl_pregame_snapshots.R -s 2027 --pregame-dir ../fastRhockey-nhl-raw/nhl/pregame --out-dir nhl
 #
+# The missing-capture gate (pregame.missing_capture_dates) is Python-only: this rollback twin
+# compiles what exists and exits 0.
 # Writes nhl/pregame_snapshots/parquet/nhl_pregame_snapshots_{END_YEAR}.parquet. Publishing to
 # the release is the Python call sites' job (publish._PUBLISH).
 

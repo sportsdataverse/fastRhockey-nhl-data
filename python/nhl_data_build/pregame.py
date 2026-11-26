@@ -30,7 +30,7 @@ import argparse
 import json
 import re
 import unicodedata
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import polars as pl
@@ -273,14 +273,28 @@ def coverage(df: pl.DataFrame, docs: list[dict], lead: timedelta = timedelta(hou
         "goalie_both_teams_at_lead": both.height,
         "rows": df.height,
         "rows_no_game_id": df["game_id"].null_count(),
+        "rows_no_team_id": df["team_id"].null_count(),
         "rows_no_player_id": df["player_id"].null_count(),
         "max_probe_gap_min": max(gaps) if gaps else None,
     }
 
 
-#: First day nhl-raw stage 03 captured pregame state. From then on, a season with played games
-#: must have captures.
+#: First day nhl-raw stage 03 captured pregame state.
 CAPTURE_START = "2026-11-25"
+#: Months the sdv-orch pregame probe and commit deployments run (their crons: ``10-12,1-6``).
+PROBE_MONTHS = frozenset({10, 11, 12, 1, 2, 3, 4, 5, 6})
+#: A played game date this recent with no capture file means capture is failing now. Older gaps
+#: can't be recaptured, so they stop failing the build after this many days.
+GAP_WINDOW_DAYS = 3
+
+
+def missing_capture_dates(game_dates: pl.Series, captured: set[str], today: date) -> list[str]:
+    """Played game dates (``YYYY-MM-DD``) from the last ``GAP_WINDOW_DAYS`` days, on or after
+    ``CAPTURE_START`` and in ``PROBE_MONTHS``, that have no capture file. Today's slate isn't over,
+    so it's never counted."""
+    lo = max(CAPTURE_START, (today - timedelta(days=GAP_WINDOW_DAYS)).isoformat())
+    days = set(game_dates.cast(pl.String).drop_nulls().unique().to_list())
+    return sorted(d for d in days if lo <= d < today.isoformat() and int(d[5:7]) in PROBE_MONTHS and d not in captured)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -293,19 +307,16 @@ def main(argv: list[str] | None = None) -> int:
     if not Path(a.pregame_dir).is_dir():  # a wrong path must fail, not publish nothing
         raise FileNotFoundError(f"pregame dir not found: {a.pregame_dir}")
     sched_path = out / "schedules" / "parquet" / f"nhl_schedule_{a.season}.parquet"
-    if not any((Path(a.pregame_dir) / str(a.season)).glob("*.json")):
-        # No captures is normal before capture began, or before a season's first game. Once games
-        # have been played since CAPTURE_START it means lost or misfiled captures: fail, don't go green.
-        played = 0
-        if sched_path.exists():
-            today = datetime.now(timezone.utc).date().isoformat()
-            dates = pl.read_parquet(sched_path, columns=["game_date"])["game_date"].cast(pl.String)
-            played = int(((dates >= CAPTURE_START) & (dates < today)).sum())
-        if played:
-            raise RuntimeError(
-                f"[pregame] {a.season}: no captures, but {played} games were played since capture began ({CAPTURE_START})"
-            )
-        print(f"[pregame] {a.season}: no captures (no games played since capture began)", flush=True)
+    captured = {p.stem for p in (Path(a.pregame_dir) / str(a.season)).glob("*.json")}
+    if sched_path.exists():
+        # a recent slate with no capture file means the probes are failing: fail, don't publish stale
+        gaps = missing_capture_dates(
+            pl.read_parquet(sched_path, columns=["game_date"])["game_date"], captured, datetime.now(timezone.utc).date()
+        )
+        if gaps:
+            raise RuntimeError(f"[pregame] {a.season}: no capture file for played game dates {gaps}")
+    if not captured:
+        print(f"[pregame] {a.season}: no captures", flush=True)  # seasons before capture began
         return 0
     schedule = pl.read_parquet(sched_path)
     # every season's roster: the league-wide name fallback reaches players who have not dressed this season

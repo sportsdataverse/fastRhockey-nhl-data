@@ -20,7 +20,7 @@ Imports:
     arrow (>= 5.0.0),
     cli (>= 3.4.1),
     data.table (>= 1.14.0),
-    dplyr (>= 1.0.10),
+    dplyr (>= 1.1.0),
     furrr (>= 0.2.2),
     future (>= 1.21.0),
     glue (>= 1.4.2),
